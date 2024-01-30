@@ -3,11 +3,13 @@ title: "MarinePollution"
 author: "Trevor Kapuvari"
 date: "2024-01-30"
 output:
-  prettydoc::html_pretty:
-    theme: tactile
-    highlight: github
+  html_document:
+    keep_md: yes
     toc: yes
-    number_sections: yes
+    theme: cosmo
+    toc_float: yes
+    code_folding: hide
+    number_sections: no
 ---
 
 ## Title
