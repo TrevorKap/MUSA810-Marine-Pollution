@@ -1,0 +1,22 @@
+---
+title: "MarinePollution"
+author: "Trevor Kapuvari"
+date: "2024-01-30"
+output:
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+    toc: yes
+    number_sections: yes
+---
+
+## Title
+
+```{r setup clear environment,  include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+
+```
+
+
+
