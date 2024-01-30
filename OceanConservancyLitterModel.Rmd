@@ -4,12 +4,11 @@ author: "Trevor Kapuvari"
 date: "2024-01-30"
 output:
   html_document:
-    keep_md: yes
     toc: yes
     theme: cosmo
     toc_float: yes
     code_folding: hide
-    number_sections: no
+    number_sections: yes
 ---
 
 ## Title
