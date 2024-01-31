@@ -1,0 +1,913 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="resource_recovery_centre" id="resource_recovery_centre">
+	<SimpleField name="OBJECTID" type="float"></SimpleField>
+	<SimpleField name="SL_NO" type="float"></SimpleField>
+	<SimpleField name="ZN" type="float"></SimpleField>
+	<SimpleField name="WARD" type="float"></SimpleField>
+	<SimpleField name="LAT" type="float"></SimpleField>
+	<SimpleField name="LONG_" type="float"></SimpleField>
+	<SimpleField name="STR_NAME" type="string"></SimpleField>
+	<SimpleField name="LOCATION" type="string"></SimpleField>
+	<SimpleField name="TYPE" type="string"></SimpleField>
+</Schema>
+<Folder><name>resource_recovery_centre</name>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">1</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1859</SimpleData>
+		<SimpleData name="LONG_">80.3068</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Mahalakshmi Nagar</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.3067999998719,13.185899999599,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">2</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1804</SimpleData>
+		<SimpleData name="LONG_">80.2985</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Jothi Nagar 10th Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2985000001922,13.1803999997217,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">3</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1559</SimpleData>
+		<SimpleData name="LONG_">80.3021</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">T.H.Road, Zone - 1</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.3020999998227,13.1558999998708,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">4</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.15596</SimpleData>
+		<SimpleData name="LONG_">80.302</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">T.H.Road, Zone - 1</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.302000000312,13.1559600003357,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">5</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.2116</SimpleData>
+		<SimpleData name="LONG_">80.2766</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Manali new town 150 feet road (Burial ground)</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2765999998911,13.2116000000288,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">6</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.2022</SimpleData>
+		<SimpleData name="LONG_">80.2733</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">MRB Nagar</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2733000004189,13.202200000197,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">7</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.167</SimpleData>
+		<SimpleData name="LONG_">80.2681</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Bharathiyar street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2680999999538,13.1669999997926,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">8</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1774</SimpleData>
+		<SimpleData name="LONG_">80.2512</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">MGR Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2511999999368,13.177399999825,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">9</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.178</SimpleData>
+		<SimpleData name="LONG_">80.2531</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Kosapur (Near 100 bed hospital)</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2530999999474,13.1779999996307,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">10</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1705</SimpleData>
+		<SimpleData name="LONG_">80.2551</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Mullai Garden</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2551000004509,13.1705000003777,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">11</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1696</SimpleData>
+		<SimpleData name="LONG_">80.2634</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Sapabathi street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2633999998312,13.1695999998222,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">12</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1711</SimpleData>
+		<SimpleData name="LONG_">80.196</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Kannadapalayam Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.195999999785,13.1711000001533,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">13</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1698</SimpleData>
+		<SimpleData name="LONG_">80.2037</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Kannappasamy Nagar Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2037000000902,13.1697999998705,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">14</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1451</SimpleData>
+		<SimpleData name="LONG_">80.1824</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Barathidhasan Nagar Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1824000004346,13.1450999999426,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">15</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1529</SimpleData>
+		<SimpleData name="LONG_">80.203</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Barathiyar Street Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2029999998797,13.1528999997921,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">16</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1479</SimpleData>
+		<SimpleData name="LONG_">80.2246</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Truck Terminal open ground - 2 nos</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.22459999977,13.1478999995983,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">17</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1567</SimpleData>
+		<SimpleData name="LONG_">80.234</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Telugu colony Burial Ground - 2 nos</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2340000003569,13.1567000003078,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">18</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.164</SimpleData>
+		<SimpleData name="LONG_">80.2553</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Sasthriri Nagar Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2552999995823,13.1640000004094,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">19</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1504</SimpleData>
+		<SimpleData name="LONG_">80.2617</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Velu Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2617000000582,13.1504000001209,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">20</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1596</SimpleData>
+		<SimpleData name="LONG_">80.2585</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Karunanithi Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2585000001945,13.1595999995621,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">21</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1621</SimpleData>
+		<SimpleData name="LONG_">80.2257</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Masilamani Open Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2256999999412,13.1620999998411,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">22</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">3</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1351</SimpleData>
+		<SimpleData name="LONG_">80.2246</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Selvam Nagar Open Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2245999999299,13.1351000003527,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">23</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">4</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.14111</SimpleData>
+		<SimpleData name="LONG_">80.2426</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Vazhuthalaimedu Road</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2426000003603,13.1411100002411,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">24</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">4</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1345</SimpleData>
+		<SimpleData name="LONG_">80.2532</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">KKD Nagar 6th Main Road 5th Block</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2532000002515,13.1345000001864,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">25</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">4</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1377</SimpleData>
+		<SimpleData name="LONG_">80.2458</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Muthamil Nagar 7th block</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2457999999777,13.1376999998867,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">26</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">4</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1245</SimpleData>
+		<SimpleData name="LONG_">80.2483</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Ambedkar Street Suzhpunalkarai</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.248300000262,13.1245000001479,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">27</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">4</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1253</SimpleData>
+		<SimpleData name="LONG_">80.2601</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">TVK Link</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2601000000708,13.1253000001853,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">28</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">4</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1264</SimpleData>
+		<SimpleData name="LONG_">80.264</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">North Avenue Road</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2640000000831,13.126399999893,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">29</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">4</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1264</SimpleData>
+		<SimpleData name="LONG_">80.26194</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2619400000163,13.1264000003824,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">30</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">5</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1068</SimpleData>
+		<SimpleData name="LONG_">80.2912</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">O.S.H road</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2911999996185,13.1068000003864,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">31</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">5</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1028</SimpleData>
+		<SimpleData name="LONG_">80.274</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Wall tax road</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2740000001832,13.1028000002163,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">32</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">5</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.0725</SimpleData>
+		<SimpleData name="LONG_">80.265</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Ayya sami street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2649999996883,13.0724999999669,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">33</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">5</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.0721</SimpleData>
+		<SimpleData name="LONG_">80.2709</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Adhi kesavalu street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.270900000058,13.0721000002722,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">34</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">6</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1224</SimpleData>
+		<SimpleData name="LONG_">80.2381</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Thangal burial ground - Pallavan salai</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2381000001439,13.1223999998158,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">35</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.1405</SimpleData>
+		<SimpleData name="LONG_">80.15835</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Oragadam Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1583500002938,13.1404999998507,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">36</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.12324</SimpleData>
+		<SimpleData name="LONG_">80.15955</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Thangal Eri park</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1595499999726,13.1232400001368,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">37</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.12493</SimpleData>
+		<SimpleData name="LONG_">80.16946</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Menambedu Burial Ground,div-82</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.169459999717,13.1249299998191,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">38</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.12505</SimpleData>
+		<SimpleData name="LONG_">80.16957</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Menambedu Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1695700000045,13.1250499999418,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">39</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.11134</SimpleData>
+		<SimpleData name="LONG_">80.18716</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">TNHB 61st Street Park</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1871599999231,13.1113399998117,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">40</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.09949</SimpleData>
+		<SimpleData name="LONG_">80.18716</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Kannagi Nagar Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1871599997602,13.0994900002647,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">41</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.09782</SimpleData>
+		<SimpleData name="LONG_">80.14983</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Athipet Dumping Yard</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1498300000115,13.0978199995582,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">42</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.09191</SimpleData>
+		<SimpleData name="LONG_">80.17723</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Mogappair road Burial Ground,div -92</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1772300003427,13.0919100000642,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">43</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.09036</SimpleData>
+		<SimpleData name="LONG_">80.19418</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Kannagi Nagar Burial Ground,div-84</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1941799995546,13.0903599998289,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">44</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.07765</SimpleData>
+		<SimpleData name="LONG_">80.18068</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Mogappair road</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1806799996929,13.0776500002455,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">45</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.07923</SimpleData>
+		<SimpleData name="LONG_">80.19062</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Padikuppam Burial Ground Road</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1906200004269,13.0792300000445,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">46</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.08389</SimpleData>
+		<SimpleData name="LONG_">80.18834</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Mogappair Eri Scheme 7th cross street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1883400003341,13.0838900001099,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">47</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.09191</SimpleData>
+		<SimpleData name="LONG_">80.17723</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Mogappair road Burial Ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1772300003427,13.0919100000642,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">48</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">7</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.07246</SimpleData>
+		<SimpleData name="LONG_">80.17978</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Gangai Amman Koil street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1797800004473,13.0724600003315,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">49</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">8</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.09534</SimpleData>
+		<SimpleData name="LONG_">80.2219</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Velangadu Burial Ground.</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2218999997152,13.0953400001918,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">50</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">8</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.0907</SimpleData>
+		<SimpleData name="LONG_">80.2514</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Otteri Burial Ground.</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2514000002387,13.09069999963,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">51</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.224449</SimpleData>
+		<SimpleData name="LONG_">80.327843</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Thalankuppam</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.327842990242,13.2244491897908,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">52</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.21743</SimpleData>
+		<SimpleData name="LONG_">80.32036</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Grama Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.3203599999173,13.2174300003597,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">53</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.19598</SimpleData>
+		<SimpleData name="LONG_">80.31665</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Annai Sivagami Nagar</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.3166499999977,13.1959800003814,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">54</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.184238</SimpleData>
+		<SimpleData name="LONG_">80.314359</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Ramakrishna Nagar</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.314359090946,13.1842377811787,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">55</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.184136</SimpleData>
+		<SimpleData name="LONG_">80.314317</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Bharath Nagar</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.3143168069706,13.1841358298023,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">56</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.167122</SimpleData>
+		<SimpleData name="LONG_">80.296558</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Basin Road</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2965575000187,13.1671222995975,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">57</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.160115</SimpleData>
+		<SimpleData name="LONG_">80.298827</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">West Mada Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2988269999148,13.1601150002942,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">58</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.15774</SimpleData>
+		<SimpleData name="LONG_">80.28774</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Sathagadu dumping yard</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2877400001921,13.1577400002982,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">59</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">1</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.15698</SimpleData>
+		<SimpleData name="LONG_">80.30442</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Ellaiyamman Koil Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.3044200003916,13.1569800002336,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">60</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.180942</SimpleData>
+		<SimpleData name="LONG_">80.229114</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Kathakuzhi Burial ground</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2291140298209,13.1809416296071,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">61</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">2</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.178113</SimpleData>
+		<SimpleData name="LONG_">80.25295</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">MGR Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.2529500001412,13.1781133297271,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">62</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">8</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.103672</SimpleData>
+		<SimpleData name="LONG_">80.196671</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Villivakkam Burial Ground.</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1966714999968,13.1036718997897,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">63</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">11</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.057641</SimpleData>
+		<SimpleData name="LONG_">80.174352</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Gangaiamman Koil Street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1743519998307,13.0576409998209,0</coordinates></Point>
+  </Placemark>
+  <Placemark>
+	<ExtendedData><SchemaData schemaUrl="#resource_recovery_centre">
+		<SimpleData name="OBJECTID">64</SimpleData>
+		<SimpleData name="SL_NO">0</SimpleData>
+		<SimpleData name="ZN">11</SimpleData>
+		<SimpleData name="WARD">0</SimpleData>
+		<SimpleData name="LAT">13.038377</SimpleData>
+		<SimpleData name="LONG_">80.16256</SimpleData>
+		<SimpleData name="STR_NAME"></SimpleData>
+		<SimpleData name="LOCATION">Alapakkam Cross street</SimpleData>
+		<SimpleData name="TYPE">Resource Recovery Centre</SimpleData>
+	</SchemaData></ExtendedData>
+      <Point><coordinates>80.1625599995914,13.0383770001952,0</coordinates></Point>
+  </Placemark>
+</Folder>
+</Document></kml>
