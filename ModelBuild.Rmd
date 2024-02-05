@@ -25,6 +25,7 @@ library(kableExtra)
 library(tidycensus)
 library(classInt)
 library(RCurl)
+library(httr)
 ```
 
 ```{r load data}
@@ -32,18 +33,19 @@ path <- 'https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/tr
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
-litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv?token=GHSAT0AAAAAACM4UMDCEPEVW3ZZLNQQVHLYZOAQ4CA')
+litter_id <- '1xtwbhs6bHGufxMK6-BjZO7mPECRmIzeW'
+litter <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
 
 litter_p <- litter%>%
   filter(master_material == 'PLASTIC')%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
   st_transform('ESRI:102271')
 
-chen_bdry <- st_read("/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/gcc-zones-latest.kml")
+chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml?token=GHSAT0AAAAAACM4UMDDOD2UHU5S3ZWOZP66ZOBMFRQ')
 chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
   st_transform('ESRI:102271')
 
-chen_zone <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/gcc-divisions-latest.kml')%>%
+chen_zone <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-zones-latest.kml?token=GHSAT0AAAAAACM4UMDDRP6PRGP7J6VXKBZUZOBKQ2Q')%>%
   st_transform('ESRI:102271')
 ```
 
@@ -98,7 +100,76 @@ ggplot(litter_p, aes(x = location)) +
   theme(axis.text.x = element_text(angle = 25,size = 6))
 ```
 
-what's about geospatial things?
+## what about potential relevant social-econmic variables?
+  1. slum
+  2. population (density)
+  3. 
+```{r}
+chen_bdry <- st_read("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml?token=GHSAT0AAAAAACM4UMDCNXPWYGVQ6LZESKBEZOBKQMA")
+chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
+  st_transform('ESRI:102271')
+
+chen_zone <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-zones-latest.kml?token=GHSAT0AAAAAACM4UMDDRP6PRGP7J6VXKBZUZOBKQ2Q')
+
+chen_slum <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slums.kml?token=GHSAT0AAAAAACM4UMDDSLLVAMRRTCPGZTPEZOBKMUA')%>%
+  st_transform('ESRI:102271')
+
+chen_slum_bdry <- st_read("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slum_boundaries.kml?token=GHSAT0AAAAAACM4UMDCLCNN6TCNVCPK5YCWZOBKNMQ")
+
+chen_pop <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/Chennai_pop_2020estimation.csv?token=GHSAT0AAAAAACM4UMDDAX3NFCPJGHH6GNXYZOBKOPA')
+```
+
+```{r}
+fishnet <- 
+  st_make_grid(chen_bdry,
+               cellsize = 500, 
+               square = TRUE) %>%
+  .[chen_bdry] %>%            
+  st_sf() %>%
+  mutate(uniqueID = 1:n())
+
+slum_net <- 
+  dplyr::select(chen_slum) %>% 
+  mutate(countslum = 1) %>% 
+  aggregate(., fishnet, sum) %>%
+  mutate(countslum = replace_na(countslum, 0),
+         uniqueID = 1:n(),
+         cvID = sample(round(nrow(fishnet) / 24), 
+                       size=nrow(fishnet), replace = TRUE))
+
+grid.arrange(
+  ggplot() +
+  geom_sf(data = slum_net, aes(fill = countslum), color = NA) +
+  scale_fill_viridis() +
+  labs(title = "Slum count for the fishnet") +
+  mapTheme(),
+  ggplot() + 
+  geom_sf(data = chen_bdry) +
+  geom_sf(data = chen_slum, colour="red", size=0.2, show.legend = "point") +
+  labs(title= "Slum, Chennai") +
+  mapTheme(title_size = 14),
+  nrow = 1
+)
+```
+
+```{r}
+chen_pop_sp <- merge(chen_bdry, chen_pop, by.x = 'Name', by.y = 'Div', all.x = TRUE)
+
+grid.arrange(
+  ggplot() +
+  geom_sf(data = chen_pop_sp, aes(fill = PopulationEsti2020), color = NA) +
+  scale_fill_viridis() +
+  labs(title = "Popultion in Chennai") +
+  mapTheme(),
+  ggplot() +
+  geom_sf(data = chen_pop_sp, aes(fill = PopulationDensity), color = NA) +
+  scale_fill_viridis() +
+  labs(title = "Pop Density in Chennai") +
+  mapTheme(),nrow = 1
+)
+```
+
+## what's about geospatial things?
   1. point map
   2. density map (general distribution trend illustration)
   3. fishnet map (analysis into unit)
@@ -130,7 +201,7 @@ fishnet <-
   st_make_grid(chen_bdry,
                cellsize = 500, 
                square = TRUE) %>%
-  .[chen_bdry] %>%            # fast way to select intersecting polygons
+  .[chen_bdry] %>%            
   st_sf() %>%
   mutate(uniqueID = 1:n())
 
@@ -188,5 +259,6 @@ ggplot() +
       labs(title="Litter NN Distance") +
       mapTheme()
 ```
-  
+
+
   
