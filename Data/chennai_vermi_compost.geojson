@@ -1,0 +1,4 @@
+{"type":"FeatureCollection", "features":[
+{"type":"Feature","geometry":{"type":"Point","coordinates":[80.2065899998415,13.155809999697,0]},"properties":{"OBJECTID":1,"SL_NO":7,"ZN":3,"WARD":23,"LAT":13.1558,"LONG_":80.2066,"STR_NAME":"GNT Road ,puzhal","LOCATION":"GNT Road Near Burial Ground in Puzhal","TYPE":"Vermi Compost"}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[80.1625599995914,13.0383770001952,0]},"properties":{"OBJECTID":2,"SL_NO":155,"ZN":11,"WARD":151,"LAT":13.0384,"LONG_":80.1626,"STR_NAME":"Alapakkam cross street","LOCATION":"Alapakkam cross street","TYPE":"Vermi Compost"}}
+]}

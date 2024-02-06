@@ -1,0 +1,4 @@
+{"type":"FeatureCollection", "features":[
+{"type":"Feature","geometry":{"type":"Point","coordinates":[80.2284027097397,12.9542597267385,0]},"properties":{"OBJECTID":1,"CODE":"DG02","D_C":"D.C HEALTH\n","DIV":186,"ZONE":14,"ADDRESS":"Greater Chennai Corporation Perungudi Dumping Ground, Perungudi,Chennai-600 096 [PDG(XI,XII,XIV,XV)]","DEPARTMENT":"SWM","ASSET_NAME":"DUMPING GROUND"}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[80.2697862917482,13.1347798775252,0]},"properties":{"OBJECTID":2,"CODE":"DG01\n","D_C":"D.C HEALTH","ZONE":4,"ADDRESS":"CH Road, RR Nagar, Kodungaiyur, Chennai -600 118 (KDG,(II,III))","DEPARTMENT":"SWM","ASSET_NAME":"DUMPING GROUND"}}
+]}
