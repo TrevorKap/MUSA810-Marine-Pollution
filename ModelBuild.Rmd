@@ -2,13 +2,7 @@
 title: "MUSA8010ModelBuild"
 author: "Trevor Kapuvari"
 date: "2024-01-30"
-output:
-  html_document:
-    toc: yes
-    theme: cosmo
-    toc_float: yes
-    code_folding: hide
-    number_sections: yes
+output: html_document
 ---
 # Introduction
 
@@ -32,27 +26,37 @@ library(tidycensus)
 library(classInt)
 library(RCurl)
 library(httr)
+
+palette6 <- c("#264653","#2a9d8f",'#8AB17D',"#e9c46a",'#f4a261',"#e76f51")
+palette5 <- c("#264653","#2a9d8f","#e9c46a",'#f4a261',"#e76f51")
+palette4 <- c("#264653","#2a9d8f","#e9c46a","#e76f51")
+palette2 <- c("#264653","#2a9d8f")
 ```
 
 ```{r load data}
-path <- 'https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/tree/main/Data/'
-
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 
-litter_id <- '1xtwbhs6bHGufxMK6-BjZO7mPECRmIzeW'
-litter <- read.csv(sprintf("https://docs.google.com/uc?id=%s&export=download", id))
+litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 
 litter_p <- litter%>%
   filter(master_material == 'PLASTIC')%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
-  st_transform('ESRI:102271')
+  st_transform('EPSG:32643')
 
-chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml?token=GHSAT0AAAAAACM4UMDDOD2UHU5S3ZWOZP66ZOBMFRQ')
+chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml')
 chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
-  st_transform('ESRI:102271')
+  st_transform('EPSG:32643')
 
-chen_zone <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-zones-latest.kml?token=GHSAT0AAAAAACM4UMDDRP6PRGP7J6VXKBZUZOBKQ2Q')%>%
-  st_transform('ESRI:102271')
+chen_zone <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-zones-latest.kml')%>%
+  st_transform('EPSG:32643')
+
+chen_slum <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slums.kml')%>%
+  st_transform('EPSG:32643')
+
+chen_slum_bdry <- st_read("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slum_boundaries.kml")%>%
+  st_transform('EPSG:32643')
+
+chen_pop <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/Chennai_pop_2020estimation.csv')
 ```
 
 ## statistical analysis of litter dataset
@@ -111,18 +115,7 @@ ggplot(litter_p, aes(x = location)) +
   2. population (density)
   3. 
 ```{r}
-chen_bdry <- st_read("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml?token=GHSAT0AAAAAACM4UMDCNXPWYGVQ6LZESKBEZOBKQMA")
-chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
-  st_transform('ESRI:102271')
 
-chen_zone <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-zones-latest.kml?token=GHSAT0AAAAAACM4UMDDRP6PRGP7J6VXKBZUZOBKQ2Q')
-
-chen_slum <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slums.kml?token=GHSAT0AAAAAACM4UMDDSLLVAMRRTCPGZTPEZOBKMUA')%>%
-  st_transform('ESRI:102271')
-
-chen_slum_bdry <- st_read("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slum_boundaries.kml?token=GHSAT0AAAAAACM4UMDCLCNN6TCNVCPK5YCWZOBKNMQ")
-
-chen_pop <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/Chennai_pop_2020estimation.csv?token=GHSAT0AAAAAACM4UMDDAX3NFCPJGHH6GNXYZOBKOPA')
 ```
 
 ```{r}
@@ -242,11 +235,9 @@ vars_net <- l_p%>%
 ```
 
 ```{r}
-# convinience to reduce length of function names.
 st_c    <- st_coordinates
 st_coid <- st_centroid
 
-## create NN from abandoned cars
 vars_net <- vars_net %>%
     mutate(litter.nn = nn_function(st_c(st_coid(vars_net)), 
                                            st_c(l_p),
