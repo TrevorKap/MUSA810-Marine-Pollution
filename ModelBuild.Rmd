@@ -50,17 +50,29 @@ q0 <- opq(bbox = c(12.8988, 80.1312,13.1711, 80.3252)) %>%
     add_osm_feature(key = 'highway', value = 'motorway')
 
 bb_poly <- getbb(place_name = "chennai", format_out = "polygon")
-x <- opq(bbox = bb_poly) %>%
-    add_osm_feature(key = 'highway', value = 'motorway') %>%
+roads <- opq(bbox = bb_poly) %>%
+    add_osm_feature(key = 'highway', value = 'primary') %>%
     osmdata_sf () %>%
     trim_osmdata (bb_poly)
 # Parks
 
-q <- opq(bbox = 'Chennai, India') %>%
+naturalwater <- opq(bbox = 'Chennai, India') %>%
     add_osm_feature(key = 'natural', value = 'water')
-q1 <- opq('Chennai, India') %>%
+cycleways <- opq('Chennai, India') %>%
     add_osm_feature(key = 'highway', value = 'cycleway')
 
+
+building <- opq('Chennai, India') %>%
+  add_osm_feature(key = 'building')
+
+
+
+
+# LIST (key value, value2)
+#natural water 
+#water beach 
+#amenity sanitary_dump_station
+#amenity recycling, waste_basket, waste_disposal, waste_transfer_station
 
 ```
 
