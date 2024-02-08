@@ -32,12 +32,39 @@ library(tidycensus)
 library(classInt)
 library(RCurl)
 library(httr)
+library(tidyverse)
+library(osmdata)
+library(tigris)
 
 palette6 <- c("#264653","#2a9d8f",'#8AB17D',"#e9c46a",'#f4a261',"#e76f51")
 palette5 <- c("#264653","#2a9d8f","#e9c46a",'#f4a261',"#e76f51")
 palette4 <- c("#264653","#2a9d8f","#e9c46a","#e76f51")
 palette2 <- c("#264653","#2a9d8f")
 ```
+
+```{r OSM testing}
+# set bounding box - the maximum x-y extent you are interested in
+# Do some right-clicking in google maps to figure this out
+
+q0 <- opq(bbox = c(12.8988, 80.1312,13.1711, 80.3252)) %>%
+    add_osm_feature(key = 'highway', value = 'motorway')
+
+bb_poly <- getbb(place_name = "chennai", format_out = "polygon")
+x <- opq(bbox = bb_poly) %>%
+    add_osm_feature(key = 'highway', value = 'motorway') %>%
+    osmdata_sf () %>%
+    trim_osmdata (bb_poly)
+# Parks
+
+q <- opq(bbox = 'Chennai, India') %>%
+    add_osm_feature(key = 'natural', value = 'water')
+q1 <- opq('Chennai, India') %>%
+    add_osm_feature(key = 'highway', value = 'cycleway')
+
+
+```
+
+
 
 ```{r load data}
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
