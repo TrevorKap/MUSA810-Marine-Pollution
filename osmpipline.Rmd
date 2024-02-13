@@ -2,7 +2,12 @@
 title: "MUSA8010ModelBuild"
 author: "Trevor Kapuvari"
 date: "2024-01-30"
-output: html_document
+output: 
+  html_document:
+    theme: cosmo
+    toc: yes
+    toc_float:
+      collapsed: true
 ---
 # Introduction
 ```{r setup, include=FALSE}
