@@ -1,1 +1,472 @@
+---
+title: "MUSA8010ModelBuild"
+author: "Trevor Kapuvari"
+date: "2024-01-30"
+output: html_document
+---
+# Introduction
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 
+library(tidyverse)
+library(sf)
+library(RSocrata)
+library(viridis)
+library(spatstat)
+library(raster)
+library(spdep)
+library(FNN)
+library(grid)
+library(gridExtra)
+library(knitr)
+library(kableExtra)
+library(tidycensus)
+library(classInt)
+library(RCurl)
+library(httr)
+library(osmdata)
+
+source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
+
+st_c    <- st_coordinates
+st_coid <- st_centroid
+
+palette6 <- c("#264653","#2a9d8f",'#8AB17D',"#e9c46a",'#f4a261',"#e76f51")
+palette5 <- c("#264653","#2a9d8f","#e9c46a",'#f4a261',"#e76f51")
+palette4 <- c("#264653","#2a9d8f","#e9c46a","#e76f51")
+palette2 <- c("#264653","#2a9d8f")
+```
+
+```{r function build}
+countfishnet <- function(fishnet,dataset){
+  net <- 
+  dplyr::select(dataset) %>% 
+  mutate(count = 1) %>% 
+  aggregate(., fishnet, sum) %>%
+  mutate(count = replace_na(count, 0),
+         uniqueID = 1:n(),
+         cvID = sample(round(nrow(fishnet) / 24), 
+                       size=nrow(fishnet), replace = TRUE))
+  return(net)
+}
+
+knnfishnet <- function(fishnet,dataset,knum){
+  vars_net <- dataset%>%
+    st_join(fishnet, join=st_within) %>%
+    st_drop_geometry() %>%
+    group_by(uniqueID,osm_id) %>%
+    summarize(count = n()) %>%
+    left_join(fishnet, ., by = "uniqueID") %>%
+    spread(osm_id, count, fill=0) %>%
+    dplyr::select(-`<NA>`) %>%
+    ungroup()
+  vars_net <- vars_net %>%
+    mutate(item.nn = nn_function(st_c(st_coid(vars_net)), 
+                                           st_c(dataset),
+                                           k = knum))
+  return(vars_net)
+}
+
+visual <- function(net_one,point_one,variable_name){
+grid.arrange(
+  ggplot() +
+  geom_sf(data = net_one, aes(fill = count), color = NA) +
+  scale_fill_viridis() +
+  labs(title = paste(variable_name,"count for the fishnet")) +
+  mapTheme(),
+  ggplot() + 
+  geom_sf(data = chen_bdry) +
+  geom_sf(data = point_one, colour="red", size=0.2, show.legend = "point") +
+  labs(title= paste(variable_name,", Chennai")) +
+  mapTheme(title_size = 14),
+  nrow = 1
+)
+}
+```
+
+```{r}
+litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
+
+litter_p <- litter%>%
+  filter(master_material == 'PLASTIC')%>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
+  st_transform('EPSG:32643')
+
+chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml')
+chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
+  st_transform('EPSG:32643')
+
+fishnet <- 
+  st_make_grid(chen_bdry,
+               cellsize = 500, 
+               square = TRUE) %>%
+  .[chen_bdry] %>%            
+  st_sf() %>%
+  mutate(uniqueID = 1:n())
+```
+
+## statistical analysis of litter dataset
+what's about the litter dataset?
+  1. master_item_name histogram
+  2. quantity histogram
+  3. altitude
+  4. radius 
+  5. location distribution
+```{r}
+grid.arrange(
+  ggplot(litter_p, aes(x = quantity)) + 
+  geom_bar() +
+  theme_minimal() +
+  labs(title = "Count of Quantity Per Record",
+       x = "Category",
+       y = "Count"),
+  ggplot(litter_p, aes(x = altitude)) + 
+  geom_histogram() +
+  theme_minimal() +
+  labs(title = "Altitude Histogram",
+       x = "Category",
+       y = "Count"),
+  ggplot(litter_p, aes(x = radius)) + 
+  geom_histogram() +
+  theme_minimal() +
+  labs(title = "Radius Histogram",
+       x = "Category",
+       y = "Count"),
+  ncol = 3
+)
+
+ggplot(litter_p, aes(x = master_item_name)) + 
+  geom_bar() +
+  theme_minimal() +
+  labs(title = "Count of Main Item Category",
+       x = "Category",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(litter_p, aes(x = location)) + 
+  geom_bar() +
+  theme_minimal() +
+  labs(title = "Count of Location in Litter Record",
+       x = "Category",
+       y = "Count")+
+  theme(axis.text.x = element_text(angle = 25,size = 6))
+```
+
+```{r}
+litter_net <- 
+  dplyr::select(litter_p) %>% 
+  mutate(countlitter = 1) %>% 
+  aggregate(., fishnet, sum) %>%
+  mutate(countlitter = replace_na(countlitter, 0),
+         uniqueID = 1:n(),
+         cvID = sample(round(nrow(fishnet) / 24), 
+                       size=nrow(fishnet), replace = TRUE))
+
+ggplot() +
+  geom_sf(data = litter_net, aes(fill = countlitter), color = NA) +
+  scale_fill_viridis() +
+  labs(title = "Count of Litter for the fishnet") +
+  mapTheme()
+```
+
+
+use case?
+our goals aims at finding a potential world-wide applied index that could evaluate the regional risk of litter generating and effects on the marine pollution, and help urban ocean to determine the targeted manage place.
+
+### what's the logic of getting the proper independent variable?
+To get the variables that could show the potential relationship of human activity and litter distribution, we first load the data from osm, and load all point type data (if some POI stored like polygon, converting the type to point), counting the number in the same fishnet. Then, combine the fishnet of litter and targeted variable, use [chisq.test] to check the association of the potential varialbe and litter.
+
+### what's the potential variables that contributes to the litter distribution?
+```{r}
+# reference: https://wiki.openstreetmap.org/wiki/Map_features#Entertainment,_Arts_&_Culture
+amenity_wm <- c('waste_basket','waste_disposal','waste_transfer_station','recycling')
+water<- c('canal','drain','ditch')
+leisure <- c('park')
+landuse <- c('commercial','residential','retail')
+highway <- c('motorway','trunk','primary','secondary','tertiary','unclassified','residential')
+act <- c('maxspeed')
+amenity_food <- c('restaurant','pub','bar')
+```
+
+```{r}
+india <- getbb(place_name = "india", format_out = "polygon")
+bb_df <- getbb(place_name = "chennai india", format_out = "data.frame")
+bdry <- bb_df$boundingbox
+chen_bd <- c(80.4301860, 13.2436939, 80.1101860, 12.8236939)
+```
+#### transportation
+```{r transportation}
+trans <- opq(bbox = chen_bd) %>%
+    add_osm_feature(key = 'highway', value = 'residential')%>%
+  osmdata_sf()
+
+trans_point <- bind_rows(
+  pluck(trans,'osm_points'),
+  st_centroid(pluck(trans,'osm_lines'))
+)%>%dplyr::select(osm_id,geometry)%>%
+  st_transform('EPSG:32643')
+
+road_net <- countfishnet(fishnet,trans_point)
+vars_net <- knnfishnet(fishnet,trans_point,3)
+```
+
+```{r trans visualization}
+visual(road_net,trans_point,'residential road')
+```
+
+```{r}
+litter_no <- st_drop_geometry(litter_net)%>%dplyr::select(countlitter, uniqueID)
+corr_trans_net <- road_net %>%
+  left_join(litter_no, by = "uniqueID")
+print(chisq.test(corr_trans_net$count,corr_trans_net$countlitter))
+```
+
+#### restaurant distribution
+```{r restaurant data}
+restrt <- opq(bbox = chen_bd) %>%
+    add_osm_feature(key = 'amenity', value = c('restaurant','pub','bar'))%>%
+  osmdata_sf()
+
+restrt_point <- pluck(restrt,'osm_points')%>%
+  dplyr::select(osm_id,geometry)%>%
+  st_transform('EPSG:32643')
+
+rstrt_net <- countfishnet(fishnet,restrt_point)
+visual(rstrt_net,restrt_point,'restaurant')
+```
+
+```{r corr-rest-litter}
+corr_net <- rstrt_net %>%
+  left_join(litter_no, by = "uniqueID")
+print(chisq.test(corr_net$count,corr_net$countlitter))
+```
+
+#### water distribution 
+```{r water data}
+chen_water <- opq(bbox = chen_bd) %>%
+    add_osm_feature(key = 'water', value = water)%>%
+  osmdata_sf()
+
+chen_water_point <- pluck(chen_water,'osm_points')%>%
+  dplyr::select(osm_id,geometry)%>%
+  st_transform('EPSG:32643')
+
+water_net <- countfishnet(fishnet,chen_water_point)
+visual(water_net,chen_water_point,'water')
+```
+
+```{r water visualization}
+corr_water_net <- water_net %>%
+  left_join(litter_no, by = "uniqueID")
+print(chisq.test(corr_water_net$count,corr_water_net$countlitter))
+```
+#### waste manageament 
+we can make two assumptions for the influence of waste management's effects on the risk of high litter distribution: 
+  a).the waste management facilities could reduce the surrouding litter thrown away
+  b).the waste management facilities could increase more human activities that would increase the total amount of litter found on the ground.
+```{r waste data}
+chen_waste <- opq(bbox = chen_bd) %>%
+    add_osm_feature(key = 'amenity', value = amenity_wm)%>%
+  osmdata_sf()
+
+chen_waste_point <- pluck(chen_waste,'osm_points')%>%
+  dplyr::select(osm_id,geometry)%>%
+  st_transform('EPSG:32643')
+
+waste_net <- countfishnet(fishnet,chen_waste_point)
+visual(waste_net,chen_waste_point,'water management')
+```
+
+```{r waste visualization}
+corr_waste_net <- waste_net %>%
+  left_join(litter_no, by = "uniqueID")
+print(chisq.test(corr_waste_net$count,corr_waste_net$countlitter))
+```
+
+### the period result 
+from the chi.sq test for the association test, the restaurant (represent the human activity ), the water (no obvious causation between two variables), and the residential road density(I use the count in each fishnet unit to represent density) have some association with litter distribution. and the waste management seems has little association.
+Chi-square test it's a good approach to analysis the two categorical variables' association, but in this case, the road seems to have little association but still proved strongly associated, if there is another way to check the more associated variables? perhaps local Moran's I to decrease the influence of data lack? or other methods?
+The next step, if we get several more strongly associated variables (I mean, test around some ohter cities in india and still proved associated), if our target get converted to 'use this variables to build a weight model to assess the risk for generating litter'? whether it's necessary to use ML? or ML model is functioning more like a testing tool?
+
+# ABOLISHED VERSION
+```{r load data}
+
+litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
+
+litter_p <- litter%>%
+  filter(master_material == 'PLASTIC')%>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
+  st_transform('EPSG:32643')
+
+chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml')
+chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
+  st_transform('EPSG:32643')
+
+chen_zone <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-zones-latest.kml')%>%
+  st_transform('EPSG:32643')
+
+chen_slum <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slums.kml')%>%
+  st_transform('EPSG:32643')
+
+chen_slum_bdry <- st_read("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_slum_boundaries.kml")%>%
+  st_transform('EPSG:32643')
+
+chen_pop <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/Chennai_pop_2020estimation.csv')
+```
+
+```{r}
+chen_park <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai-city-parks-over-8k.kml')%>%
+  st_set_crs(4326)%>%st_transform('EPSG:32643')
+chen_community_park <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai-community-parks-4k-8k.geojson')%>%
+  st_set_crs(4326)%>%st_transform('EPSG:32643')
+chen_flood_nov <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai-flooded-streets-23-Nov-2017.geojson')%>%
+  st_set_crs(4326)%>%st_transform('EPSG:32643')
+chen_nbhd_park <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai-neighbourhood-parks-under-4k.kml')%>%
+  st_set_crs(4326)%>%st_transform('EPSG:32643')
+chen_water <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_basin_waterbodies.kml')%>%
+  st_set_crs(4326)%>%st_transform('EPSG:32643')
+```
+
+```{r}
+chen_park <- chen_park%>%dplyr::select(geometry)
+chen_community_park <- chen_community_park %>%dplyr::select(geometry)
+chen_nbhd_park <- chen_nbhd_park %>% dplyr::select(geometry)
+chen_park <- rbind(chen_park,chen_community_park)
+chen_park <- rbind(chen_park,chen_nbhd_park)
+```
+
+```{r}
+chen_bin <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_biogas_plants.kml')
+chen_bm <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_bio_methanisation.kml')
+chen_dump <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_dumping_ground.kml')
+chen_river <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/chennai_rivers.kml')
+```
+
+
+
+## what about potential relevant social-econmic variables?
+  1. slum
+  2. population (density)
+  3. park
+
+```{r}
+fishnet <- 
+  st_make_grid(chen_bdry,
+               cellsize = 500, 
+               square = TRUE) %>%
+  .[chen_bdry] %>%            
+  st_sf() %>%
+  mutate(uniqueID = 1:n())
+
+slum_net <- 
+  dplyr::select(chen_slum) %>% 
+  mutate(countslum = 1) %>% 
+  aggregate(., fishnet, sum) %>%
+  mutate(countslum = replace_na(countslum, 0),
+         uniqueID = 1:n(),
+         cvID = sample(round(nrow(fishnet) / 24), 
+                       size=nrow(fishnet), replace = TRUE))
+
+grid.arrange(
+  ggplot() +
+  geom_sf(data = slum_net, aes(fill = countslum), color = NA) +
+  scale_fill_viridis() +
+  labs(title = "Slum count for the fishnet") +
+  mapTheme(),
+  ggplot() + 
+  geom_sf(data = chen_bdry) +
+  geom_sf(data = chen_slum, colour="red", size=0.2, show.legend = "point") +
+  labs(title= "Slum, Chennai") +
+  mapTheme(title_size = 14),
+  nrow = 1
+)
+```
+
+```{r}
+chen_pop_sp <- merge(chen_bdry, chen_pop, by.x = 'Name', by.y = 'Div', all.x = TRUE)
+
+grid.arrange(
+  ggplot() +
+  geom_sf(data = chen_pop_sp, aes(fill = PopulationEsti2020), color = NA) +
+  scale_fill_viridis() +
+  labs(title = "Popultion in Chennai") +
+  mapTheme(),
+  ggplot() +
+  geom_sf(data = chen_pop_sp, aes(fill = PopulationDensity), color = NA) +
+  scale_fill_viridis() +
+  labs(title = "Pop Density in Chennai") +
+  mapTheme(),nrow = 1
+)
+```
+
+## what's about geospatial things?
+  1. point map
+  2. density map (general distribution trend illustration)
+  3. fishnet map (analysis into unit)
+  4. KNN map (one way to make assumption of the spatal distribution?)
+  5. Local Moran's I analysis
+```{r litter distribution}
+grid.arrange(
+  ggplot() + 
+  geom_sf(data = chen_bdry) +
+  geom_sf(data = litter_p, colour="red", size=0.2, show.legend = "point") +
+  labs(title= "Litter, Chennai") +
+  mapTheme(title_size = 14),
+  ggplot() + 
+  geom_sf(data = chen_bdry, fill = "grey40") +
+  stat_density2d(data = data.frame(st_coordinates(litter_p)), 
+                 aes(X, Y, fill = ..level.., alpha = ..level..),
+                 size = 0.01, bins = 80, geom = 'polygon') +
+  scale_fill_viridis() +
+  scale_alpha(range = c(0.00, 0.35), guide = FALSE) +
+  labs(title = "Density of Litter, Chennai") +
+  mapTheme(title_size = 14) + theme(legend.position = "none"),
+  nrow=1
+)
+```
+
+```{r}
+fishnet <- 
+  st_make_grid(chen_bdry,
+               cellsize = 500, 
+               square = TRUE) %>%
+  .[chen_bdry] %>%            
+  st_sf() %>%
+  mutate(uniqueID = 1:n())
+
+
+```
+
+```{r}
+l_p <- litter_p%>%
+  dplyr::select(list_name,geometry)
+vars_net <- l_p%>%
+  st_join(fishnet, join=st_within) %>%
+  st_drop_geometry() %>%
+  group_by(uniqueID,list_name) %>%
+  summarize(count = n()) %>%
+  left_join(fishnet, ., by = "uniqueID") %>%
+  spread(list_name, count, fill=0) %>%
+  dplyr::select(-`<NA>`) %>%
+  ungroup()
+
+st_c    <- st_coordinates
+st_coid <- st_centroid
+
+vars_net <- vars_net %>%
+    mutate(litter.nn = nn_function(st_c(st_coid(vars_net)), 
+                                           st_c(l_p),
+                                           k = 3))
+## Visualize the NN feature
+vars_net.long.nn <- 
+  dplyr::select(vars_net, ends_with(".nn")) %>%
+    gather(Variable, value, -geometry)
+
+ggplot() +
+      geom_sf(data = vars_net.long.nn, aes(fill=value), colour=NA) +
+      scale_fill_viridis(name="NN Distance") +
+      labs(title="Litter NN Distance") +
+      mapTheme()
+```
+
+  
