@@ -2,12 +2,7 @@
 title: "MUSA8010ModelBuild"
 author: "Trevor Kapuvari"
 date: "2024-01-30"
-output: 
-  html_document:
-    theme: cosmo
-    toc: yes
-    toc_float:
-      collapsed: true
+output: html_document
 ---
 # Introduction
 ```{r setup, include=FALSE}
@@ -108,6 +103,23 @@ fishnet <-
   .[chen_bdry] %>%            
   st_sf() %>%
   mutate(uniqueID = 1:n())
+```
+
+```{r}
+litter_people <- litter_p%>%
+  group_by(username)%>%
+  tally()
+```
+
+```{r}
+grid.arrange(
+  ggplot() + 
+  geom_sf(data = chen_bdry) +
+  geom_sf(data = litter_p, colour="red", size=0.2, show.legend = "point") +
+  geom_sf(data = litter_p%>%filter(username == 'Chandranram'), colour="green", size=0.2, show.legend = "point") +
+  mapTheme(title_size = 14),
+  nrow = 1
+)
 ```
 
 ## statistical analysis of litter dataset
@@ -246,6 +258,20 @@ corr_net <- rstrt_net %>%
 print(chisq.test(corr_net$count,corr_net$countlitter))
 ```
 
+```{r}
+vars_net_rstrt <- knnfishnet(fishnet,restrt_point,3)
+
+vars_net_rstrt.long.nn <- 
+  dplyr::select(vars_net_rstrt, ends_with(".nn")) %>%
+    gather(Variable, value, -geometry)
+
+ggplot() +
+      geom_sf(data = vars_net_rstrt.long.nn, aes(fill=value), colour=NA) +
+      scale_fill_viridis(name="NN Distance") +
+      labs(title="Restaurant 3NN Distance") +
+      mapTheme()
+```
+
 #### water distribution 
 ```{r water data}
 chen_water <- opq(bbox = chen_bd) %>%
@@ -286,6 +312,82 @@ visual(waste_net,chen_waste_point,'water management')
 corr_waste_net <- waste_net %>%
   left_join(litter_no, by = "uniqueID")
 print(chisq.test(corr_waste_net$count,corr_waste_net$countlitter))
+```
+
+```{r}
+vars_net_waste <- knnfishnet(fishnet,chen_waste_point,3)
+
+vars_net_waste1.long.nn <- 
+  dplyr::select(vars_net_waste, ends_with(".nn")) %>%
+    gather(Variable, value, -geometry)
+
+ggplot() +
+      geom_sf(data = vars_net_waste1.long.nn, aes(fill=value), colour=NA) +
+      scale_fill_viridis(name="NN Distance") +
+      labs(title="Water 3NN Distance") +
+      mapTheme()
+```
+
+```{r}
+vars_net_rstrt <- knnfishnet(fishnet,restrt_point,3)
+final_net <-
+  left_join(litter_net, st_drop_geometry(vars_net_rstrt), by="uniqueID") 
+```
+
+```{r}
+final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE)
+final_net.weights <- nb2listw(final_net.nb, style="W", zero.policy=TRUE)
+```
+
+```{r}
+## see ?localmoran
+local_morans <- localmoran(final_net$countlitter, final_net.weights, zero.policy=TRUE) %>% 
+  as.data.frame()
+
+# join local Moran's I results to fishnet
+final_net.localMorans <- 
+  cbind(local_morans, as.data.frame(final_net)) %>% 
+  st_sf() %>%
+  dplyr::select(Litter_Count = countlitter, 
+                Local_Morans_I = Ii, 
+                P_Value = `Pr(z != E(Ii))`) %>%
+  mutate(Significant_Hotspots = ifelse(P_Value <= 0.001, 1, 0)) %>%
+  gather(Variable, Value, -geometry)
+```
+
+```{r}
+vars <- unique(final_net.localMorans$Variable)
+varList <- list()
+
+for(i in vars){
+  varList[[i]] <- 
+    ggplot() +
+      geom_sf(data = filter(final_net.localMorans, Variable == i), 
+              aes(fill = Value), colour=NA) +
+      scale_fill_viridis(name="") +
+      labs(title=i) +
+      mapTheme(title_size = 14) + theme(legend.position="bottom")}
+
+do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I statistics, Chennai"))
+```
+
+```{r}
+final_net <- final_net %>% 
+  mutate(restaurant.isSig = 
+           ifelse(local_morans[,5] <= 0.001, 1, 0)) %>%
+  mutate(restaurant.isSig.dist = 
+           nn_function(st_c(st_coid(final_net)),
+                       st_c(st_coid(filter(final_net, 
+                                           restaurant.isSig == 1))), 
+                       k = 1))
+```
+
+```{r}
+ggplot() +
+      geom_sf(data = final_net, aes(fill=restaurant.isSig.dist), colour=NA) +
+      scale_fill_viridis(name="NN Distance") +
+      labs(title="Restaurant NN Distance") +
+      mapTheme()
 ```
 
 ### the period result 
