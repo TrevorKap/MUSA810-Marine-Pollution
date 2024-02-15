@@ -245,7 +245,7 @@ builds <- opq(bbox = chen_bd) %>%
   osmdata_sf()
 
 build_point <- pluck(builds,'osm_points')%>%
-  dplyr::select(osm_id,geometry,levels)%>%
+  dplyr::select(osm_id,geometry,'building:levels')%>%
   st_transform('EPSG:32643')
 
 build_net <- countfishnet(fishnet, build_point)
