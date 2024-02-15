@@ -240,16 +240,16 @@ print(chisq.test(corr_trans_net$count,corr_trans_net$countlitter))
 
 ### buildings
 ```{r building attempt}
-builds <- opq(bbox = chen_bd) %>%
-    add_osm_feature(key = 'building', value = 'yes')%>%
-  osmdata_sf()
+#builds <- opq(bbox = chen_bd) %>%
+#    add_osm_feature(key = 'building', value = 'yes')%>%
+#  osmdata_sf 
 
-build_point <- pluck(builds,'osm_points')%>%
-  dplyr::select(osm_id,geometry,'building:levels')%>%
-  st_transform('EPSG:32643')
+#build_point <- pluck(builds,'osm_points')%>%
+#  dplyr::select(osm_id,geometry)%>%
+#  st_transform('EPSG:32643')
 
-build_net <- countfishnet(fishnet, build_point)
-visual(build_net, build_point,'buildings')
+#build_net <- countfishnet(fishnet, build_point)
+#visual(build_net, build_point,'buildings')
 ```
 
 
