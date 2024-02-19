@@ -1,0 +1,201 @@
+---
+title: "addPoint_func"
+output: html_document
+date: "2024-02-17"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(sp)
+library(sf)
+library(ggplot2)
+
+
+source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
+
+st_c    <- st_coordinates
+st_coid <- st_centroid
+
+```
+
+```{r}
+
+# input data and map here for test
+
+litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
+
+litter$legend <- 'original'
+
+litter_sf <- litter %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
+  st_transform('EPSG:32643')
+
+chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml')
+chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
+  st_transform('EPSG:32643')
+
+```
+
+```{r}
+# function 1
+# generate 20 points at random locations within rough 500m
+populated_points <- function(litter_df) {
+  # create a new df for generated pts
+  populated_points_df <- data.frame(
+    list_name = character(),
+    master_item_name = character(),
+    master_material = character(),
+    itemname = character(),
+    material = character(),
+    quantity = numeric(),
+    description = character(),
+    latitude = numeric(),
+    longitude = numeric(),
+    altitude = numeric(),
+    radius = numeric(),
+    location = character(),
+    timestamp = character(),
+    dt = character(),
+    project_name = character(),
+    username = character(),
+    manual_upload = character(),
+    event_name = character(),
+    id = character(),
+    log_index = numeric(),
+    legend = character()
+    )
+  
+  # loop through each row in litter_df
+  for (i in 1:nrow(litter_df)) {
+    # get lat, lon for each pt
+    center_lat <- litter_df$latitude[i]
+    center_lon <- litter_df$longitude[i]
+    
+    # Generate 20 random points within a radius of 500 meters
+    for (j in 1:20) {
+      # generate random location for new pts
+      new_lat <- center_lat + runif(1, -0.0045, 0.0045) # within 0.0045 degree
+      new_lon <- center_lon + runif(1, -0.0045, 0.0045) 
+      
+      # India's latitude ranges from 8°~37°
+      # here take the 23° to calculate the distance of 500m：
+      # distance（°）= distance（meter） / distance coefficient
+      # at 23° lat，distance coefficient ≈ 111 km/degrees
+      # 500 meter ≈ 0.0045 degree
+      
+      # inherit data from original data set
+      new_row <- litter_df[i, ]
+      # update lat, lon
+      new_row$latitude <- new_lat
+      new_row$longitude <- new_lon
+      # update legend
+      new_row$legend <- 'locationrandom'
+      
+      # add generated rows to new df
+      populated_points_df <- rbind(populated_points_df, new_row)
+      
+      #populated_points_df[nrow(populated_points_df) + 1,] <- new_row
+    }
+  }
+  
+  return(populated_points_df)
+}
+
+```
+
+
+```{r}
+# test the functions... it takes long
+populated_litter_df <- populated_points(litter)
+
+populated_litter_df_sf <- populated_litter_df %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
+  st_transform('EPSG:32643')
+
+```
+
+```{r}
+# map the data
+ggplot() + 
+  geom_sf(data = chen_bdry) +
+  geom_sf(data = populated_litter_df_sf, colour="orange", size=0.1, show.legend = "point") +
+  geom_sf(data = litter_sf, colour="blue", size=0.1, show.legend = "point") +
+  mapTheme(title_size = 14)
+
+```
+
+
+```{r}
+# function 2 
+# generate random num of pts at random locations within rough 500m
+generate_populated_points <- function(litter_df) {
+  populated_points_df <- data.frame(
+    list_name = character(),
+    master_item_name = character(),
+    master_material = character(),
+    itemname = character(),
+    material = character(),
+    quantity = numeric(),
+    description = character(),
+    latitude = numeric(),
+    longitude = numeric(),
+    altitude = numeric(),
+    radius = numeric(),
+    location = character(),
+    timestamp = character(),
+    dt = character(),
+    project_name = character(),
+    username = character(),
+    manual_upload = character(),
+    event_name = character(),
+    id = character(),
+    log_index = numeric(),
+    legend = character()
+  )
+  
+  for (i in 1:nrow(litter_df)) {
+    center_lat <- litter_df$latitude[i]
+    center_lon <- litter_df$longitude[i]
+    
+    # generate points from 1 to 20, change the num to change the range
+    num_points <- sample(1:20, 1)
+    
+    for (j in 1:num_points) {
+      new_lat <- center_lat + runif(1, -0.0045, 0.0045) 
+      new_lon <- center_lon + runif(1, -0.0045, 0.0045)
+      
+      new_row <- litter_df[i, ]
+      new_row$latitude <- new_lat
+      new_row$longitude <- new_lon
+      new_row$legend <- 'allrandom'
+      
+      populated_points_df <- rbind(populated_points_df, new_row)
+    }
+  }
+  
+  return(populated_points_df)
+}
+
+# test
+allrandom_points_df <- generate_populated_points(litter)
+
+```
+
+
+```{r}
+# map the data
+
+allrandom_sf <- allrandom_points_df %>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
+  st_transform('EPSG:32643')
+
+
+ggplot() + 
+  geom_sf(data = chen_bdry) +
+  geom_sf(data = allrandom_sf, colour="pink", size=0.2, show.legend = "point") +
+  geom_sf(data = litter_sf, colour="green", size=0.2, show.legend = "point") +
+  mapTheme(title_size = 14)
+```
