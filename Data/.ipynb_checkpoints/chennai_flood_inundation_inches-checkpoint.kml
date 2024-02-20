@@ -3,6 +3,7 @@
 <Document id="root_doc">
 <Schema name="chennai_flood_inundation_inches" id="chennai_flood_inundation_inches">
 	<SimpleField name="OBJECTID_1" type="int"></SimpleField>
+	<SimpleField name="OBJECTID" type="int"></SimpleField>
 	<SimpleField name="F_ID" type="int"></SimpleField>
 	<SimpleField name="F_REMARKS" type="string"></SimpleField>
 	<SimpleField name="F_LATITUDE" type="float"></SimpleField>
