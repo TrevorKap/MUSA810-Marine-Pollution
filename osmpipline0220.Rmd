@@ -28,7 +28,6 @@ library(osmdata)
 library(randomForest)
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
-
 st_c    <- st_coordinates
 st_coid <- st_centroid
 
