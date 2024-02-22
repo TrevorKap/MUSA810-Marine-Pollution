@@ -1,6 +1,7 @@
 ---
 title: "MUSA8010ModelBuild"
-author: "Trevor Kapuvari"
+author: "Trevor Kapuvari, Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Xiaofan Liu"
+affilitation: "University of Pennsylvania"
 date: "2024-01-30"
 output:
   html_document:
@@ -11,6 +12,9 @@ output:
     number_sections: yes
 ---
 # Introduction
+
+The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and collected information regarding their waste management circumstances. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geosaptial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data that can be repeated on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment. 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -43,7 +47,7 @@ palette4 <- c("#264653","#2a9d8f","#e9c46a","#e76f51")
 palette2 <- c("#264653","#2a9d8f")
 ```
 
-what's lack for model 
+
 
 ```{r function build}
 countfishnet <- function(fishnet,dataset){
@@ -119,7 +123,10 @@ litter_people <- litter_p%>%
   tally()
 ```
 
-```{r}
+
+
+
+```{r eval=FALSE, include=FALSE}
 grid.arrange(
   ggplot() + 
   geom_sf(data = chen_bdry) +
@@ -130,13 +137,20 @@ grid.arrange(
 )
 ```
 
-## statistical analysis of litter dataset
+
+## Initial Analysis and Preperation
+
+
+
+https://www.debristracker.org/data/
+
 what's about the litter dataset?
   1. master_item_name histogram
   2. quantity histogram
   3. altitude
   4. radius 
   5. location distribution
+  
 ```{r}
 grid.arrange(
   ggplot(litter_p, aes(x = quantity)) + 
@@ -891,7 +905,7 @@ buildRFModel <- function(dataset, dependentVariable, indVariables,
 }
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 reg.ss.vars <- c("rst_nn", "rstrt.isSig.dist","road_nn", "road.isSig.dist","wtr_nn", "wtr.isSig.dist")
 
 ## RUN REGRESSIONS
@@ -903,7 +917,7 @@ reg.ss.spatialCV_new <- rf_cv(
     dplyr::select(uniqueID, countlitter, Prediction, geometry)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 chen_bd <- c(80.4301860, 13.2436939, 80.1101860, 12.8236939)
 chen_sub_bd <- c(80.4301860, 13.1536939, 80.2601860, 12.9136939)
 
@@ -921,7 +935,7 @@ polygon_geometry <- st_polygon(list(coordinates))
 polygon_sf <- st_sfc(polygon_geometry, crs = 4326) 
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 fishnet_new <- 
   st_make_grid(chen_bdry,
                cellsize = 500, 
