@@ -215,7 +215,7 @@ ggplot() +
   mapTheme()
 ```
 
-# Independent Variables, Quality and Quantity 
+# Data Gathering and Variables
 
 The primary importance of our independent variables is to function as indicators for human activity and, indirectly, litter distribution. The aim of these variables is to act as substitutes for litter, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
@@ -262,6 +262,8 @@ trans_point <- bind_rows(
 road_net <- countfishnet(fishnet,trans_point)
 vars_net <- knnfishnet(fishnet,trans_point,3)
 ```
+
+## Independent Variables Examined
 
 ### Residential Roads, Fishnet & Raw Data
 
@@ -414,7 +416,17 @@ final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE)
 final_net.weights <- nb2listw(final_net.nb, style="W", zero.policy=TRUE)
 ```
 
+# Spatial Analysis
 
+We look at several statistical measurements to improve our understanding of how these independent variables correlation and associate with the litter data. 
+
+Litter_Count
+
+Local Moran's I 
+
+P Value
+
+Significant Hotspot (LMAO)
 
 ```{r}
 ## see ?localmoran
@@ -459,11 +471,14 @@ final_net <- final_net %>%
                        k = 1))
 ```
 
+
+## Restuarant Signfiance 
+
 ```{r}
 ggplot() +
       geom_sf(data = final_net, aes(fill=restaurant.isSig.dist), colour=NA) +
       scale_fill_viridis(name="NN Distance") +
-      labs(title="Restaurant NN Distance") +
+      labs(title="Restaurant Signficance Distance") +
       mapTheme()
 ```
 
