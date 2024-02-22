@@ -474,6 +474,8 @@ final_net <- final_net %>%
 
 ## Restuarant Signfiance 
 
+Restaurants are signficant because xyz 
+
 ```{r}
 ggplot() +
       geom_sf(data = final_net, aes(fill=restaurant.isSig.dist), colour=NA) +
@@ -496,11 +498,13 @@ weight_net <-
 weight_net <- weight_net %>% rename(countrstrt = count) %>% dplyr::select(!starts_with('cv'))
 ```
 
-### the period result
+### the period result (whats period result)
 
 from the chi.sq test for the association test, the restaurant (represent the human activity ), the water (no obvious causation between two variables), and the residential road density(I use the count in each fishnet unit to represent density) have some association with litter distribution. and the waste management seems has little association. Chi-square test it's a good approach to analysis the two categorical variables' association, but in this case, the road seems to have little association but still proved strongly associated, if there is another way to check the more associated variables? perhaps local Moran's I to decrease the influence of data lack? or other methods? The next step, if we get several more strongly associated variables (I mean, test around some ohter cities in india and still proved associated), if our target get converted to 'use this variables to build a weight model to assess the risk for generating litter'? whether it's necessary to use ML? or ML model is functioning more like a testing tool?
 
-## Temp Modeling
+# Temporary Modeling
+
+Here we developed a temporary model to
 
 ```{r function trial}
 knnfishnet_new <- function(fishnet,dataset,knum){
@@ -524,6 +528,15 @@ rest_net_temp <- knnfishnet_new(fishnet,restrt_point,3)
 tran_net_temp <- knnfishnet_new(fishnet,trans_point,3)
 water_net_temp <- knnfishnet_new(fishnet,chen_water_point,3)
 ```
+
+
+## Visualizing Variables and Analysis 
+We wanna show relations by having them side by side 
+
+
+### Nearest Neighbor Series 
+
+NN distance is blah 
 
 ```{r}
 rest_net_temp.long.nn <- 
@@ -589,6 +602,8 @@ local_morans_wtr <- localmoran(final_net$water, final_net.weights, zero.policy=T
   as.data.frame()
 ```
 
+### Statistic Analysis with restaurants...again? 
+
 ```{r}
 final_net.localMorans <- 
   cbind(local_morans_wtr, as.data.frame(final_net)) %>% 
@@ -611,7 +626,7 @@ for(i in vars){
       labs(title=i) +
       mapTheme(title_size = 14) + theme(legend.position="bottom")}
 
-do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I statistics, Burglary"))
+do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I statistics, of literally what?"))
 ```
 
 ```{r}
@@ -643,7 +658,7 @@ final_net <- final_net %>%
                        k = 1))
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 grid.arrange(
 ggplot() +
       geom_sf(data = final_net, aes(fill=rstrt.isSig.dist), colour=NA) +
@@ -663,7 +678,7 @@ ggplot() +
 nrow = 1)
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE, results='hide'}
 reg.ss.vars <- c("rst_nn", "rstrt.isSig.dist","road_nn", "road.isSig.dist","wtr_nn", "wtr.isSig.dist")
 
 ## RUN REGRESSIONS
@@ -674,6 +689,12 @@ reg.ss.spatialCV <- crossValidate(
   indVariables = reg.ss.vars) %>%
     dplyr::select(uniqueID, countlitter, Prediction, geometry)
 ```
+
+# Model Results 
+
+We did it yay
+
+## Mean Absolute Error of Model
 
 ```{r}
 error_by_reg_and_fold <- 
@@ -718,6 +739,11 @@ litter_risk_sf <-
   dplyr::select(label,Risk_Category, litterCount)
 ```
 
+## Predictions & Results by Category 
+
+1-5 are the categories
+the encirlced data, why it says 5th category without any actual litter there. 
+
 ```{r}
 ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
@@ -728,7 +754,9 @@ ggplot() +
     mapTheme(title_size = 14)
 ```
 
-## New Dataset Test
+## Compensating Bias Experiment 
+
+Assuming litter found in one spot means litter found in its surrounding, creates random points in the surrounding area and goes off that. 
 
 ```{r}
 generate_populated_points <- function(litter_df) {
@@ -856,7 +884,7 @@ final_net_new <- final_net_new %>%
                        k = 1))
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE, results='hide'}
 reg.ss.vars <- c("rst_nn", "rstrt.isSig.dist","road_nn", "road.isSig.dist","wtr_nn", "wtr.isSig.dist")
 
 ## RUN REGRESSIONS
@@ -867,6 +895,12 @@ reg.ss.spatialCV_new <- crossValidate(
   indVariables = reg.ss.vars) %>%
     dplyr::select(uniqueID, countlitter, Prediction, geometry)
 ```
+
+### Bias Reduction Model Results
+
+we tried something 
+
+#### Bias Reduction Model, Mean Absolute Error
 
 ```{r}
 error_by_reg_and_fold_new <- 
@@ -911,6 +945,10 @@ litter_risk_sf_new <-
   dplyr::select(label,Risk_Category, litterCount)
 ```
 
+#### Bias Reduction Model Prediction 
+
+lowkey same stuff so either we didnt do anything about bias or the model already compensated
+
 ```{r}
 ggplot() +
     geom_sf(data = litter_risk_sf_new, aes(fill = Risk_Category), colour = NA) +
@@ -921,7 +959,9 @@ ggplot() +
     mapTheme(title_size = 14)
 ```
 
-## try random forest model
+# Attempt at Random Forest Model
+
+we are doing random forst now because why not 
 
 ```{r}
 buildRFModel <- function(dataset, dependentVariable, indVariables, 
