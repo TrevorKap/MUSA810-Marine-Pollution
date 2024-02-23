@@ -393,7 +393,7 @@ print(chisq.test(corr_waste_net$count,corr_waste_net$countlitter))
 
 We notice most waste management facilities are central and south in the city, showing mild correlations between previous variables and the urban core & coastline where we wish to prevent litter accumulation from occurring. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 vars_net_waste <- knnfishnet(fishnet,chen_waste_point,3)
 
 vars_net_waste1.long.nn <- 
@@ -407,7 +407,7 @@ ggplot() +
       mapTheme()
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 vars_net_rstrt <- knnfishnet(fishnet,restrt_point,3)
 final_net <-
   left_join(litter_net, st_drop_geometry(vars_net_rstrt), by="uniqueID") 
@@ -430,7 +430,7 @@ P Value: Records statistical significance, there  is a peculiar pattern made for
 
 Significant Hotspot: Detects potential hotspots for litter, which appears to not directly relate where litter counts are found to be. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 ## see ?localmoran
 local_morans <- localmoran(final_net$item.nn, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
@@ -462,7 +462,7 @@ for(i in vars){
 do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I statistics, Chennai"))
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 final_net <- final_net %>% 
   mutate(restaurant.isSig = 
            ifelse(local_morans[,5] <= 0.001, 1, 0)) %>%
@@ -510,7 +510,7 @@ from the chi.sq test for the association test, the restaurant (represent the hum
 
 In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quanity. 
 
-```{r function trial}
+```{r function trial, warning=FALSE, message=FALSE, results='hide'}
 knnfishnet_new <- function(fishnet,dataset,knum){
   vars_net <- dataset%>%
     st_join(fishnet, join=st_within) %>%
@@ -608,7 +608,7 @@ local_morans_wtr <- localmoran(final_net$water, final_net.weights, zero.policy=T
   as.data.frame()
 ```
 
-### Statistic Analysis with restaurants...again? 
+### Statistic Analysis, Restaurants 
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 final_net.localMorans <- 
@@ -704,7 +704,7 @@ After a full analysis on variables, model development, and statistical evaluatio
 
 We see negligible error for vast majority of litter. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 error_by_reg_and_fold <- 
   reg.ss.spatialCV %>%
     group_by(uniqueID) %>% 
@@ -719,6 +719,10 @@ error_by_reg_and_fold %>%
 error_by_reg_and_fold %>% 
   arrange(MAE)
 
+```
+
+
+```{r, warning=FALSE, message=FALSE}
 error_by_reg_and_fold %>%
   ggplot(aes(MAE)) + 
     geom_histogram(bins = 30, colour="black", fill = "#FDE725FF") +
@@ -913,7 +917,7 @@ We examine the accuracy and integrity of the model before looking at the results
 
 We see slightly less error compared to before. 
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 error_by_reg_and_fold_new <- 
   reg.ss.spatialCV_new %>%
     group_by(uniqueID) %>% 
@@ -927,7 +931,9 @@ error_by_reg_and_fold_new %>%
 
 error_by_reg_and_fold_new %>% 
   arrange(MAE)
+```
 
+```{r, warning=FALSE, message=FALSE, results='hide'}
 error_by_reg_and_fold_new %>%
   ggplot(aes(MAE)) + 
     geom_histogram(bins = 30, colour="black", fill = "#FDE725FF") +
@@ -936,7 +942,7 @@ error_by_reg_and_fold_new %>%
          x="Mean Absolute Error", y="Count") 
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 ml_breaks_new <- classIntervals(reg.ss.spatialCV_new$Prediction, 
                              n = 5, "fisher")
 litter_risk_sf_new <-
