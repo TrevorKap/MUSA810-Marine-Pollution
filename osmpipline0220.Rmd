@@ -194,7 +194,7 @@ ggplot(litter_p, aes(x = location)) +
   theme(axis.text.x = element_text(angle = 25,size = 6))
 ```
 
-### Chennai Debris Analysis
+## Chennai Debris Analysis
 
 With the boundary of the city and litter within acquired and accounted for, we could evaluate Chennai's litter data situation through a fishnet grid. The fishnet grid allows us to categorize the city into uniformed sections, identify concentrations of data, and allow our model to quantify predictions in terms of quantity by cell rather than by precise locations.
 
@@ -273,7 +273,7 @@ To keep all data acquired to be interpreted uniformly, we add our independent va
 visual(road_net,trans_point,'residential road')
 ```
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 litter_no <- st_drop_geometry(litter_net)%>%dplyr::select(countlitter, uniqueID)
 corr_trans_net <- road_net %>%
   left_join(litter_no, by = "uniqueID")
@@ -306,7 +306,7 @@ print(chisq.test(corr_net$count,corr_net$countlitter))
 
 For specific variables such as restaurants, we wanted to examine a nearest neighbor analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 vars_net_rstrt <- knnfishnet(fishnet,restrt_point,3)
 
 vars_net_rstrt.long.nn <- 
@@ -338,7 +338,7 @@ water_net <- countfishnet(fishnet,chen_water_point)
 visual(water_net,chen_water_point,'water')
 ```
 
-```{r water visualization}
+```{r water visualization, warning=FALSE}
 corr_water_net <- water_net %>%
   left_join(litter_no, by = "uniqueID")
 print(chisq.test(corr_water_net$count,corr_water_net$countlitter))
@@ -348,7 +348,7 @@ print(chisq.test(corr_water_net$count,corr_water_net$countlitter))
 
 On this fishnet grid we notice sections adjacent to the coastline (east) create two centers with low 'nearest neighbor' values, also places that loosely defined outlined sections similar to restaurants.  
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 vars_net_water <- knnfishnet(fishnet,chen_water_point,3)
 
 vars_net_water.long.nn <- 
@@ -383,7 +383,7 @@ waste_net <- countfishnet(fishnet,chen_waste_point)
 visual(waste_net,chen_waste_point,'waste management')
 ```
 
-```{r waste visualization}
+```{r waste visualization, warning=FALSE}
 corr_waste_net <- waste_net %>%
   left_join(litter_no, by = "uniqueID")
 print(chisq.test(corr_waste_net$count,corr_waste_net$countlitter))
