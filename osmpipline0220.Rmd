@@ -500,15 +500,10 @@ weight_net <-
 weight_net <- weight_net %>% rename(countrstrt = count) %>% dplyr::select(!starts_with('cv'))
 ```
 
-## Concluded Results
 
-(to get explained later)
+# Modeling
 
-from the chi.sq test for the association test, the restaurant (represent the human activity ), the water (no obvious causation between two variables), and the residential road density(I use the count in each fishnet unit to represent density) have some association with litter distribution. and the waste management seems has little association. Chi-square test it's a good approach to analysis the two categorical variables' association, but in this case, the road seems to have little association but still proved strongly associated, if there is another way to check the more associated variables? perhaps local Moran's I to decrease the influence of data lack? or other methods? The next step, if we get several more strongly associated variables (I mean, test around some ohter cities in india and still proved associated), if our target get converted to 'use this variables to build a weight model to assess the risk for generating litter'? whether it's necessary to use ML? or ML model is functioning more like a testing tool?
-
-# Temporary Modeling
-
-In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quanity. 
+In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators. 
 
 ```{r function trial, warning=FALSE, message=FALSE, results='hide'}
 knnfishnet_new <- function(fishnet,dataset,knum){
@@ -698,7 +693,7 @@ reg.ss.spatialCV <- crossValidate(
 
 # Model Results 
 
-After a full analysis on variables, model development, and statistical evaluation of all relations, we developed a risk assessment model. 
+After a full analysis on variables, model development, and statistical evaluation of all relations, we developed a risk assessment model. The results that follow examine the numeric, visual, and decision implications of the model's outcome. 
 
 ## Mean Absolute Error of Model
 
