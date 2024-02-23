@@ -1,0 +1,217 @@
+---
+title: "function_uo"
+author: "Tianxiao"
+date: "2024-02-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(sf)
+library(RSocrata)
+library(viridis)
+library(spatstat)
+library(raster)
+library(spdep)
+library(FNN)
+library(grid)
+library(gridExtra)
+library(knitr)
+library(kableExtra)
+library(tidycensus)
+library(classInt)
+library(RCurl)
+library(httr)
+library(osmdata)
+library(randomForest)
+
+source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
+source('/Users/mr.smile/Desktop/function_UO.R')
+st_c    <- st_coordinates
+st_coid <- st_centroid
+```
+
+```{r}
+litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
+
+litter_p <- litter%>%
+  filter(master_material == 'PLASTIC')%>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
+  st_transform('EPSG:32643')
+
+chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml')
+chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
+  st_transform('EPSG:32643')
+
+fishnet <- 
+  st_make_grid(chen_bdry,
+               cellsize = 500, 
+               square = TRUE) %>%
+  .[chen_bdry] %>%            
+  st_sf() %>%
+  mutate(uniqueID = 1:n())
+```
+
+```{r}
+# reference: https://wiki.openstreetmap.org/wiki/Map_features#Entertainment,_Arts_&_Culture
+amenity_wm <- c('waste_basket','waste_disposal','waste_transfer_station','recycling')
+water<- c('canal','drain','ditch')
+leisure <- c('park')
+landuse <- c('commercial','residential','retail')
+highway <- c('motorway','trunk','primary','secondary','tertiary','unclassified','residential')
+act <- c('maxspeed')
+amenity_food <- c('restaurant','pub','bar')
+building <- ('apartments,')
+
+india <- getbb(place_name = "india", format_out = "polygon")
+bb_df <- getbb(place_name = "chennai india", format_out = "data.frame")
+bdry <- bb_df$boundingbox
+chen_bd <- c(80.4301860, 13.2436939, 80.1101860, 12.8236939)
+```
+
+```{r get point_nn_fishnet}
+water_point <- point_data(chen_bd, 'water',c('canal','drain','ditch'),'water')
+water_net <- countfishnet(fishnet,water_point)
+water_nn_net <- knnfishnet(fishnet,water_point,3)
+
+waste_point <- point_data(chen_bd, 'amenity',c('waste_basket','waste_disposal','waste_transfer_station','recycling'),'waste')
+waste_net <- countfishnet(fishnet,waste_point)
+waste_nn_net <- knnfishnet(fishnet,waste_point,3)
+
+rstrt_point <- point_data(chen_bd, 'amenity',c('restaurant','pub','bar'),'restaurant')
+rstrt_net <- countfishnet(fishnet,rstrt_point)
+rstrt_nn_net <- knnfishnet(fishnet,rstrt_point,3)
+
+road_point <- point_data(chen_bd, 'highway','residential','road')
+road_net <- countfishnet(fishnet,road_point)
+road_nn_net <- knnfishnet(fishnet,road_point,3)
+```
+
+```{r visualize count net}
+visual_count_net(water_net,water_point,chen_bdry,'water')
+visual_count_net(waste_net,waste_point,chen_bdry,'waste')
+visual_count_net(rstrt_net,rstrt_point,chen_bdry,'restaurant')
+visual_count_net(road_net,road_point,chen_bdry,'road')
+```
+
+```{r visualizae nn net}
+nn_visual(water_nn_net,'water')
+nn_visual(waste_nn_net,'waste')
+nn_visual(rstrt_nn_net,'restaurant')
+nn_visual(road_nn_net,'road')
+```
+
+```{r combine the final dataset}
+litter_net <- countfishnet(fishnet, litter_p)
+
+final_net <-
+  left_join(litter_net, st_drop_geometry(water_nn_net), by="uniqueID")
+
+final_net <-
+  left_join(final_net, st_drop_geometry(rstrt_nn_net), by="uniqueID")
+
+final_net <-
+  left_join(final_net, st_drop_geometry(road_nn_net ), by="uniqueID")
+
+final_net <- final_net%>%
+  rename(watr_nn = item.nn.x,
+         restaurant_nn = item.nn.y,
+         road_nn = item.nn)
+```
+
+```{r local moran's I analysis}
+final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE)
+
+final_net.weights <- nb2listw(final_net.nb, style="W", zero.policy=TRUE)
+
+local_morans_rst <- localmoran(final_net$restaurant, final_net.weights, zero.policy=TRUE) %>% 
+  as.data.frame()
+local_morans_road <- localmoran(final_net$road, final_net.weights, zero.policy=TRUE) %>% 
+  as.data.frame()
+local_morans_wtr <- localmoran(final_net$water, final_net.weights, zero.policy=TRUE) %>% 
+  as.data.frame()
+```
+
+```{r}
+# attention!
+# the legends here shoud be the same as label set when create the count fishnet
+lc_mr_visual(local_morans_wtr,final_net,'water')
+lc_mr_visual(local_morans_rst,final_net,'restaurant')
+lc_mr_visual(local_morans_road,final_net,'road')
+```
+
+```{r add lm sig to dataset}
+final_net <- lm_col(final_net,local_morans_wtr)
+final_net <- final_net%>% rename(wtr_sig = col_name, wtr_sig_dis = col_name_dis)
+
+final_net <- lm_col(final_net,local_morans_road)
+final_net <- final_net%>% rename(road_sig = col_name, road_sig_dis = col_name_dis)
+
+final_net <- lm_col(final_net,local_morans_rst)
+final_net <- final_net%>% rename(rst_sig = col_name, rst_sig_dis = col_name_dis)
+```
+
+```{r}
+grid.arrange(
+ggplot() +
+      geom_sf(data = final_net, aes(fill=rst_sig_dis), colour=NA) +
+      scale_fill_viridis(name="NN Distance") +
+      labs(title="Restaurant NN Distance") +
+      mapTheme(),
+ggplot() +
+      geom_sf(data = final_net, aes(fill=road_sig_dis), colour=NA) +
+      scale_fill_viridis(name="NN Distance") +
+      labs(title="Road NN Distance") +
+      mapTheme(),
+ggplot() +
+      geom_sf(data = final_net, aes(fill=wtr_sig_dis), colour=NA) +
+      scale_fill_viridis(name="NN Distance") +
+      labs(title="Water NN Distance") +
+      mapTheme(),
+nrow = 1)
+```
+
+```{r}
+reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis")
+
+## RUN REGRESSIONS
+reg.ss.spatialCV <- crossValidate(
+  dataset = final_net,
+  id = "uniqueID",                           
+  dependentVariable = "count",
+  indVariables = reg.ss.vars) %>%
+    dplyr::select(uniqueID, count, Prediction, geometry)
+```
+
+```{r}
+error_by_reg_and_fold <- 
+  reg.ss.spatialCV %>%
+    group_by(uniqueID) %>% 
+    summarize(Mean_Error = mean(Prediction - count, na.rm = T),
+              MAE = mean(abs(Mean_Error), na.rm = T),
+              SD_MAE = mean(abs(Mean_Error), na.rm = T)) %>%
+  ungroup()
+
+error_by_reg_and_fold %>% 
+  arrange(desc(MAE))
+
+error_by_reg_and_fold %>% 
+  arrange(MAE)
+
+error_by_reg_and_fold %>%
+  ggplot(aes(MAE)) + 
+    geom_histogram(bins = 100, colour="black", fill = "#FDE725FF") +
+  scale_x_continuous(breaks = seq(0, 11, by = 1)) + 
+    labs(title="Distribution of MAE", subtitle = "LOGO-CV",
+         x="Mean Absolute Error", y="Count") 
+```
+
+```{r}
+error_visual(reg.ss.spatialCV)
+```
+
+```{r}
+risk_visualize(reg.ss.spatialCV,litter_p)
+```
