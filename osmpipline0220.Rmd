@@ -739,12 +739,12 @@ error_by_reg_and_fold %>%
 
 
 ```{r, warning=FALSE, message=FALSE}
-error_by_reg_and_fold %>%
+error_by_reg_and_fold %>% filter(MAE <=10) %>%
   ggplot(aes(MAE)) + 
-    geom_histogram(bins = 30, colour="black", fill = "#FDE725FF") +
+    geom_histogram(bins = 60, colour="black", fill = "#FDE725FF") +
   scale_x_continuous(breaks = seq(0, 11, by = 1)) + 
     labs(title="Distribution of MAE", subtitle = "LOGO-CV",
-         x="Mean Absolute Error", y="Count") 
+         x="Mean Absolute Error", y="Count")
 ```
 
 ```{r}
@@ -950,7 +950,7 @@ error_by_reg_and_fold_new %>%
 ```
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-error_by_reg_and_fold_new %>%
+error_by_reg_and_fold_new %>% filter(MAE <=10) %>%
   ggplot(aes(MAE)) + 
     geom_histogram(bins = 30, colour="black", fill = "#FDE725FF") +
   scale_x_continuous(breaks = seq(0, 11, by = 1)) + 
