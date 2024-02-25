@@ -462,7 +462,7 @@ for(i in vars){
 do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I statistics, Chennai"))
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 final_net <- final_net %>% 
   mutate(restaurant.isSig = 
            ifelse(local_morans[,5] <= 0.001, 1, 0)) %>%
@@ -499,6 +499,16 @@ weight_net <-
   left_join(weight_net, st_drop_geometry(rstrt_net), by="uniqueID") 
 weight_net <- weight_net %>% rename(countrstrt = count) %>% dplyr::select(!starts_with('cv'))
 ```
+
+## Concluded Results
+ !!! BENCH MARK!!
+ 
+ Trevor: redo paragraph below
+ Stephanie: Spell check (starting at top)
+ 
+
+
+from the chi.sq test for the association test, the restaurant (represent the human activity ), the water (no obvious causation between two variables), and the residential road density(I use the count in each fishnet unit to represent density) have some association with litter distribution. and the waste management seems has little association. Chi-square test it’s a good approach to analysis the two categorical variables’ association, but in this case, the road seems to have little association but still proved strongly associated, if there is another way to check the more associated variables? perhaps local Moran’s I to decrease the influence of data lack? or other methods? The next step, if we get several more strongly associated variables (I mean, test around some other cities in India and still proved associated), if our target get converted to ‘use this variables to build a weight model to assess the risk for generating litter’? whether it’s necessary to use ML? or ML model is functioning more like a testing tool?
 
 
 # Modeling
@@ -604,6 +614,14 @@ local_morans_wtr <- localmoran(final_net$water, final_net.weights, zero.policy=T
 ```
 
 ### Statistic Analysis, Restaurants 
+
+acting as a predictor in addition to displaying spatial autocorrelation
+restaurants specifically
+
+Restaurant Count
+Local Moran's I
+P_Value
+Signficant Hotspots
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 final_net.localMorans <- 
