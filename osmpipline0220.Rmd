@@ -501,12 +501,12 @@ weight_net <- weight_net %>% rename(countrstrt = count) %>% dplyr::select(!start
 ```
 
 ## Concluded Results
- !!! BENCH MARK!!
+ !!! BENCH MARK!!!
  
  Trevor: redo paragraph below
  Stephanie: Spell check (starting at top)
  
-
+Talk about inverse in p value hot spot in rest sig maps
 
 from the chi.sq test for the association test, the restaurant (represent the human activity ), the water (no obvious causation between two variables), and the residential road density(I use the count in each fishnet unit to represent density) have some association with litter distribution. and the waste management seems has little association. Chi-square test it’s a good approach to analysis the two categorical variables’ association, but in this case, the road seems to have little association but still proved strongly associated, if there is another way to check the more associated variables? perhaps local Moran’s I to decrease the influence of data lack? or other methods? The next step, if we get several more strongly associated variables (I mean, test around some other cities in India and still proved associated), if our target get converted to ‘use this variables to build a weight model to assess the risk for generating litter’? whether it’s necessary to use ML? or ML model is functioning more like a testing tool?
 
@@ -928,7 +928,7 @@ We examine the accuracy and integrity of the model before looking at the results
 
 #### Bias Reduction Model, Mean Absolute Error
 
-We see slightly less error compared to before. 
+We see slightly more erroror compared to before. 
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 error_by_reg_and_fold_new <- 
