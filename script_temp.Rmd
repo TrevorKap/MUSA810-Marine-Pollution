@@ -8,6 +8,9 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+#install.packages("remotes")
+#remotes::install_github("IREA-CNR-MI/sprawl")
+
 library(tidyverse)
 library(sf)
 library(RSocrata)
@@ -26,6 +29,7 @@ library(RCurl)
 library(httr)
 library(osmdata)
 library(randomForest)
+library(tidygraph)
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
@@ -54,6 +58,53 @@ fishnet <-
   mutate(uniqueID = 1:n())
 ```
 
+## raster data
+```{r}
+img <- raster("/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/population_ind_pak_general/population_10_lon_80_general-v1.5.tif")
+
+temp_bd <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/archive (1)/cma_layer.shp')
+
+tifCropped <- crop(img, extent(temp_bd))
+tifClipped <- mask(tifCropped, temp_bd)
+polys1 = rasterToPolygons(tifClipped)
+sf_object <- st_as_sf(polys1)
+temp <- as.data.frame(sf_object)
+temp_sf <- st_as_sf(temp)
+df_points <- st_centroid(temp_sf)
+```
+
+```{r}
+df_points <- df_points%>%
+  st_transform('EPSG:32643')
+joined_data <- st_join(fishnet, df_points)
+
+avg_pop <- joined_data %>%
+  group_by(uniqueID) %>%
+  summarise(avg_pop = mean(Population.Count, na.rm = TRUE))
+
+avg_pop[is.na(avg_pop)] <- 0
+
+sum_pop <- joined_data %>%
+  group_by(uniqueID) %>%
+  summarise(sum_pop = sum(Population.Count, na.rm = TRUE))
+```
+
+```{r}
+grid.arrange(
+ggplot() +
+      geom_sf(data = avg_pop, aes(fill = avg_pop), color = NA) +
+      scale_fill_viridis() +
+      labs(title = 'Average Pop for the fishnet') +
+      mapTheme(),
+ggplot() +
+      geom_sf(data = sum_pop, aes(fill = sum_pop), color = NA) +
+      scale_fill_viridis() +
+      labs(title = 'Total Pop for the fishnet') +
+      mapTheme(),
+nrow=1)
+```
+
+## osm data
 ```{r}
 # reference: https://wiki.openstreetmap.org/wiki/Map_features#Entertainment,_Arts_&_Culture
 amenity_wm <- c('waste_basket','waste_disposal','waste_transfer_station','recycling')
@@ -119,6 +170,12 @@ final_net <- final_net%>%
   rename(watr_nn = item.nn.x,
          restaurant_nn = item.nn.y,
          road_nn = item.nn)
+
+final_net <- 
+  left_join(final_net,st_drop_geometry(avg_pop), by="uniqueID")
+
+final_net <- 
+  left_join(final_net,st_drop_geometry(sum_pop), by="uniqueID")
 ```
 
 ```{r local moran's I analysis}
@@ -132,6 +189,16 @@ local_morans_road <- localmoran(final_net$road, final_net.weights, zero.policy=T
   as.data.frame()
 local_morans_wtr <- localmoran(final_net$water, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
+```
+
+```{r}
+local_morans_sp <- localmoran(final_net$sum_pop, final_net.weights, zero.policy=TRUE) %>% 
+  as.data.frame()
+lc_mr_visual(local_morans_sp,final_net,'sum_pop')
+
+local_morans_ap <- localmoran(final_net$avg_pop, final_net.weights, zero.policy=TRUE) %>% 
+  as.data.frame()
+lc_mr_visual(local_morans_ap,final_net,'avg_pop')
 ```
 
 ```{r}
@@ -174,7 +241,7 @@ nrow = 1)
 ```
 
 ```{r}
-reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis")
+reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis",'sum_pop')
 
 ## RUN REGRESSIONS
 reg.ss.spatialCV <- crossValidate(
@@ -200,7 +267,7 @@ error_by_reg_and_fold %>%
 error_by_reg_and_fold %>% 
   arrange(MAE)
 
-error_by_reg_and_fold %>%
+error_by_reg_and_fold %>% filter(MAE <= 10)%>%
   ggplot(aes(MAE)) + 
     geom_histogram(bins = 100, colour="black", fill = "#FDE725FF") +
   scale_x_continuous(breaks = seq(0, 11, by = 1)) + 
@@ -215,3 +282,7 @@ error_visual(reg.ss.spatialCV)
 ```{r}
 risk_visualize(reg.ss.spatialCV,litter_p)
 ```
+
+
+
+
