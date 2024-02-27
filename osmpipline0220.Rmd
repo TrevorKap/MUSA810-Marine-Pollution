@@ -1,22 +1,27 @@
 ---
-title: "Ocean Conservancy, Urban Oceans Marine Debris Prediction"
-subtitle: "Trevor Kapuvari, Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Xiaofan Liu"
-author: "Unviersity of Pennsylvania"
-date: "2024-01-30"
-output:
+title: "Ocean Conservancy, Urban Ocean Marine Debris Prediction"
+subtitle: "Exploratory Analysis and Preliminary Model Building"
+author: "University of Pennsylvania MUSA Practicum: Trevor Kapuvari, Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Xiaofan Liu"
+date: "2024-02-27"
+output: 
   html_document:
-    toc: yes
-    theme: cosmo
-    toc_float: yes
-    code_folding: hide
+    toc: true
+    toc_float: true
+    code_folding: "hide"
+    theme: flatly
+    highlight: tango
     number_sections: yes
+mainfont: DejaVu Sans
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 # Introduction
 
-The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and collected information regarding their waste management circumstances. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geosaptial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and have collected waste management information. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
 
-```{r setup, include=FALSE}
+```{r, warning=FALSE, message=FALSE, error=FALSE, include=FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
@@ -48,7 +53,7 @@ palette4 <- c("#264653","#2a9d8f","#e9c46a","#e76f51")
 palette2 <- c("#264653","#2a9d8f")
 ```
 
-```{r function build, results='hide'}
+```{r function build, results='hide', message=FALSE, error=FALSE, cache=TRUE}
 countfishnet <- function(fishnet,dataset){
   net <- 
   dplyr::select(dataset) %>% 
@@ -95,7 +100,7 @@ grid.arrange(
 }
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide'}
+```{r data, message=FALSE, warning=FALSE, results='hide', cache=TRUE}
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 
 litter_p <- litter%>%
@@ -114,9 +119,7 @@ fishnet <-
   .[chen_bdry] %>%            
   st_sf() %>%
   mutate(uniqueID = 1:n())
-```
 
-```{r, message=FALSE, warning=FALSE, results='hide'}
 litter_people <- litter_p%>%
   group_by(username)%>%
   tally()
@@ -124,11 +127,11 @@ litter_people <- litter_p%>%
 
 # Initial Analysis and Preperation
 
-For our first model, we directed our focus on Chennai, India. The data regarding the region and its attributes was sourced solely by global open-source resources such as OpenStreetMaps (OSM) to ensure a repeatable framework & quality consistency. For each selected city we developed a 'boundary box' automated by OSM simply by specifying the name of the area (city & nation) and using the output coordinates as the scope of data acquisition. From there, further attributes of the area with respect to structures, networks, or political divisions can be extracted for use.
+For our first model, we directed our focus on Chennai, India. The data regarding the region and its attributes was sourced from OpenStreetMaps (OSM) to ensure a repeatable framework & quality consistency. For each selected city we developed a 'boundary box' automated by OSM simply by specifying the name of the area (city & nation) and using the output coordinates as the scope of data acquisition. From there, further attributes of the area with respect to structures, networks, or political divisions can be extracted for use.
 
 In terms of our dependent variable, litter data, the process required manually downloading data from Marine Debris Tracker (<https://www.debristracker.org/data/>). Each selected city required its own evaluation in terms of quantitative debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early-stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors.
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 grid.arrange(
   ggplot() + 
   geom_sf(data = chen_bdry) +
@@ -139,12 +142,11 @@ grid.arrange(
 )
 ```
 
-
 The litter data featured a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present.
 
 ## Marine Debris Data, in Summary
 
-Each graph below describes the observed litter data acquired from the Marine Debris Tracker (MDT). The most important feature we looked at in predicting accumulation or the possibility of additional unrecorded samples were quantity, altitude, and radius.
+Each chart below visualizes the observed litter data from the Marine Debris Tracker (MDT). The most important feature we looked at in predicting accumulation or the possibility of additional unrecorded samples were quantity, altitude, and radius.
 
 Quantity measured groupings of specific litter samples that were disposed of at the same time & place.
 
@@ -152,9 +154,9 @@ Altitude measured the elevation of recorded litter, ranging widely between steep
 
 Radius functioned as a confidence interval for coordinates and known accuracy of where the litter was recorded, majority of which had consistent readings with notably some outliers.
 
-The bar graph of 'Main Item Category' measures each type of litter found in the dataset, the project goals focused heavily on plastic and plastic-related waste. As a result, the largest counts of items measured are plastic-based products.
+The bar chart of 'Main Item Category' measures each type of litter found in the dataset, the project goals focused heavily on plastic and plastic-related waste. As a result, the largest counts of items measured are plastic-based products.
 
-```{r message=FALSE, warning=FALSE}
+```{r warning=FALSE, message=FALSE, cache=TRUE}
 grid.arrange(
   ggplot(litter_p, aes(x = quantity)) + 
   geom_bar() +
@@ -196,9 +198,9 @@ ggplot(litter_p, aes(x = location)) +
 
 ## Chennai Debris Analysis
 
-With the boundary of the city and litter within acquired and accounted for, we could evaluate Chennai's litter data situation through a fishnet grid. The fishnet grid allows us to categorize the city into uniformed sections, identify concentrations of data, and allow our model to quantify predictions in terms of quantity by cell rather than by precise locations.
+Using Chennai boundaries and MDT litter, we evaluated Chennai's litter data situation through a fishnet grid. The fishnet grid allows us to categorize the city into uniformed sections, identify concentrations of data, and allow our model to quantify predictions in terms of quantity by cell rather than by precise locations.
 
-```{r,  message=FALSE, warning=FALSE}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 litter_net <- 
   dplyr::select(litter_p) %>% 
   mutate(countlitter = 1) %>% 
@@ -217,13 +219,13 @@ ggplot() +
 
 # Data Gathering and Variables
 
-The primary importance of our independent variables is to function as indicators for human activity and, indirectly, litter distribution. The aim of these variables is to act as substitutes for litter, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
+Our variable selection were based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
 ## OpenStreetMap Variable Acquisition 
 
-Our variables acquired to compare correlations include, waste management facilities, bodies of water, parks, land use, roadways, food-service amenities, and apartments. Below features the code example for OSM variable & city boundary defining & gathering. 
+Our variables acquired to compare correlations include waste management facilities, bodies of water, parks, land use, roadways, food-service amenities, and apartments. Below features the code example for OSM variable & city boundary defining & gathering. 
 
-```{r, message=FALSE, warning=FALSE, results='hide'}
+```{r, message=FALSE, warning=FALSE, results='hide', cache=TRUE}
 # reference: https://wiki.openstreetmap.org/wiki/Map_features#Entertainment,_Arts_&_Culture
 amenity_wm <- c('waste_basket','waste_disposal','waste_transfer_station','recycling')
 water<- c('canal','drain','ditch')
@@ -237,17 +239,17 @@ building <- ('apartments,')
 ```
 
 ```{r, message=FALSE, warning=FALSE, results='hide'}
-india <- getbb(place_name = "india", format_out = "polygon")
-bb_df <- getbb(place_name = "chennai india", format_out = "data.frame")
-bdry <- bb_df$boundingbox
+#india <- getbb(place_name = "india", format_out = "polygon")
+#bb_df <- getbb(place_name = "chennai india", format_out = "data.frame")
+#bdry <- bb_df$boundingbox
 chen_bd <- c(80.4301860, 13.2436939, 80.1101860, 12.8236939)
 ```
 
-```{r, message=FALSE, warning=FALSE, results='hide'}
-bb_mb <- getbb(place_name = "mumbai india", format_out = "data.frame")
+```{r, message=FALSE, warning=FALSE, results='hide', cache=TRUE}
+#bb_mb <- getbb(place_name = "mumbai india", format_out = "data.frame")
 ```
 
-```{r transportation, message=FALSE, warning=FALSE, results='hide'}
+```{r transportation, message=FALSE, warning=FALSE, results='hide', cache=TRUE}
 trans <- opq(bbox = chen_bd) %>%
     add_osm_feature(key = 'highway', value = 'residential')%>%
   osmdata_sf()
@@ -267,13 +269,13 @@ vars_net <- knnfishnet(fishnet,trans_point,3)
 
 ### Residential Roads, Fishnet & Raw Data
 
-To keep all data acquired to be interpreted uniformly, we add our independent variables on a fishnet grid as shown below. Notably, using the raw value/geometry of each set does not assist with visual display or comprehension of data. 
+To interpret data uniformly, we add our independent variables on a fishnet grid as shown below. Notably, using the raw value/geometry of each set does not assist with visual display or comprehension of data. 
 
-```{r trans visualization}
+```{r trans visualization, message=FALSE, warning=FALSE, cache=TRUE}
 visual(road_net,trans_point,'residential road')
 ```
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 litter_no <- st_drop_geometry(litter_net)%>%dplyr::select(countlitter, uniqueID)
 corr_trans_net <- road_net %>%
   left_join(litter_no, by = "uniqueID")
@@ -282,7 +284,7 @@ print(chisq.test(corr_trans_net$count,corr_trans_net$countlitter))
 
 ### Restaurants, Fishnet & Raw Data
 
-```{r restaurant data, cache=TRUE}
+```{r restaurant data, warning=FALSE, message=FALSE, cache=TRUE}
 restrt <- opq(bbox = chen_bd) %>%
     add_osm_feature(key = 'amenity', value = c('restaurant','pub','bar'))%>%
   osmdata_sf()
@@ -296,9 +298,10 @@ rstrt_net <- countfishnet(fishnet,restrt_point)
 visual(rstrt_net,restrt_point,'restaurant')
 ```
 
-```{r corr-rest-litter, warning=FALSE}
+```{r corr-rest-litter, warning=FALSE, message=FALSE, cache=TRUE}
 corr_net <- rstrt_net %>%
   left_join(litter_no, by = "uniqueID")
+
 print(chisq.test(corr_net$count,corr_net$countlitter))
 ```
 
@@ -306,7 +309,7 @@ print(chisq.test(corr_net$count,corr_net$countlitter))
 
 For specific variables such as restaurants, we wanted to examine a nearest neighbor analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 vars_net_rstrt <- knnfishnet(fishnet,restrt_point,3)
 
 vars_net_rstrt.long.nn <- 
@@ -324,7 +327,7 @@ ggplot() +
 
 Water was an additional indicator to be further examined due to the physical circumstances surrounding marine debris. Often times, when litter/waste ends up in water, the waste will not  naturally exit the body of water and reside on nearby shore or be carried to other bodies. These areas are also a heavier focus by Urban Oceans as marine pollution is a key focus. 
 
-```{r water data}
+```{r water data, warning=FALSE, message=FALSE, cache=TRUE}
 chen_water <- opq(bbox = chen_bd) %>%
     add_osm_feature(key = 'water', value = water)%>%
   osmdata_sf()
@@ -338,7 +341,7 @@ water_net <- countfishnet(fishnet,chen_water_point)
 visual(water_net,chen_water_point,'water')
 ```
 
-```{r water visualization, warning=FALSE}
+```{r water visualization, warning=FALSE, cache=TRUE}
 corr_water_net <- water_net %>%
   left_join(litter_no, by = "uniqueID")
 print(chisq.test(corr_water_net$count,corr_water_net$countlitter))
@@ -348,7 +351,7 @@ print(chisq.test(corr_water_net$count,corr_water_net$countlitter))
 
 On this fishnet grid we notice sections adjacent to the coastline (east) create two centers with low 'nearest neighbor' values, also places that loosely defined outlined sections similar to restaurants.  
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 vars_net_water <- knnfishnet(fishnet,chen_water_point,3)
 
 vars_net_water.long.nn <- 
@@ -370,7 +373,7 @@ a) The waste management facilities reduces the surrounding litter.
 
 b) The facilities are distant from places of high human activity, not necessarily implying that its location reduces its surrounding litter. 
 
-```{r waste data}
+```{r waste data, warning=FALSE, message=FALSE, cache=TRUE}
 chen_waste <- opq(bbox = chen_bd) %>%
     add_osm_feature(key = 'amenity', value = amenity_wm)%>%
   osmdata_sf()
@@ -383,7 +386,7 @@ waste_net <- countfishnet(fishnet,chen_waste_point)
 visual(waste_net,chen_waste_point,'waste management')
 ```
 
-```{r waste visualization, warning=FALSE}
+```{r waste visualization, warning=FALSE, message=FALSE, cache=TRUE}
 corr_waste_net <- waste_net %>%
   left_join(litter_no, by = "uniqueID")
 print(chisq.test(corr_waste_net$count,corr_waste_net$countlitter))
@@ -393,7 +396,7 @@ print(chisq.test(corr_waste_net$count,corr_waste_net$countlitter))
 
 We notice most waste management facilities are central and south in the city, showing mild correlations between previous variables and the urban core & coastline where we wish to prevent litter accumulation from occurring. 
 
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 vars_net_waste <- knnfishnet(fishnet,chen_waste_point,3)
 
 vars_net_waste1.long.nn <- 
@@ -407,13 +410,13 @@ ggplot() +
       mapTheme()
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 vars_net_rstrt <- knnfishnet(fishnet,restrt_point,3)
 final_net <-
   left_join(litter_net, st_drop_geometry(vars_net_rstrt), by="uniqueID") 
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE)
 final_net.weights <- nb2listw(final_net.nb, style="W", zero.policy=TRUE)
 ```
@@ -430,7 +433,7 @@ P Value: Records statistical significance, there  is a peculiar pattern made for
 
 Significant Hotspot: Detects potential hotspots for litter, which appears to not directly relate where litter counts are found to be. 
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 ## see ?localmoran
 local_morans <- localmoran(final_net$item.nn, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
@@ -446,7 +449,7 @@ final_net.localMorans <-
   gather(Variable, Value, -geometry)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 vars <- unique(final_net.localMorans$Variable)
 varList <- list()
 
@@ -474,19 +477,19 @@ final_net <- final_net %>%
 ```
 
 
-## Restuarant Signfiance 
+## Restaurant Significance 
 
-Restaurants are used as a point of significance because of their indirectly relation to commercial activity. We notice here there is more 'NN Distance' in the south due to the lack of restaurants and general activity.  
+Restaurants are used as a point of significance because of their relation to commercial activity. We notice here there is more 'NN Distance' in the north due to the lack of restaurants and general activity.  
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 ggplot() +
-      geom_sf(data = final_net, aes(fill=restaurant.isSig.dist), colour=NA) +
+      geom_sf(data = rest_net_temp.long.nn, aes(fill=value), colour=NA) +
       scale_fill_viridis(name="NN Distance") +
-      labs(title="Restaurant Signficance Distance") +
+      labs(title="Restaurant NN Distance")+
       mapTheme()
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 weight_net <- 
   left_join(litter_net, st_drop_geometry(road_net), by="uniqueID") 
 weight_net <- weight_net %>% rename(countroad = count) %>% dplyr::select(!starts_with('cv'))
@@ -501,24 +504,14 @@ weight_net <- weight_net %>% rename(countrstrt = count) %>% dplyr::select(!start
 ```
 
 ## Concluded Results
- !!! BENCH MARK!!!
- 
- Trevor: redo paragraphs below
- Stephanie: 1 hard read for spell check, logic flow, grammar, etc. Optimize all R chunks with cache=true.
- 
- 
+
 With all considered in terms of all statistical tests and independent variables measured, water and restaurants act as the greatest associated indicators for litter accumulation. Regarding other aspects and measurements considered, such as Moran's I and and hotspots, there is sufficient data to, at minimum, evaluate model performance in assessing litter accumulation. It is noted that additional variables that build upon litter assessment will enhance the model's accuracy. This run-through acts as the initial development process in the machine-learning approach to Urban Ocean's objectives and needs.
- 
-Talk about inverse in p value hot spot in rest sig maps
-
-
-
 
 # Modeling
 
 In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators. 
 
-```{r function trial, warning=FALSE, message=FALSE, results='hide'}
+```{r function trial, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 knnfishnet_new <- function(fishnet,dataset,knum){
   vars_net <- dataset%>%
     st_join(fishnet, join=st_within) %>%
@@ -550,7 +543,7 @@ This model requires us to re-examine similar or duplicate variables and measurin
 
 Here, we further examine the nearest neighbor distances of restaurants, roads, and water, all of which have identical patterns to previous analyses. Each has a somewhat similar outcome to nearest neighbor maps prior, and do not provide insight on litter accumulation alone.  
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 rest_net_temp.long.nn <- 
   dplyr::select(rest_net_temp, ends_with(".nn")) %>%
     gather(Variable, value, -geometry)
@@ -587,7 +580,7 @@ nrow = 1)
 
 
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 final_net <-
   left_join(litter_net, st_drop_geometry(rest_net_temp), by="uniqueID")
 
@@ -601,13 +594,13 @@ final_net <-
          wtr_nn = item.nn)
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE)
-## ... and neighborhoods to list of weigths
+## ... and neighborhoods to list of weights
 final_net.weights <- nb2listw(final_net.nb, style="W", zero.policy=TRUE)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 local_morans_rst <- localmoran(final_net$restaurant, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
 local_morans_road <- localmoran(final_net$road, final_net.weights, zero.policy=TRUE) %>% 
@@ -626,7 +619,7 @@ The P Value and Significant Hotspot map examine the inverse relationship between
   
 
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 final_net.localMorans <- 
   cbind(local_morans_wtr, as.data.frame(final_net)) %>% 
   st_sf() %>%
@@ -648,10 +641,10 @@ for(i in vars){
       labs(title=i) +
       mapTheme(title_size = 14) + theme(legend.position="bottom")}
 
-do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I statistics, of literally what?"))
+do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I Statistics"))
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 final_net <- final_net %>% 
   mutate(rstrt.isSig = 
            ifelse(local_morans_rst[,5] <= 0.001, 1, 0)) %>%
@@ -680,7 +673,7 @@ final_net <- final_net %>%
                        k = 1))
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r eval=FALSE, include=FALSE, message=FALSE, cache=TRUE}
 grid.arrange(
 ggplot() +
       geom_sf(data = final_net, aes(fill=rstrt.isSig.dist), colour=NA) +
@@ -700,13 +693,13 @@ ggplot() +
 nrow = 1)
 ```
 
-```{r message=FALSE, warning=FALSE, results='hide'}
+```{r message=FALSE, warning=FALSE, results='hide', eval=FALSE, cache=TRUE}
 reg.ss.vars <- c("rst_nn", "rstrt.isSig.dist","road_nn", "road.isSig.dist","wtr_nn", "wtr.isSig.dist")
 
 ## RUN REGRESSIONS
 reg.ss.spatialCV <- crossValidate(
   dataset = final_net,
-  id = "uniqueID",                           
+  id = "uniqueID",
   dependentVariable = "countlitter",
   indVariables = reg.ss.vars) %>%
     dplyr::select(uniqueID, countlitter, Prediction, geometry)
@@ -720,7 +713,7 @@ After a full analysis on variables, model development, and statistical evaluatio
 
 We see negligible error for vast majority of litter. These results do not relate to the potential of other cities but act as a benchmark in the current stage of development. Majority of litter points are not considered to be subject to absolute error.
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 error_by_reg_and_fold <- 
   reg.ss.spatialCV %>%
     group_by(uniqueID) %>% 
@@ -737,8 +730,7 @@ error_by_reg_and_fold %>%
 
 ```
 
-
-```{r, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 error_by_reg_and_fold %>% filter(MAE <=10) %>%
   ggplot(aes(MAE)) + 
     geom_histogram(bins = 60, colour="black", fill = "#FDE725FF") +
@@ -747,7 +739,7 @@ error_by_reg_and_fold %>% filter(MAE <=10) %>%
          x="Mean Absolute Error", y="Count")
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 ml_breaks <- classIntervals(reg.ss.spatialCV$Prediction, 
                              n = 5, "fisher")
 litter_risk_sf <-
@@ -773,7 +765,7 @@ The model produces a risk assessment that categorizes the city into 5 sections, 
 
 When looking at the current litter points (red dots), we see a vague circularly pattern for the larger core. The model appears to notice this pattern and is stating there is potential litter in the center of the "circle" where pre-recorded litter encircles yet feature zero data points. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_p, size = .3, colour = "red") +
@@ -787,7 +779,7 @@ ggplot() +
 
 Assuming litter found in one spot means litter found in its surrounding, we created random points in the surrounding area to act as additional to data quantity. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 generate_populated_points <- function(litter_df) {
   populated_points_df <- data.frame(
     list_name = character(),
@@ -840,7 +832,7 @@ generate_populated_points <- function(litter_df) {
 allrandom_points_df <- generate_populated_points(litter)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 allrandom_points_df <- allrandom_points_df%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
   st_transform('EPSG:32643')
@@ -861,7 +853,7 @@ ggplot() +
   mapTheme()
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 final_net_new <-
   left_join(litter_net_new, st_drop_geometry(rest_net_temp), by="uniqueID")
 
@@ -875,7 +867,7 @@ final_net_new <-
          wtr_nn = item.nn)
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 local_morans_rst_n <- localmoran(final_net_new$restaurant, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
 local_morans_road_n <- localmoran(final_net_new$road, final_net.weights, zero.policy=TRUE) %>% 
@@ -884,7 +876,7 @@ local_morans_wtr_n <- localmoran(final_net_new$water, final_net.weights, zero.po
   as.data.frame()
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 final_net_new <- final_net_new %>% 
   mutate(rstrt.isSig = 
            ifelse(local_morans_rst_n[,5] <= 0.001, 1, 0)) %>%
@@ -913,7 +905,7 @@ final_net_new <- final_net_new %>%
                        k = 1))
 ```
 
-```{r message=FALSE, warning=FALSE, results='hide'}
+```{r message=FALSE, warning=FALSE, results='hide', cache=TRUE}
 reg.ss.vars <- c("rst_nn", "rstrt.isSig.dist","road_nn", "road.isSig.dist","wtr_nn", "wtr.isSig.dist")
 
 ## RUN REGRESSIONS
@@ -933,7 +925,7 @@ The potential issue with litter data is due to quantity and unrecorded amounts. 
 
 The accuracy is almost the same as the one before with slightly more error in this model due to the auxillary datapoints that are similar but not exact in the original dataset. 
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 error_by_reg_and_fold_new <- 
   reg.ss.spatialCV_new %>%
     group_by(uniqueID) %>% 
@@ -949,7 +941,7 @@ error_by_reg_and_fold_new %>%
   arrange(MAE)
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 error_by_reg_and_fold_new %>% filter(MAE <=10) %>%
   ggplot(aes(MAE)) + 
     geom_histogram(bins = 30, colour="black", fill = "#FDE725FF") +
@@ -958,7 +950,7 @@ error_by_reg_and_fold_new %>% filter(MAE <=10) %>%
          x="Mean Absolute Error", y="Count") 
 ```
 
-```{r, warning=FALSE, message=FALSE, results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide', cache=TRUE}
 ml_breaks_new <- classIntervals(reg.ss.spatialCV_new$Prediction, 
                              n = 5, "fisher")
 litter_risk_sf_new <-
@@ -982,7 +974,7 @@ litter_risk_sf_new <-
 
 We see similar results as from the first model further proving the integrity of the data evaluated prior. Despite the additional data points that are meant to spread out the evaluation, we see a circular shape forming on the central north section adjacent to the edge. Because the boundary (water) is on the east, and there is litter developing an encirclement, the model detect the potential for litter to most likely occur within that circle. After all, restaurants are present in the 'category 5' area just as much as the surroundings, yet no litter was recorded there. These results bring hope to our model's capabilities in advancing Urban Ocean's goals as it aims to assess litter accumulation in cities around the world. 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 ggplot() +
     geom_sf(data = litter_risk_sf_new, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = allrandom_points_df, size = .01,alpha = 0.01, colour = "red") +
@@ -992,11 +984,13 @@ ggplot() +
     mapTheme(title_size = 14)
 ```
 
-# Attempt at Random Forest Model
+# Next Steps
 
-To be continued. 
+## Random Forest Model Attempt
 
-```{r}
+We will be continuing our modeling process by attempting different kinds of models, including a random forest model. These models will be completed and properly evaluated in the future.
+
+```{r, warning=FALSE, message=FALSE, cache=TRUE}
 buildRFModel <- function(dataset, dependentVariable, indVariables, 
                          testFraction = 0.2, ntree = 500, mtry = NULL, nodesize = 1) {
   # Split dataset into training and testing sets
@@ -1029,19 +1023,20 @@ buildRFModel <- function(dataset, dependentVariable, indVariables,
 }
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r eval=FALSE, include=FALSE, cache=TRUE}
 reg.ss.vars <- c("rst_nn", "rstrt.isSig.dist","road_nn", "road.isSig.dist","wtr_nn", "wtr.isSig.dist")
 
 ## RUN REGRESSIONS
-reg.ss.spatialCV_new <- rf_cv(
-  dataset = final_net_new,
-  id = "uniqueID",                           
-  dependentVariable = "countlitter",
-  indVariables = reg.ss.vars) %>%
-    dplyr::select(uniqueID, countlitter, Prediction, geometry)
+#reg.ss.spatialCV_new <- rf_cv(
+#  dataset = final_net_new,
+#  id = "uniqueID",                           
+#  dependentVariable = "countlitter",
+#  indVariables = reg.ss.vars) %>%
+#    dplyr::select(uniqueID, countlitter, Prediction, geometry)
 ```
 
-```{r eval=FALSE, include=FALSE}
+
+```{r eval=FALSE, include=FALSE, cache=TRUE}
 chen_bd <- c(80.4301860, 13.2436939, 80.1101860, 12.8236939)
 chen_sub_bd <- c(80.4301860, 13.1536939, 80.2601860, 12.9136939)
 
@@ -1059,7 +1054,7 @@ polygon_geometry <- st_polygon(list(coordinates))
 polygon_sf <- st_sfc(polygon_geometry, crs = 4326) 
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r eval=FALSE, include=FALSE, cache=TRUE}
 fishnet_new <- 
   st_make_grid(chen_bdry,
                cellsize = 500, 
