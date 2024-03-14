@@ -19,7 +19,7 @@ editor_options:
 
 # Introduction
 
-The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and have collected waste management information. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and have collected waste management information. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
 
 ```{r, warning=FALSE, message=FALSE, error=FALSE, include=FALSE,  }
 knitr::opts_chunk$set(echo = TRUE)
@@ -220,7 +220,7 @@ ggplot() +
 
 # Data Gathering and Variables
 
-Our variable selection were based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
+Our variable selection were based on our hypothesis of areas of human activity leading to higher litter assessment. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
 ## OpenStreetMap Variable Acquisition 
 
@@ -710,7 +710,7 @@ reg.ss.spatialCV <- crossValidate(
 
 # Model Results 
 
-After a full analysis on variables, model development, and statistical evaluation of all relations, we developed a risk assessment model. The results that follow examine the numeric, visual, and decision implications of the model's outcome. The goal of the results is to evaluate the general accuracy of the model in terms of Chennai alone, detect the potential accumulation risk zones, and adjust the framework for generalizability for other cities. 
+After a full analysis on variables, model development, and statistical evaluation of all relations, we developed an assessment model. The results that follow examine the numeric, visual, and decision implications of the model's outcome. The goal of the results is to evaluate the general accuracy of the model in terms of Chennai alone, detect the potential accumulation assessment zones, and adjust the framework for generalizability for other cities. 
 
 ## Mean Absolute Error of Model
 
@@ -747,7 +747,7 @@ ml_breaks <- classIntervals(reg.ss.spatialCV$Prediction,
                              n = 5, "fisher")
 litter_risk_sf <-
   reg.ss.spatialCV %>%
-  mutate(label = "Risk Predictions",
+  mutate(label = "Assessment Predictions",
          Risk_Category =classInt::findCols(ml_breaks),
          Risk_Category = case_when(
            Risk_Category == 5 ~ "5th",
@@ -764,7 +764,7 @@ litter_risk_sf <-
 
 ## Predictions & Results by Category 
 
-The model produces a risk assessment that categorizes the city into 5 sections, 1 being the lowest risk for litter production while 5 is the highest. For what the model has predicted, there appears to be a core prediction in the central area and a smaller core in the south. There is reasonable concern regarding the fact no section where the model predicting category 4 or 5 are where litter was recorded. What needs to be considered is the pattern the model detects, the purpose of the model is not to depict where litter was already recorded, but where it was not. 
+The model produces an assessment that categorizes the city into 5 sections, 1 being the lowest assessment for litter production while 5 is the highest. For what the model has predicted, there appears to be a core prediction in the central area and a smaller core in the south. There is reasonable concern regarding the fact no section where the model predicting category 4 or 5 are where litter was recorded. What needs to be considered is the pattern the model detects, the purpose of the model is not to depict where litter was already recorded, but where it was not. 
 
 When looking at the current litter points (red dots), we see a vague circularly pattern for the larger core. The model appears to notice this pattern and is stating there is potential litter in the center of the "circle" where pre-recorded litter encircles yet feature zero data points. 
 
@@ -773,7 +773,7 @@ ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_p, size = .3, colour = "red") +
     scale_fill_viridis(discrete = TRUE) +
-    labs(title="Litter Risk Predictions, Chennai",
+    labs(title="Litter Assessment Predictions, Chennai",
          subtitle="") +
     mapTheme(title_size = 14)
 ```
@@ -958,7 +958,7 @@ ml_breaks_new <- classIntervals(reg.ss.spatialCV_new$Prediction,
                              n = 5, "fisher")
 litter_risk_sf_new <-
   reg.ss.spatialCV_new %>%
-  mutate(label = "Risk Predictions",
+  mutate(label = "Assessment Predictions",
          Risk_Category =classInt::findCols(ml_breaks_new),
          Risk_Category = case_when(
            Risk_Category == 5 ~ "5th",
@@ -982,7 +982,7 @@ ggplot() +
     geom_sf(data = litter_risk_sf_new, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = allrandom_points_df, size = .01,alpha = 0.01, colour = "red") +
     scale_fill_viridis(discrete = TRUE) +
-    labs(title="Litter Risk Predictions, Chennai",
+    labs(title="Litter assessment Predictions, Chennai",
          subtitle="") +
     mapTheme(title_size = 14)
 ```
