@@ -55,12 +55,12 @@ mumb_bdry <- st_set_crs(mumb_bdry, 4326)%>%
 
 
 ## ATTENTION! if this part not work, it's totally fine, you can just grab the bbox data in google map
-city <- getbb(place_name = "Panama City", format_out = "polygon")  # not used 
+city <- getbb(place_name = "Panama City Panama", format_out = "polygon")  # not used 
 bb_df <- getbb(place_name = "Panama City Panama", format_out = "data.frame") # get chennai boundary
 
 bdry <- bb_df$boundingbox # extract the geoemtry part
 bdry
-bdry <- st_as_sfc(bdry, crs = 4326)
+
 # just a record
 # 4,2,3 1 in northern hemisphere
 bd <- st_bbox(bdry, crs = 4326) # create a bbox
