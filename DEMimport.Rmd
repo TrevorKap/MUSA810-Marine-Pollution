@@ -92,5 +92,14 @@ Panama = raster("C:/Users/Owner/Downloads/dem30plus_acp.tif")
 
 plot(Panama)
 ```
+```{r DEM attempt 2}
+
+Chennai = raster("C:/Users/Owner/Downloads/rasters_Chennai/output_NASADEM.tif")
+
+plot(Chennai)
+```
+
+
+
 
   
