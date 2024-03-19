@@ -49,7 +49,7 @@ litter_p <- subset(litter_p, select = -c(event_name, project_name))
 
 # load boundary data
 ## ATTENTION! this part should be the boundry of YOUR CITY
-mumb_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/MMRDA/MMRDA_Manual.shx')
+mumb_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mumbai-wards-map.kml')
 mumb_bdry <- st_set_crs(mumb_bdry, 4326)%>%
   st_transform('EPSG:32643')
 
@@ -139,7 +139,9 @@ india <- getbb(place_name = "india", format_out = "polygon") # not used
 bb_df <- getbb(place_name = "mumbai india", format_out = "data.frame") # get chennai boundary
 bdry <- bb_df$boundingbox # extract the geoemtry part
 bdry
-mumb_bd <- c(72.9068144, 19.0525850, 72.7915568, 18.8939566) # just a record
+mumb_bd <- c(72.947085, 19.180209, 72.7915568, 18.8939566) # just a record
+
+
 ```
 
 ```{r get point_nn_fishnet}
@@ -190,7 +192,7 @@ visual_count_net(rstrt_net,rstrt_point,mumb_bdry,'restaurant')
 visual_count_net(road_net,road_point,mumb_bdry,'road')
 visual_count_net(indstr_net,indstr_point,mumb_bdry,'Industrial Land Use')
 visual_count_net(rsdnt_net,rsdnt_point,mumb_bdry,'Residential Land Use')
-visual_count_net(rtl_net,rtl_point,mumb_bdry,'retail Land Use')
+ visual_count_net(rtl_net,rtl_point,mumb_bdry,'retail Land Use')
 
 nn_visual(water_nn_net,'water') # visualize the knn variable data
 nn_visual(waste_nn_net,'waste')
@@ -331,10 +333,4 @@ error_by_reg_and_fold %>% filter(MAE <= 10)%>%
 error_visual(reg.ss.spatialCV) # visualize the MSE of prediction
 ```
 
-```{r}
-risk_visualize(reg.ss.spatialCV,litter_p) # visualize the risk map
 ```
-
-
-
-
