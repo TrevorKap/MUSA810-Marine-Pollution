@@ -49,7 +49,7 @@ litter_p <- subset(litter_p, select = -c(event_name, project_name))
 
 # load boundary data
 ## ATTENTION! this part should be the boundry of YOUR CITY
-mumb_bdry <- st_read('C:/Users/Owner/Downloads/Santiago__Parcel_Boundaries/Santiago_Parcel_Boundaries.shp')
+mumb_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/PanamaCity.kml')
 mumb_bdry <- st_set_crs(mumb_bdry, 4326)%>%
   st_transform('EPSG:32643')
 
@@ -79,7 +79,7 @@ litter_net <- countfishnet(fishnet, litter_p)
 ```
 
 ## raster data
-```{r}
+```{r eval=FALSE, include=FALSE}
 # load raster data
 ## ATTENTION! you can download the data from facebook population link to your local place first
 ## AND, based on the lat & lon to choose the image you need, and the geometry info is in the name of file
@@ -97,7 +97,7 @@ temp_sf <- st_as_sf(temp)
 df_points <- st_centroid(temp_sf) # convert to point geometry
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # convert projection
 df_points <- df_points%>%
   st_transform('EPSG:32643')
@@ -117,7 +117,7 @@ sum_pop <- joined_data %>%
   summarise(sum_pop = sum(Population.Count, na.rm = TRUE))
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # pop thing visualize
 grid.arrange(
 ggplot() +
