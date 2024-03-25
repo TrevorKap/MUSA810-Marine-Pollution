@@ -203,3 +203,52 @@ error_visual <- function(model_data){
     labs(title="Distribution of MAE", subtitle = "LOGO-CV",
          x="Mean Absolute Error", y="Count") 
 }
+
+model_process <- function(dataset,model){
+  df_rf_rst <- dataset%>%
+    mutate(Prediction = predict(model,dataset,type = 'response'),
+           Mean_Error = mean(Prediction - count,na.rm = T),
+           MAE = mean(abs(Mean_Error), na.rm = T),
+           SD_MAE = mean(abs(Mean_Error), na.rm = T))%>%
+    dplyr::select(uniqueID,count,Prediction)
+  return(df_rf_rst)
+}
+
+model_result <- function(dataset,model){
+  df_rf_rst <- dataset%>%
+    mutate(Prediction = predict(model,dataset,type = 'response'))%>%
+    summarise(Mean_Error = mean(Prediction - count,na.rm = T),
+              MAE = mean(abs(Mean_Error), na.rm = T),
+              SD_MAE = mean(abs(Mean_Error), na.rm = T))%>%
+    dplyr::select(Mean_Error,MAE,SD_MAE)
+  return(df_rf_rst)
+}
+
+# approach is from "fixed", "sd", "equal", "pretty", "quantile", "kmeans", "hclust", "bclust", "fisher", "jenks", "dpih", "headtails", "maximum", or "box"
+risk_v <- function(model_data,litter_data,approach){
+  ml_breaks <- classIntervals(model_data$Prediction, 
+                              n = 5, approach)
+  
+  litter_risk_sf <- model_data %>%
+    mutate(label = "Risk Predictions",
+           Risk_Category =classInt::findCols(ml_breaks),
+           Risk_Category = case_when(
+             Risk_Category == 5 ~ "5th",
+             Risk_Category == 4 ~ "4th",
+             Risk_Category == 3 ~ "3rd",
+             Risk_Category == 2 ~ "2nd",
+             Risk_Category == 1 ~ "1st")) %>%
+    cbind(
+      aggregate(
+        dplyr::select(litter_data) %>% mutate(litterCount = 1), ., sum) %>%
+        mutate(litterCount = replace_na(litterCount, 0))) %>%
+    dplyr::select(label,Risk_Category, litterCount)
+  
+  ggplot() +
+    geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
+    geom_sf(data = litter_data, size = .3, colour = "red") +
+    scale_fill_viridis(discrete = TRUE) +
+    labs(title=paste("Litter Risk Predictions",approach,sep = '--'),
+         subtitle="") +
+    mapTheme(title_size = 8)
+}
