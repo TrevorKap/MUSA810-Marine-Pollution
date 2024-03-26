@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
-    <name>Untitled layer</name>
-    <Style id="poly-000000-1200-77-nodesc-normal">
+    <name>PanamaCity</name>
+    <Style id="poly-000000-1200-77-normal">
       <LineStyle>
         <color>ff000000</color>
         <width>1.2</width>
@@ -12,11 +12,8 @@
         <fill>1</fill>
         <outline>1</outline>
       </PolyStyle>
-      <BalloonStyle>
-        <text><![CDATA[<h3>$[name]</h3>]]></text>
-      </BalloonStyle>
     </Style>
-    <Style id="poly-000000-1200-77-nodesc-highlight">
+    <Style id="poly-000000-1200-77-highlight">
       <LineStyle>
         <color>ff000000</color>
         <width>1.8</width>
@@ -26,48 +23,46 @@
         <fill>1</fill>
         <outline>1</outline>
       </PolyStyle>
-      <BalloonStyle>
-        <text><![CDATA[<h3>$[name]</h3>]]></text>
-      </BalloonStyle>
     </Style>
-    <StyleMap id="poly-000000-1200-77-nodesc">
+    <StyleMap id="poly-000000-1200-77">
       <Pair>
         <key>normal</key>
-        <styleUrl>#poly-000000-1200-77-nodesc-normal</styleUrl>
+        <styleUrl>#poly-000000-1200-77-normal</styleUrl>
       </Pair>
       <Pair>
         <key>highlight</key>
-        <styleUrl>#poly-000000-1200-77-nodesc-highlight</styleUrl>
+        <styleUrl>#poly-000000-1200-77-highlight</styleUrl>
       </Pair>
     </StyleMap>
     <Placemark>
       <name>PanamaCity</name>
-      <styleUrl>#poly-000000-1200-77-nodesc</styleUrl>
+      <description>End borders are around San Miguelito, Parque National Park, and neighborhood Llano Bonito.</description>
+      <styleUrl>#poly-000000-1200-77</styleUrl>
       <Polygon>
         <outerBoundaryIs>
           <LinearRing>
             <tessellate>1</tessellate>
             <coordinates>
-              -79.596296,9.0044125,0
-              -79.5933778,9.0005129,0
-              -79.5890862,8.9988174,0
-              -79.5870263,8.9961046,0
-              -79.5849664,8.9935614,0
-              -79.5817048,8.9913572,0
-              -79.5803315,8.9877966,0
-              -79.5799882,8.9840664,0
-              -79.5794732,8.979997,0
-              -79.5780999,8.9762668,0
-              -79.5765549,8.9715191,0
-              -79.5741517,8.9664322,0
-              -79.5712334,8.9633801,0
-              -79.5665986,8.9593105,0
-              -79.564882,8.9569365,0
-              -79.5684869,8.953206,0
-              -79.5664269,8.9513407,0
-              -79.5679719,8.948458,0
-              -79.5664269,8.9467623,0
-              -79.5624787,8.9442187,0
+              -79.6012742,9.001615,0
+              -79.5975835,8.9961894,0
+              -79.5950085,8.9927136,0
+              -79.5925195,8.9886443,0
+              -79.5908029,8.9837273,0
+              -79.5874555,8.9793188,0
+              -79.5859963,8.9771993,0
+              -79.5838506,8.9731299,0
+              -79.582134,8.9702473,0
+              -79.5798165,8.966517,0
+              -79.5774132,8.9619388,0
+              -79.575525,8.9582083,0
+              -79.5738942,8.9560887,0
+              -79.5768125,8.9521038,0
+              -79.5734651,8.9497298,0
+              -79.5758683,8.9443035,0
+              -79.5728642,8.9415055,0
+              -79.5696885,8.9411663,0
+              -79.5659119,8.9404033,0
+              -79.5676285,8.9345529,0
               -79.5538956,8.9384531,0
               -79.5442826,8.9303134,0
               -79.5427377,8.9335354,0
@@ -174,7 +169,7 @@
               -79.5879183,9.0078727,0
               -79.5899783,9.0086356,0
               -79.5916949,9.0071945,0
-              -79.596296,9.0044125,0
+              -79.6012742,9.001615,0
             </coordinates>
           </LinearRing>
         </outerBoundaryIs>
