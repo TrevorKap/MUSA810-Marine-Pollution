@@ -53,23 +53,12 @@ mumb_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/
 mumb_bdry <- st_set_crs(mumb_bdry, 4326)%>%
   st_transform('EPSG:32643')
 
-
-## ATTENTION! if this part not work, it's totally fine, you can just grab the bbox data in google map
-city <- getbb(place_name = "Panama City Panama", format_out = "polygon")  # not used 
-bb_df <- getbb(place_name = "Panama City Panama", format_out = "data.frame") # get chennai boundary
-
-bdry <- bb_df$boundingbox # extract the geoemtry part
-bdry
-
-# just a record
-# 4,2,3 1 in northern hemisphere
-bd <- st_bbox(bdry, crs = 4326) # create a bbox
 # create fishnet of city boundary
 fishnet <- 
-  st_make_grid(bdry,
+  st_make_grid(mumb_bdry,
                cellsize = 500, 
                square = TRUE) %>%
-  .[bdry] %>%            
+  .[mumb_bdry] %>%            
   st_sf() %>%
   mutate(uniqueID = 1:n())
 
@@ -137,7 +126,7 @@ nrow=1)
 ```{r}
 # reference: https://wiki.openstreetmap.org/wiki/Map_features#Entertainment,_Arts_&_Culture
 amenity_wm <- c('waste_basket','waste_disposal','waste_transfer_station','recycling') # done
-water<- c('canal','drain','ditch') # done 
+water<- c('canal','drain','ditch', 'harbor', 'wastewaster') # done 
 leisure <- c('park')
 landuse <- c('commercial','residential','retail','industrial') # done 
 highway <- c('motorway','trunk','primary','secondary','tertiary','unclassified','residential') # done
@@ -145,14 +134,18 @@ act <- c('maxspeed')
 amenity_food <- c('restaurant','pub','bar') # done
 building <- ('apartments,')
 
-
-
-
+## ATTENTION! if this part not work, it's totally fine, you can just grab the bbox data in google map
+india <- getbb(place_name = "Panama", format_out = "polygon") # not used 
+bb_df <- getbb(place_name = "Panama City, Panama", format_out = "data.frame") # get chennai boundary
+bdry <- bb_df$boundingbox # extract the geoemtry part
+bdry
+mumb_bd <- c(-79.3741802, 9.3314493, -79.6941802, -8.5114493) # just a record
+# 4, 2, 3, 1
 ```
 
 ```{r get point_nn_fishnet}
-water_point <- point_data(mumb_bd, 'water',c('canal','drain','ditch'),'water') # grab osm point data (the detail input variable just check the 'https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R' and I have write the input require)
-water_net <- countfishnet(fishnet,water_point) # create fn variable of litter count
+water_point <- point_data(mumb_bd, 'water',c('canal','drain','ditch', 'harbor', 'wastewaster'),'waterway') # grab osm point data (the detail input variable just check the 'https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R' and I have write the input require)
+#water_net <- countfishnet(fishnet,water_point) # create fn variable of litter count (for panama didnt work)
 water_nn_net <- knnfishnet(fishnet,water_point,3) # create fn knn variable 
 
 waste_point <- point_data(mumb_bd, 'amenity',c('waste_basket','waste_disposal','waste_transfer_station','recycling'),'waste')
@@ -181,7 +174,7 @@ rtl_nn_net <- knnfishnet(fishnet,rtl_point,3)
 ```
 
 ```{r}
-print(chisq.test(water_net$count,litter_net$count)) # chi-square test 
+#print(chisq.test(water_nn_net$count,litter_net$count)) # chi-square test 
 print(chisq.test(rstrt_net$count,litter_net$count))
 print(chisq.test(road_net$count,litter_net$count))
 print(chisq.test(waste_net$count,litter_net$count))
@@ -192,7 +185,7 @@ print(chisq.test(rtl_net$count,litter_net$count))
 ```
 
 ```{r visualize count net}
-visual_count_net(water_net,water_point,mumb_bdry,'water') # visualize the point and fn count data
+#visual_count_net(water_nn_net,water_point,mumb_bdry,'water') # visualize the point and fn count data
 visual_count_net(waste_net,waste_point,mumb_bdry,'waste')
 visual_count_net(rstrt_net,rstrt_point,mumb_bdry,'restaurant')
 visual_count_net(road_net,road_point,mumb_bdry,'road')
@@ -227,11 +220,11 @@ final_net <- final_net%>%
          restaurant_nn = item.nn.y,
          road_nn = item.nn)
 
-final_net <- 
-  left_join(final_net,st_drop_geometry(avg_pop), by="uniqueID")
+#final_net <- 
+#  left_join(final_net,st_drop_geometry(avg_pop), by="uniqueID")
 
-final_net <- 
-  left_join(final_net,st_drop_geometry(sum_pop), by="uniqueID")
+#final_net <- 
+#  left_join(final_net,st_drop_geometry(sum_pop), by="uniqueID")
 ```
 
 ```{r local moran's I analysis}
@@ -244,11 +237,11 @@ local_morans_rst <- localmoran(final_net$restaurant, final_net.weights, zero.pol
   as.data.frame()
 local_morans_road <- localmoran(final_net$road, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
-local_morans_wtr <- localmoran(final_net$water, final_net.weights, zero.policy=TRUE) %>% 
+local_morans_wtr <- localmoran(final_net$watr_nn, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 local_morans_sp <- localmoran(final_net$sum_pop, final_net.weights, zero.policy=TRUE) %>% 
   as.data.frame()
 lc_mr_visual(local_morans_sp,final_net,'sum_pop')
@@ -262,7 +255,7 @@ lc_mr_visual(local_morans_ap,final_net,'avg_pop')
 # attention!
 # the legends here shoud be the same as label set when create the count fishnet
 # visualize the local moran result
-lc_mr_visual(local_morans_wtr,final_net,'water')
+#lc_mr_visual(local_morans_wtr,final_net,'water')
 lc_mr_visual(local_morans_rst,final_net,'restaurant')
 lc_mr_visual(local_morans_road,final_net,'road')
 ```
@@ -300,7 +293,7 @@ nrow = 1)
 ```
 
 ```{r}
-reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis",'sum_pop') # the independent variables included
+reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis") # the independent variables included
 
 ## RUN REGRESSIONS
 reg.ss.spatialCV <- crossValidate(
@@ -309,6 +302,8 @@ reg.ss.spatialCV <- crossValidate(
   dependentVariable = "count", # this count is the litter count 
   indVariables = reg.ss.vars) %>%
     dplyr::select(uniqueID, count, Prediction, geometry)
+
+risk_v(reg.ss.spatialCV,litter_p,'kmeans')
 ```
 
 ```{r}
