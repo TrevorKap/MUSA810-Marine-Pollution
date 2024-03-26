@@ -204,6 +204,10 @@ error_visual <- function(model_data){
          x="Mean Absolute Error", y="Count") 
 }
 
+# model_process: to get the prediction variable
+# input of function: 
+# dataset: the data need to be predict
+# model: the ML model
 model_process <- function(dataset,model){
   df_rf_rst <- dataset%>%
     mutate(Prediction = predict(model,dataset,type = 'response'),
@@ -214,6 +218,10 @@ model_process <- function(dataset,model){
   return(df_rf_rst)
 }
 
+# model_process: to get the model performance result
+# input of function: 
+# dataset: the data need to be predict
+# model: the ML model
 model_result <- function(dataset,model){
   df_rf_rst <- dataset%>%
     mutate(Prediction = predict(model,dataset,type = 'response'))%>%
@@ -225,6 +233,11 @@ model_result <- function(dataset,model){
 }
 
 # approach is from "fixed", "sd", "equal", "pretty", "quantile", "kmeans", "hclust", "bclust", "fisher", "jenks", "dpih", "headtails", "maximum", or "box"
+# risk_v: visualize the result of risk map
+# input of function: 
+# model_data: the dataset with Prediction column
+# litter_data: the litter data
+# appraoch: see from above
 risk_v <- function(model_data,litter_data,approach){
   ml_breaks <- classIntervals(model_data$Prediction, 
                               n = 5, approach)
@@ -251,4 +264,24 @@ risk_v <- function(model_data,litter_data,approach){
     labs(title=paste("Litter Risk Predictions",approach,sep = '--'),
          subtitle="") +
     mapTheme(title_size = 8)
+}
+
+# risk_v: visualize all the result of risk map
+# input of function: 
+# dataset: the dataset with Prediction column
+partytime <- function(dataset){
+  grid.arrange(risk_v(dataset,litter_p,"sd"),
+               risk_v(dataset,litter_p,"equal"),
+               risk_v(dataset,litter_p,"pretty"),
+               risk_v(dataset,litter_p,"quantile"),
+               risk_v(dataset,litter_p,"kmeans"),
+               risk_v(dataset,litter_p,"hclust"),ncol=3)
+  
+  grid.arrange(
+    risk_v(dataset,litter_p,"bclust"),
+    risk_v(dataset,litter_p,"fisher"),
+    risk_v(dataset,litter_p,"jenks"),
+    risk_v(dataset,litter_p,"dpih"),
+    risk_v(dataset,litter_p,"headtails"),
+    risk_v(dataset,litter_p,"maximum"),ncol=3)
 }
