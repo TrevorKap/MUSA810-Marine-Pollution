@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #install.packages("remotes")
 #remotes::install_github("IREA-CNR-MI/sprawl")
-install.packages("tidygraph")
+#install.packages("tidygraph")
 library(tidyverse)
 library(sf)
 library(RSocrata)
@@ -72,13 +72,13 @@ litter_net <- countfishnet(fishnet, litter_p)
 # load raster data
 ## ATTENTION! you can download the data from facebook population link to your local place first
 ## AND, based on the lat & lon to choose the image you need, and the geometry info is in the name of file
-img <- raster("/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/population_ind_pak_general/population_10_lon_80_general-v1.5.tif")
+img <- raster("/Users/skycheng17/Documents/2. practicum/population_ind_pak_general 2/population_10_lon_80_general-v1.5.tif")
 
 # p.s. this part is still the chennai boundary, why i load another one is the original one have incorrect z-dimention and can not be used as mask. 
-temp_bd <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/archive (1)/cma_layer.shp')
+#temp_bd <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/archive (1)/cma_layer.shp')
 
-tifCropped <- crop(img, extent(temp_bd)) # extract raster based on boundary
-tifClipped <- mask(tifCropped, temp_bd) # clip the raster based on boundary
+tifCropped <- crop(img, extent(mumb_bdry)) # extract raster based on boundary
+tifClipped <- mask(tifCropped, mumb_bdry) # clip the raster based on boundary
 polys1 = rasterToPolygons(tifClipped) # convert raster to polygon (it will take some time, it's OK)
 sf_object <- st_as_sf(polys1) 
 temp <- as.data.frame(sf_object) # convert to sf dataframe
@@ -332,5 +332,17 @@ error_by_reg_and_fold %>% filter(MAE <= 10)%>%
 ```{r}
 error_visual(reg.ss.spatialCV) # visualize the MSE of prediction
 ```
+
+```{r}
+
+write_sf(final_net, "final_net_mumbai.geojson")
+
+final_net_mumbai <-st_read("final_net_mumbai.geojson")
+final_net_chennai <-st_read("final_net_chennai.geojson")
+
+final_net_combined <- rbind(final_net_mumbai, final_net_chennai)
+
+write_sf(final_net_combined, "final_net_combined.geojson")
+
 
 ```
