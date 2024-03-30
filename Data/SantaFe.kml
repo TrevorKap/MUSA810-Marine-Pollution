@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Santa Fe</name>
+    <Style id="poly-000000-1200-77-nodesc-normal">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>1.2</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>4d000000</color>
+        <fill>1</fill>
+        <outline>1</outline>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <Style id="poly-000000-1200-77-nodesc-highlight">
+      <LineStyle>
+        <color>ff000000</color>
+        <width>1.8</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>4d000000</color>
+        <fill>1</fill>
+        <outline>1</outline>
+      </PolyStyle>
+      <BalloonStyle>
+        <text><![CDATA[<h3>$[name]</h3>]]></text>
+      </BalloonStyle>
+    </Style>
+    <StyleMap id="poly-000000-1200-77-nodesc">
+      <Pair>
+        <key>normal</key>
+        <styleUrl>#poly-000000-1200-77-nodesc-normal</styleUrl>
+      </Pair>
+      <Pair>
+        <key>highlight</key>
+        <styleUrl>#poly-000000-1200-77-nodesc-highlight</styleUrl>
+      </Pair>
+    </StyleMap>
+    <Placemark>
+      <name>Santa Fe</name>
+      <styleUrl>#poly-000000-1200-77-nodesc</styleUrl>
+      <Polygon>
+        <outerBoundaryIs>
+          <LinearRing>
+            <tessellate>1</tessellate>
+            <coordinates>
+              -60.7287604,-31.6749622,0
+              -60.7146841,-31.6707255,0
+              -60.7069594,-31.6633473,0
+              -60.7036978,-31.6572836,0
+              -60.6995779,-31.6555301,0
+              -60.692969,-31.6481507,0
+              -60.6857592,-31.644205,0
+              -60.6821543,-31.6405515,0
+              -60.6766611,-31.6295169,0
+              -60.6766611,-31.6229394,0
+              -60.6624133,-31.6084671,0
+              -60.6630999,-31.5979405,0
+              -60.7537371,-31.5768836,0
+              -60.7537371,-31.5839031,0
+              -60.7506472,-31.592238,0
+              -60.7257563,-31.6110986,0
+              -60.7252413,-31.616069,0
+              -60.7367426,-31.6377016,0
+              -60.7417208,-31.6426706,0
+              -60.7420641,-31.6491006,0
+              -60.7386309,-31.6574297,0
+              -60.7334811,-31.660352,0
+              -60.7287604,-31.6749622,0
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>
