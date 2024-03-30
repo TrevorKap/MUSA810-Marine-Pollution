@@ -139,9 +139,16 @@ landuse <- c('commercial','residential','retail','industrial') # done
 highway <- c('motorway','trunk','primary','secondary','tertiary','unclassified','residential') # done
 act <- c('maxspeed') 
 amenity_food <- c('restaurant','pub','bar') # done
-building <- ('apartments,')
+building <- ('apartments')
+
+bb_df <- getbb(place_name = "mumbai india", format_out = "data.frame") # get  boundary
+bdry <- bb_df$boundingbox # extract the geometry parts
+bdry #output is a set of coordinates, follow the follow order for the 'boundary list' as indicated below
+# 4, 2, 3, 1
 
 chen_bd <- c(80.4301860, 13.2436939, 80.1101860, 12.8236939) # just a record
+
+
 ```
 
 ```{r get point_nn_fishnet}
