@@ -11,10 +11,16 @@ point_data <- function(boundary,keys,values,legends){
     add_osm_feature(key = keys, value = values)%>%
     osmdata_sf()
   
-  temp_point <- pluck(temp,'osm_points')%>%
-    dplyr::select(osm_id,geometry)%>%
-    st_transform('EPSG:32643')%>%
-    mutate(legend = legends)
+  if (nrow(temp$osm_points) == 0) {
+    temp_point <- st_sf(osm_id = integer(), geometry = st_sfc(crs = 4326))%>%
+      mutate(legend = legends)%>%
+      st_transform('EPSG:32643')
+  } else {
+    temp_point <- pluck(temp,'osm_points')%>%
+      dplyr::select(osm_id,geometry)%>%
+      st_transform('EPSG:32643')%>%
+      mutate(legend = legends)
+  }
   
   return(temp_point)
 }
@@ -42,20 +48,26 @@ countfishnet <- function(fishnet,dataset){
 # dataset: the POI dataset generated from 'point_data' 
 # knum: the parameter of KNN, the normal situation is 3 (type: numeric)
 
-knnfishnet <- function(fishnet,dataset,knum){
-  vars_net <- dataset%>%
-    st_join(fishnet, join=st_within) %>%
-    st_drop_geometry() %>%
-    group_by(uniqueID,legend) %>%
-    summarize(count = n()) %>%
-    left_join(fishnet, ., by = "uniqueID") %>%
-    spread(legend, count, fill=0) %>%
-    dplyr::select(-`<NA>`) %>%
-    ungroup()
-  vars_net <- vars_net %>%
-    mutate(item.nn = nn_function(st_c(st_coid(vars_net)), 
-                                 st_c(dataset),
-                                 k = knum))
+knnfishnet <- function(fishnet,dataset,knum,label){
+  if(nrow(dataset) == 0){
+    vars_net <- fishnet %>%
+      mutate(!!label := 0,
+             item.nn = 0)
+  } else{
+    vars_net <- dataset%>%
+      st_join(fishnet, join=st_within) %>%
+      st_drop_geometry() %>%
+      group_by(uniqueID,legend) %>%
+      summarize(count = n()) %>%
+      left_join(fishnet, ., by = "uniqueID") %>%
+      spread(legend, count, fill=0) %>%
+      dplyr::select(-`<NA>`) %>%
+      ungroup()
+    vars_net <- vars_net %>%
+      mutate(item.nn = nn_function(st_c(st_coid(vars_net)), 
+                                   st_c(dataset),
+                                   k = knum))
+  }
   return(vars_net)
 }
 

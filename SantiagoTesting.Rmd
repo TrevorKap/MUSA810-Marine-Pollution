@@ -144,13 +144,13 @@ mumb_bd <- c(-70.6249963, -33.4255933, -70.6920527, -33.4785698) # just a record
 ```
 
 ```{r get point_nn_fishnet}
-water_point <- point_data(mumb_bd, 'water',c('canal','drain','ditch', 'harbor', 'wastewaster'),'waterway') # grab osm point data (the detail input variable just check the 'https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R' and I have write the input require)
+water_point <- point_data(mumb_bd, 'water',c('canal','drain','ditch', 'harbor', 'wastewaster'),'water') # grab osm point data (the detail input variable just check the 'https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R' and I have write the input require)
 #water_net <- countfishnet(fishnet,water_point) # create fn variable of litter count (for panama didnt work)
-#water_nn_net <- knnfishnet(fishnet,water_point,3) # create fn knn variable 
+water_nn_net <- knnfishnet(fishnet,water_point,3) # create fn knn variable 
 
 waste_point <- point_data(mumb_bd, 'amenity',c('waste_basket','waste_disposal','waste_transfer_station','recycling'),'waste')
 waste_net <- countfishnet(fishnet,waste_point)
-waste_nn_net <- knnfishnet(fishnet,waste_point,3)
+waste_nn_net <- knnfishnet(fishnet,waste_point,3,'waste')
 
 rstrt_point <- point_data(mumb_bd, 'amenity',c('restaurant','pub','bar'),'restaurant')
 rstrt_net <- countfishnet(fishnet,rstrt_point)
