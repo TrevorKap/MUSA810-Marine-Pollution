@@ -408,10 +408,10 @@ partytime <- function(dataset){
 
 
 create_fish <- function(boudary){
-  fishnet <- st_make_grid(chen_bdry,
+  fishnet <- st_make_grid(boudary,
                           cellsize = 500, 
                           square = TRUE) %>%
-    .[chen_bdry] %>%            
+    .[boudary] %>%            
     st_sf() %>%
     mutate(uniqueID = 1:n())
   return(fishnet)
