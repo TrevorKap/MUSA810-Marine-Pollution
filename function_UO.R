@@ -124,7 +124,13 @@ pop_process <- function(temp_point,fishnet,epsg){
   return(list(avg_pop = avg_pop, sum_pop = sum_pop))
 }
 
-
+add_pop <- function(pop_result,final_net){
+  temp_a_pop <- pop_result$avg_pop
+  temp_s_pop <- pop_result$sum_pop
+  final_net <- left_join(final_net,st_drop_geometry(temp_a_pop), by="uniqueID")%>%
+    left_join(.,st_drop_geometry(temp_s_pop), by="uniqueID")
+  return(final_net)
+}
 # nn_visual: plot the fishnet in NN distance
 # input of function: 
 # nn_data: the POI dataset generated from 'knnfishnet' 
@@ -244,6 +250,34 @@ lm_col <- function(final_net,lm_data){
                                              col_name == 1))), 
                          k = 1))
   return(temp)
+}
+
+moran_agg <- function(final_net){
+  final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE) 
+  final_net.weights <- nb2listw(final_net.nb, style="W", zero.policy=TRUE) 
+  
+  local_morans_rst <- localmoran(final_net$restaurant, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  local_morans_road <- localmoran(final_net$road, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  local_morans_wtr <- localmoran(final_net$water, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  local_morans_sp <- localmoran(final_net$sum_pop, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  local_morans_ap <- localmoran(final_net$avg_pop, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  local_morans_indstr <- localmoran(final_net$industrial, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  local_morans_rsdnt <- localmoran(final_net$residential, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  local_morans_rtl <- localmoran(final_net$retail, final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+  
+  final_net <- lm_col(final_net,local_morans_wtr) 
+  final_net <- final_net%>% rename(wtr_sig = col_name, wtr_sig_dis = col_name_dis) 
+  final_net <- lm_col(final_net,local_morans_road)
+  final_net <- final_net%>% rename(road_sig = col_name, road_sig_dis = col_name_dis)
+  final_net <- lm_col(final_net,local_morans_rst)
+  final_net <- final_net%>% rename(rst_sig = col_name, rst_sig_dis = col_name_dis)
+  final_net <- lm_col(final_net,local_morans_indstr)
+  final_net <- final_net%>% rename(indstr_sig = col_name, indstr_sig_dis = col_name_dis)
+  final_net <- lm_col(final_net,local_morans_rsdnt)
+  final_net <- final_net%>% rename(rsdnt_sig = col_name, rsdnt_sig_dis = col_name_dis)
+  final_net <- lm_col(final_net,local_morans_rtl)
+  final_net <- final_net%>% rename(rtl_sig = col_name, rtl_sig_dis = col_name_dis)
+  return(final_net)
 }
 
 # error_visual: visualize the error of model
