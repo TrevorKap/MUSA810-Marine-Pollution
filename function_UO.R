@@ -71,6 +71,60 @@ knnfishnet <- function(fishnet,dataset,knum,label){
   return(vars_net)
 }
 
+point_nn_gen <- function(temp_bbox,temp_fish,litter_net){
+  water_point <- point_data(temp_bbox, 'water',c('canal','drain','ditch'),'water')
+  water_nn_net <- knnfishnet(temp_fish,water_point,3,'water')
+  
+  waste_point <- point_data(temp_bbox, 'amenity',c('waste_basket','waste_disposal','waste_transfer_station','recycling'),'waste')
+  waste_nn_net <- knnfishnet(temp_fish,waste_point,3,'waste')
+  
+  rstrt_point <- point_data(temp_bbox, 'amenity',c('restaurant','pub','bar'),'restaurant')
+  rstrt_nn_net <- knnfishnet(temp_fish,rstrt_point,3,'restaurant')
+  
+  road_point <- point_data(temp_bbox, 'highway','residential','road')
+  road_nn_net <- knnfishnet(temp_fish,road_point,3,'road')
+  
+  indstr_point <- point_data(temp_bbox, 'landuse','industrial','industrial')
+  indstr_nn_net <- knnfishnet(temp_fish,indstr_point,3,'industrial')
+  
+  rsdnt_point <- point_data(temp_bbox, 'landuse','residential','residential')
+  rsdnt_nn_net <- knnfishnet(temp_fish,rsdnt_point,3,'residential')
+  
+  rtl_point <- point_data(temp_bbox, 'landuse','retail','retail')
+  rtl_nn_net <- knnfishnet(temp_fish,rtl_point,3,'retail')
+  
+  final_net <- left_join(litter_net, st_drop_geometry(water_nn_net), by="uniqueID") %>%
+    left_join(.,st_drop_geometry(rstrt_nn_net),by="uniqueID")%>%
+    left_join(.,st_drop_geometry(road_nn_net), by="uniqueID")%>%
+    left_join(.,st_drop_geometry(indstr_nn_net), by="uniqueID")%>%
+    left_join(.,st_drop_geometry(rsdnt_nn_net), by="uniqueID")%>%
+    left_join(.,st_drop_geometry(rtl_nn_net), by="uniqueID")%>%
+    rename(water_nn = item.nn.x,
+           restaurant_nn = item.nn.y,
+           road_nn = item.nn.x.x,
+           indstr_nn = item.nn.y.y,
+           rsdnt_nn = item.nn.x.x.x,
+           rtl_nn = item.nn.y.y.y)
+  
+  return(final_net)
+}
+
+pop_process <- function(temp_point,fishnet,epsg){
+  df_points <- temp_point%>%st_transform(paste('EPSG:',epsg))
+  joined_data <- st_join(fishnet, df_points)
+  
+  avg_pop <- joined_data %>%
+    group_by(uniqueID) %>%
+    summarise(avg_pop = mean(Population.Count, na.rm = TRUE))
+  avg_pop[is.na(avg_pop)] <- 0
+  
+  sum_pop <- joined_data %>%
+    group_by(uniqueID) %>%
+    summarise(sum_pop = sum(Population.Count, na.rm = TRUE))
+  return(list(avg_pop = avg_pop, sum_pop = sum_pop))
+}
+
+
 # nn_visual: plot the fishnet in NN distance
 # input of function: 
 # nn_data: the POI dataset generated from 'knnfishnet' 
