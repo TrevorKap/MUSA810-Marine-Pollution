@@ -71,6 +71,15 @@ knnfishnet <- function(fishnet,dataset,knum,label){
   return(vars_net)
 }
 
+pn_gen <- function(stor_df){
+  for (i in 1:nrow(stor_df)) {
+    tw_p <- point_data(temp_bbox,stor_df[i,1],unlist(stor_df[i,3]),stor_df[i,2])
+    tw_nn <- knnfishnet(temp_fish,tw_p,3,stor_df[i,2])
+    final_net <- left_join(final_net, st_drop_geometry(tw_nn), by="uniqueID") %>%
+      rename_with(~ paste0(stor_df[i, 2], "_nn"), .cols = matches("item.nn"))}
+  return(final_net)
+}
+
 point_nn_gen <- function(temp_bbox,temp_fish,litter_net){
   water_point <- point_data(temp_bbox, 'water',c('canal','drain','ditch'),'water')
   water_nn_net <- knnfishnet(temp_fish,water_point,3,'water')
@@ -277,6 +286,17 @@ moran_agg <- function(final_net){
   final_net <- final_net%>% rename(rsdnt_sig = col_name, rsdnt_sig_dis = col_name_dis)
   final_net <- lm_col(final_net,local_morans_rtl)
   final_net <- final_net%>% rename(rtl_sig = col_name, rtl_sig_dis = col_name_dis)
+  return(final_net)
+}
+
+moran_gen <- function(final_net,stor_df){
+  final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE) 
+  final_net.weights <- nb2listw(final_net.nb, style="W", zero.policy=TRUE) 
+  for (i in 1:nrow(stor_df))  {
+    local_morans_wtr <- localmoran(final_net[[stor_df[i, 2]]], final_net.weights, zero.policy=TRUE) %>% as.data.frame()
+    final_net <- lm_col(final_net,local_morans_wtr)%>%
+      rename_with(~ paste0(stor_df[i, 2], "_sig_dis"), .cols = matches("col_name_dis")) %>%
+      rename_with(~ paste0(stor_df[i, 2], "_sig"), .cols = matches("col_name"))}
   return(final_net)
 }
 
