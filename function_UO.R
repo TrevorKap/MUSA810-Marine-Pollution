@@ -439,4 +439,13 @@ get_bbox <- function(boundary){
   return(bbox_list)
 }
 
-raster_process <- function(img,bo
+raster_process <- function(img,boundary){
+  tifCropped <- crop(img, extent(boundary)) # extract raster based on boundary
+  tifClipped <- mask(tifCropped, boundary) # clip the raster based on boundary
+  polys1 = rasterToPolygons(tifClipped) # convert raster to polygon (it will take some time, it's OK)
+  sf_object <- st_as_sf(polys1) 
+  temp <- as.data.frame(sf_object) # convert to sf dataframe
+  temp_sf <- st_as_sf(temp)
+  df_points <- st_centroid(temp_sf)
+  return(df_points)
+}
