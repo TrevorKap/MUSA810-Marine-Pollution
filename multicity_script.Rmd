@@ -34,7 +34,7 @@ library(tidygraph)
 library(XML)
 library(neuralnet)
 library(MASS)
-library(tidymodels)
+#library(tidymodels)
 library(brms)
 library(jsonlite)
 library(QuickJSR)
@@ -75,13 +75,13 @@ litter_p <- litter%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
   st_transform('EPSG:32643')
 
-img <- raster("/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/population_ind_pak_general/population_10_lon_80_general-v1.5.tif")
+img <- raster("https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/rs_img/population_10_lon_80_general-v1.5.tif")
 
 chen_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/gcc-divisions-latest.kml')
 chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
   st_transform('EPSG:32643')
 
-temp_bd <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/archive (1)/cma_layer.shp')
+temp_bd <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/cma_layer.kml')
 
 temp_bbox <- get_bbox(temp_bd) # get the bounding box (the projection of temp_bd should be epsg4326)
 temp_fish <- create_fish(chen_bdry) # get the fishnet of the city (the projection of chen_bdry should be meter degree)
@@ -145,7 +145,7 @@ san_net <- final_net
 
 ```{r}
 chen_net <- chen_net %>%
-  dplyr::select(!c(avg_pop,sum_pop))%>%
+  #dplyr::select(!c(avg_pop,sum_pop))%>%
   mutate(city = 'Chennai',
          country = 'India')
 
