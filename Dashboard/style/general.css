@@ -1,20 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
 body, html {
-    font-family: "Open Sans";
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden; /* Prevent scrollbars */
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-.container {
-    display: flex;
-    height: 100%;
-    overflow: hidden; /* Prevent scrollbars */
-    
+  font-family: "Open Sans";
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden; /* Prevent scrollbars */
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 p{
@@ -24,26 +17,31 @@ p{
   color: #696969;
 
 }
-#sidebar {
-    width: 250px;
-    background-color: #ffffff;
-    color: #fff;
-    padding: 20px;
+
+.container {
+  display: flex;
+  height: 100vh; /* Use viewport height */
+  overflow: hidden; /* Prevent scrollbars */
 }
 
-#content {
-    flex: 1;
-    padding: 10px;
-    height: 100%;
-    overflow-y: auto; /* Enable scrollbar for content if needed */
+.sidebar {
+  width: 300px;
+  background-color: #ffffff;
+  color: #fff;
+  padding: 20px;
+}
+
+.map-content {
+  flex: 1;
+  display: flex;
 }
 
 #map {
-    width: 100%;
-    height: 100%;
-    background-color: rgb(237, 237, 237);
-    border-radius: 5px;
-
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgb(237, 237, 237);
+  border-radius: 5px;
 }
 
 .header-sidebar{

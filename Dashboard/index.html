@@ -4,21 +4,45 @@
     <meta charset="UTF-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Urban Ocean Litter Dashboard</title>
-    <link rel="stylesheet" href="style/general.css"> 
-    <link rel="stylesheet" href="style/sidebar.css"> 
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- main css here-->
+    <link rel="stylesheet" href="./style/general.css"> 
+    <link rel="stylesheet" href="./style/sidebar.css"> 
+    <link rel="stylesheet" href="./style/map.css"> 
+
+    <!-- Leaflet css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+
 
 </head>
 <body>
     <div class="container">
+        <!--left side panel -->
         <div class="sidebar">
+
             <div class="sidebar-head">
                 <h4> Zero Waste Assessment </h4>
             </div>
+
             <div class="sidebar-city">
+                <!-- put drop down here-->
+                <!-- First dropdown -->
+                <select id="first-dropdown">
+                    <option value="India" selected>India</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Thailand">Thailand</option>
+                </select>
+
+                <!-- Second dropdown (populated dynamically based on the selection in the first dropdown) -->
                 <select id="second-dropdown">
+                    <option value="Chennai" selected>Chennai</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Surat">Surat</option>
                 </select>
             </div>
+
             <div class="sidebar-risk">
                 <p class="header-sidebar"> Risk Overview </p>
                 <span class="number">2</span>/5    <span class="risk-level">Risk Level</span>
@@ -27,27 +51,54 @@
                 <div class="separator"></div>
                 <p> Total pieces collected <span class="number-stat"> 2053</span> </p>
             </div>
+
             <div class="sidebar-chart">
                 <p class="header-sidebar"> Litter by Type </p>
                 <p> <span class="number"> 46.7 </span> 
                     <span class="number-stat"> %</span> 
                 </p> 
                 <p> Plastic Percentage</p>
+                
                 <div class="js-chart"></div>
             </div>
+
             <div class="sidebar-factors">
-                <p class="header-sidebar"> Key Factors </p>  
+                <p class="header-sidebar"> Key Factors </p>
+                <div class="figures">
+                    <div class="js-count">count average h1</div>
+                    <div class="js-restaraunt">restaraunt h1</div>
+                    <div class="js-water">water h1</div>
+                </div>
             </div>
         </div>
         
-        <div id="content">
-
-            <div id="map">
-            </div>
-        </div>
+         <!-- map -->
+         <div class="map-content">
+            <div id="map"></div>
+         </div>
     </div>
 
-    <script src="leaflet-learning-main/scripts/selectCity.js"></script>
-    <script src="leaflet-learning-main/scripts/chart.js"></script>
+
+    <!-- Leaflet js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+
+    <!-- Apexchart js -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+
+    <!-- main js should be after leaflet-->
+    <script type="module" src="./data/final_net_0401.js"></script>
+    <script type="module" src="./data/cityLatLon.js"></script>
+    <script type="module" src=".data/category.js"></script>
+    
+    <script type="module" src="./scripts/sortData.js"></script>
+
+
+    <script type="module" src="./scripts/map.js"></script>
+    <script type="module" src="./scripts/indicatorUpdate.js"></script>
+    <script type="module" src="./scripts/chart.js"></script>
+    <script type="module" src="./scripts/selectCity.js"></script>
 </body>
 </html>
