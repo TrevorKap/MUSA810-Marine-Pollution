@@ -172,6 +172,22 @@ nn_visual <- function(nn_data,titles){
     theme(plot.title = element_text(size = 10, hjust = 0))
 }
 
+visual_count <- function(net_one,variable){
+  ggplot() +
+    geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
+    scale_fill_viridis_c() +
+    labs(title = paste(variable,"count for the fishnet")) +
+    mapTheme()
+}
+
+visual_cotinuous <- function(net_one,variable){
+  ggplot() +
+    geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
+    scale_fill_continuous() +
+    labs(title = paste(variable,"count for the fishnet")) +
+    mapTheme()
+}
+
 # visual_count_net: plot the fishnet and point distribution 
 # input of function: 
 # net_one: the dataset that 'countfishnet' created 
@@ -274,6 +290,21 @@ lm_col <- function(final_net,lm_data){
                          k = 1))
   return(temp)
 }
+
+risk_level <-function(model_data,approach){
+  ml_breaks <- classIntervals(model_data$Prediction, 
+                              n = 5, approach)
+  
+  litter_risk_sf <- model_data %>%
+    mutate(label = "Risk Predictions",
+           Risk_Category =classInt::findCols(ml_breaks),
+           Risk_Category = case_when(
+             Risk_Category == 5 ~ "5th",
+             Risk_Category == 4 ~ "4th",
+             Risk_Category == 3 ~ "3rd",
+             Risk_Category == 2 ~ "2nd",
+             Risk_Category == 1 ~ "1st"))
+  return(litter_risk_sf)}
 
 moran_agg <- function(final_net){
   final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE) 
@@ -384,12 +415,7 @@ risk_v <- function(model_data,litter_data,approach){
              Risk_Category == 4 ~ "4th",
              Risk_Category == 3 ~ "3rd",
              Risk_Category == 2 ~ "2nd",
-             Risk_Category == 1 ~ "1st")) %>%
-    cbind(
-      aggregate(
-        dplyr::select(litter_data) %>% mutate(litterCount = 1), ., sum) %>%
-        mutate(litterCount = replace_na(litterCount, 0))) %>%
-    dplyr::select(label,Risk_Category, litterCount)
+             Risk_Category == 1 ~ "1st"))
   
   ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
