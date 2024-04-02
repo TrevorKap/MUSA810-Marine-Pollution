@@ -41,6 +41,9 @@ export function matchCity(cityName) {
     },
     xaxis: {
       categories: types,
+      labels: {
+        align: "left", // Set x-axis labels alignment to left
+      },
     },
     yaxis: {
       categories: percentages,

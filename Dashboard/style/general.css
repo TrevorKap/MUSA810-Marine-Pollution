@@ -24,12 +24,6 @@ p{
   overflow: hidden; /* Prevent scrollbars */
 }
 
-.sidebar {
-  width: 300px;
-  background-color: #ffffff;
-  color: #fff;
-  padding: 20px;
-}
 
 .map-content {
   flex: 1;
