@@ -1,3 +1,17 @@
+# load_city_data: load any mdt data file in the repository, can be applied ot a list
+# input of function:
+# city: name of city
+
+load_city_data <- function(city) {
+  # Construct the URL for the city data
+  url <- paste0("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-data", city, ".csv")
+  
+  # Load the CSV file from the URL as a data frame
+  data <- read.csv(url)
+  
+  # Return the data frame
+  return(data)
+}
 
 # point_data: load the OSM data
 # input of function: 
@@ -158,6 +172,22 @@ nn_visual <- function(nn_data,titles){
     theme(plot.title = element_text(size = 10, hjust = 0))
 }
 
+visual_count <- function(net_one,variable){
+  ggplot() +
+    geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
+    scale_fill_viridis_c() +
+    labs(title = paste(variable,"count for the fishnet")) +
+    mapTheme()
+}
+
+visual_cotinuous <- function(net_one,variable){
+  ggplot() +
+    geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
+    scale_fill_continuous() +
+    labs(title = paste(variable,"count for the fishnet")) +
+    mapTheme()
+}
+
 # visual_count_net: plot the fishnet and point distribution 
 # input of function: 
 # net_one: the dataset that 'countfishnet' created 
@@ -260,6 +290,21 @@ lm_col <- function(final_net,lm_data){
                          k = 1))
   return(temp)
 }
+
+risk_level <-function(model_data,approach){
+  ml_breaks <- classIntervals(model_data$Prediction, 
+                              n = 5, approach)
+  
+  litter_risk_sf <- model_data %>%
+    mutate(label = "Risk Predictions",
+           Risk_Category =classInt::findCols(ml_breaks),
+           Risk_Category = case_when(
+             Risk_Category == 5 ~ "5th",
+             Risk_Category == 4 ~ "4th",
+             Risk_Category == 3 ~ "3rd",
+             Risk_Category == 2 ~ "2nd",
+             Risk_Category == 1 ~ "1st"))
+  return(litter_risk_sf)}
 
 moran_agg <- function(final_net){
   final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE) 
@@ -370,12 +415,7 @@ risk_v <- function(model_data,litter_data,approach){
              Risk_Category == 4 ~ "4th",
              Risk_Category == 3 ~ "3rd",
              Risk_Category == 2 ~ "2nd",
-             Risk_Category == 1 ~ "1st")) %>%
-    cbind(
-      aggregate(
-        dplyr::select(litter_data) %>% mutate(litterCount = 1), ., sum) %>%
-        mutate(litterCount = replace_na(litterCount, 0))) %>%
-    dplyr::select(label,Risk_Category, litterCount)
+             Risk_Category == 1 ~ "1st"))
   
   ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
@@ -425,13 +465,4 @@ get_bbox <- function(boundary){
   return(bbox_list)
 }
 
-raster_process <- function(img,boundary){
-  tifCropped <- crop(img, extent(boundary)) # extract raster based on boundary
-  tifClipped <- mask(tifCropped, boundary) # clip the raster based on boundary
-  polys1 = rasterToPolygons(tifClipped) # convert raster to polygon (it will take some time, it's OK)
-  sf_object <- st_as_sf(polys1) 
-  temp <- as.data.frame(sf_object) # convert to sf dataframe
-  temp_sf <- st_as_sf(temp)
-  df_points <- st_centroid(temp_sf)
-  return(df_points)
-}
+raster_process <- function(img,bo
