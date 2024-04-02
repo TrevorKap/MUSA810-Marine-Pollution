@@ -1,3 +1,17 @@
+# load_city_data: load any mdt data file in the repository, can be applied ot a list
+# input of function:
+# city: name of city
+
+load_city_data <- function(city) {
+  # Construct the URL for the city data
+  url <- paste0("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-data", city, ".csv")
+  
+  # Load the CSV file from the URL as a data frame
+  data <- read.csv(url)
+  
+  # Return the data frame
+  return(data)
+}
 
 # point_data: load the OSM data
 # input of function: 
@@ -425,13 +439,4 @@ get_bbox <- function(boundary){
   return(bbox_list)
 }
 
-raster_process <- function(img,boundary){
-  tifCropped <- crop(img, extent(boundary)) # extract raster based on boundary
-  tifClipped <- mask(tifCropped, boundary) # clip the raster based on boundary
-  polys1 = rasterToPolygons(tifClipped) # convert raster to polygon (it will take some time, it's OK)
-  sf_object <- st_as_sf(polys1) 
-  temp <- as.data.frame(sf_object) # convert to sf dataframe
-  temp_sf <- st_as_sf(temp)
-  df_points <- st_centroid(temp_sf)
-  return(df_points)
-}
+raster_process <- function(img,bo
