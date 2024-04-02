@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+body, html {
+    font-family: "Open Sans";
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Prevent scrollbars */
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.container {
+    display: flex;
+    height: 100%;
+    overflow: hidden; /* Prevent scrollbars */
+    
+}
+
+p{
+  font-size: 12px;
+  margin-left: 5px;
+  margin-right: 5px;
+  color: #696969;
+
+}
+#sidebar {
+    width: 250px;
+    background-color: #ffffff;
+    color: #fff;
+    padding: 20px;
+}
+
+#content {
+    flex: 1;
+    padding: 10px;
+    height: 100%;
+    overflow-y: auto; /* Enable scrollbar for content if needed */
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    background-color: rgb(237, 237, 237);
+    border-radius: 5px;
+
+}
+
+.header-sidebar{
+  padding-top: 10px ;
+  font-size: 12px;
+  font-weight: bolder;
+}
+
+/* Horizontal separator */
+
+/*Risk level box*/
+
+.risk-level {
+  font-size: 10px; 
+}
+.number {
+  font-size: 30px;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-right: 5px;
+  padding-top: 5px;
+}
+.separator {
+  border-top: 1px solid #d1d1d1;
+  margin: 10px auto;
+  width: 90%; 
+}
+
+.number-stat{
+  justify-content: right;
+  align-items: right;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/*Side float-y*/
+.dropdown-container {
+  height:100px;
+  background-color: rgb(255, 255, 255);
+  position: relative; /* Ensure absolute positioning works */
+    top: 20px; /* Adjust top position as needed */
+    right: 20px;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  background-color: rgb(221, 219, 218);
+  width: 150px;
+
+}

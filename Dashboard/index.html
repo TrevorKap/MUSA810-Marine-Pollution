@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Ocean Litter Dashboard</title>
+    <link rel="stylesheet" href="style/general.css"> 
+    <link rel="stylesheet" href="style/sidebar.css"> 
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-head">
+                <h4> Zero Waste Assessment </h4>
+            </div>
+            <div class="sidebar-city">
+                <select id="second-dropdown">
+                </select>
+            </div>
+            <div class="sidebar-risk">
+                <p class="header-sidebar"> Risk Overview </p>
+                <span class="number">2</span>/5    <span class="risk-level">Risk Level</span>
+                <div class="separator"></div>
+                <p> existing pilot sites <span class="number-stat"> 2</span> </p>
+                <div class="separator"></div>
+                <p> Total pieces collected <span class="number-stat"> 2053</span> </p>
+            </div>
+            <div class="sidebar-chart">
+                <p class="header-sidebar"> Litter by Type </p>
+                <p> <span class="number"> 46.7 </span> 
+                    <span class="number-stat"> %</span> 
+                </p> 
+                <p> Plastic Percentage</p>
+                <div class="js-chart"></div>
+            </div>
+            <div class="sidebar-factors">
+                <p class="header-sidebar"> Key Factors </p>  
+            </div>
+        </div>
+        
+        <div id="content">
+
+            <div id="map">
+            </div>
+        </div>
+    </div>
+
+    <script src="leaflet-learning-main/scripts/selectCity.js"></script>
+    <script src="leaflet-learning-main/scripts/chart.js"></script>
+</body>
+</html>
