@@ -45,6 +45,10 @@ source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/mai
 st_c    <- st_coordinates
 st_coid <- st_centroid
 
+#cities
+cities <- c("Bangkok", "Can_Tho", "Chennai", "Melaka", "Mumbai", "Panama_City", 
+            "Pune", "Salvador", "Santa_Fe", "Santiago", "Semarang", "Surat")
+
 # pre-store of osm data need to use 
 # a more expandable version of function
 # the actual store order is cate label, small cate
@@ -64,6 +68,24 @@ stor_df <- add_row('landuse',list('retail'), 'retail')
 ```
 
 # Load data
+
+```{r multi-city}
+
+city_data_list <- lapply(cities, load_city_data)
+# Assign city names to the list elements
+names(city_data_list) <- cities
+
+# Convert the list of data frames to separate objects in the global environment
+list2env(city_data_list, envir = .GlobalEnv)
+
+#combined_data <- do.call(rbind, city_data_list)
+#sapply(combined_data, unique)
+
+
+
+
+```
+
 
 ```{r chennai data}
 #step to load city's data
