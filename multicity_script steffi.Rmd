@@ -30,11 +30,11 @@ library(RCurl)
 library(httr)
 library(osmdata)
 library(randomForest)
-library(tidygraph)
+#library(tidygraph)
 library(XML)
 library(neuralnet)
 library(MASS)
-library(tidymodels)
+#library(tidymodels)
 library(brms)
 library(jsonlite)
 library(QuickJSR)
@@ -45,9 +45,11 @@ source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/mai
 st_c    <- st_coordinates
 st_coid <- st_centroid
 
-#cities
+#lists!
 cities <- c("Bangkok", "Can_Tho", "Chennai", "Melaka", "Mumbai", "Panama_City", 
             "Pune", "Salvador", "Santa_Fe", "Santiago", "Semarang", "Surat")
+bd <- c("Bangkok_bd", "Can_Tho_bd", "Chennai_bd", "Melaka_bd", "Mumbai_bd", "Panama_City_bd", "Pune_bd", "Salvador_bd", "Santa_Fe_bd", "Santiago_bd", "Semarang_bd", "Surat_bd")
+bdM <- c("Bangkok_bdM", "Can_Tho_bdM", "Chennai_bdM", "Melaka_bdM", "Mumbai_bdM", "Panama_City_bdM","Pune_bdM", "Salvador_bdM", "Santa_Fe_bdM", "Santiago_bdM", "Semarang_bdM", "Surat_bdM")
 
 # pre-store of osm data need to use 
 # a more expandable version of function
@@ -70,19 +72,51 @@ stor_df <- add_row('landuse',list('retail'), 'retail')
 # Load data
 
 ```{r multi-city}
-
 city_data_list <- lapply(cities, load_city_data)
-# Assign city names to the list elements
 names(city_data_list) <- cities
 
-# Convert the list of data frames to separate objects in the global environment
-list2env(city_data_list, envir = .GlobalEnv)
+bd_data_list <- lapply(cities, load_city_kml)
+names(bd_data_list) <- bd
 
-#combined_data <- do.call(rbind, city_data_list)
-#sapply(combined_data, unique)
+bd_data_meter_list <- lapply(cities, load_city_kml_meter)
+names(bd_data_meter_list) <- bdM
 
 
+#input: mdt file
+final_net <- function(city_litter, bd, bd_meter) {
+  litter_p <- city_litter %>%
+    filter(master_material == 'PLASTIC') %>%
+    st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")
+  litter_p <- subset(litter_p, select = -c(event_name, project_name))
+  
+  #fishnet
+  temp_bbox <- get_bbox(bd) 
+  temp_fish <- create_fish(bd_meter)
+  final_net <- countfishnet(temp_fish, litter_p) 
+  final_net <- pn_gen(stor_df) 
+  final_net <- moran_gen(final_net,stor_df)
+  final_net <- st_transform(final_net, crs = 4326)
+  
+  return(final_net)
+}
 
+final_net_list <- mapply(final_net, city_data_list, bd_data_list, bd_data_meter_list, SIMPLIFY = FALSE)
+
+test <- final_net(city_data_list[[3]], bd_data_list[[3]], bd_data_meter_list[[3]])
+
+str(city_data_list[[1]])
+print(st_bbox(city_data_list[[1]]))
+
+
+list2env(final_net_list, envir = .GlobalEnv)
+
+#and then we can rbind later if we want :)
+
+for (i in seq_along(bd_data_list)) {
+  bbox <- st_bbox(bd_data_list[[i]])
+  cat("Bounding box for", names(bd_data_list)[i], ":\n")
+  print(bbox)
+}
 
 ```
 
@@ -326,41 +360,4 @@ df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
 df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
 df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
 df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
-df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
-df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
-
-df_rf_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_rf_rst, by="uniqueID")
-df_lr_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lr_rst, by="uniqueID")
-df_lrqs_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqs_rst, by="uniqueID")
-df_lrqp_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqp_rst, by="uniqueID")
-```
-
-```{r}
-# use the model only use fishnet having data to predict the whole area
-df_rf_rst_s <- model_process(df_model,temp.rf_s)
-df_lr_rst_s <- model_process(df_model,temp.lr_s)
-df_lrqs_rst_s <- model_process(df_model,temp.lr.qs_s)
-df_lrqp_rst_s <- model_process(df_model,temp.lr.qp_s)
-df_nn_rst_s <- model_process(df_model,nn_model_s)
-
-df_rf_r_s <- model_result(df_model,temp.rf_s) %>%mutate(model = 'RF')
-df_lr_r_s <- model_result(df_model,temp.lr_s) %>%mutate(model = 'LR')
-df_lrqs_r_s <- model_result(df_model,temp.lr.qs_s)%>%mutate(model = 'LR_quasi')
-df_lrqp_r_s <- model_result(df_model,temp.lr.qp_s)%>%mutate(model = 'LR_quasipoisson')
-df_nn_r_s <- model_result(df_model,nn_model_s)%>%mutate(model = 'Neural Net')
-df_r_tt_s <- do.call("rbind", list(df_rf_r_s, df_lr_r_s, df_lrqs_r_s,df_lrqp_r_s,df_nn_r_s))
-
-df_rf_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_rf_rst_s, by="uniqueID")
-df_lr_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lr_rst_s, by="uniqueID")
-df_lrqs_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqs_rst_s, by="uniqueID")
-df_lrqp_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqp_rst_s, by="uniqueID")
-```
-
-```{r}
-temp <- tt_net %>%
-  st_transform('EPSG:4326')
-
-exportJSON <- toJSON(temp)
-write(exportJSON, "/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/test_0401.json")
-#write_csv(temp,'/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/test_new.csv')
-```
+df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural

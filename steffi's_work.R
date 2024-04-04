@@ -1,3 +1,8 @@
+library(rlang)
+library(tidyr)
+library(dplyr)
+library(jsonlite)
+
 # load_city_data: load any mdt data file in the repository, can be applied ot a list
 # input of function:
 # city: name of city
@@ -38,7 +43,6 @@ unique(combined_data$material)
 
 combined_data <- combined_data %>%
   mutate(Type = case_when(
-    master_item_name == "CIGARETTES/CIGARS" ~ "Cigarette",
     master_material %in% c("FISHING GEAR", "RUBBER") ~ "Plastic",
     master_material == "PLASTIC" ~ "Plastic",
     master_material == "GLASS" ~ "Glass",
@@ -46,20 +50,17 @@ combined_data <- combined_data %>%
     master_material == "PAPER & LUMBER" ~ "Paper",
     master_material == "METAL" ~ "Metal",
     master_material %in% c("LANDMARKS", "NON-LITTER ITEM", "MIXED MATERIALS", "PERSONAL HYGEINE", "OTHER") ~ "Other",
+    master_item_name == "CIGARETTES/CIGARS" ~ "Cigarette",
     TRUE ~ NA_character_ # Default value if none of the conditions are met
   ))
 
 sum(is.na(combined_data$Type))
 print(table(combined_data$Type))
 install.packages("rlang")
-library(rlang)
-library(tidyr)
+
 tidy_combined <- combined_data %>%
   group_by(City, Type) %>%
   summarize(count = n()) %>%
   pivot_wider(names_from = Type, values_from = count, values_fill = 0)
 
-
-tidy_combined <- combined_data %>%
-  group_by(City) %>%
-  summarize(Type = n(Type))
+write_json(tidy_combined, "tidy_combined.json")

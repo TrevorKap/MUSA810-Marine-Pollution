@@ -3,14 +3,40 @@
 # city: name of city
 
 load_city_data <- function(city) {
-  # Construct the URL for the city data
   url <- paste0("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-data", city, ".csv")
+  data <- read_csv(url)
   
-  # Load the CSV file from the URL as a data frame
-  data <- read.csv(url)
+  # Convert latitude and longitude columns to numeric
+  data$latitude <- as.numeric(data$latitude)
+  data$longitude <- as.numeric(data$longitude)
   
-  # Return the data frame
-  return(data)
+  # Create spatial object
+  data_sf <- st_as_sf(data, coords = c("longitude", "latitude"), crs = 4326)
+  
+  return(data_sf)
+}
+
+# load_city_kml:
+# input of function:
+# city: name of city
+
+load_city_kml <- function(city) {
+  kml_url <- paste0("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/", city, ".kml")
+  kml_data <- st_read(kml_url)%>%
+    st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")
+  return(kml_data)
+}
+
+# load_city_kml_meter:
+# input of function:
+# city: name of city
+
+load_city_kml_meter <- function(city) {
+  kml_url <- paste0("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/", city, ".kml")
+  kml_data <- st_read(kml_url) %>%
+    st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant") %>%
+    st_transform('EPSG:32643')
+  return(kml_data)
 }
 
 # point_data: load the OSM data
