@@ -11,8 +11,8 @@ load_city_data <- function(city) {
   data$longitude <- as.numeric(data$longitude)
   
   # Create spatial object
-  data_sf <- st_as_sf(data, coords = c("longitude", "latitude"), crs = 4326)
-  
+  data_sf <- st_as_sf(data, coords = c("longitude", "latitude"),crs = 4326, agr = "constant")%>%
+    st_transform('EPSG:32643')
   return(data_sf)
 }
 
