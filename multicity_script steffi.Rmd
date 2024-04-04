@@ -360,4 +360,41 @@ df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
 df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
 df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
 df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
-df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural
+df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
+df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
+
+df_rf_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_rf_rst, by="uniqueID")
+df_lr_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lr_rst, by="uniqueID")
+df_lrqs_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqs_rst, by="uniqueID")
+df_lrqp_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqp_rst, by="uniqueID")
+```
+
+```{r}
+# use the model only use fishnet having data to predict the whole area
+df_rf_rst_s <- model_process(df_model,temp.rf_s)
+df_lr_rst_s <- model_process(df_model,temp.lr_s)
+df_lrqs_rst_s <- model_process(df_model,temp.lr.qs_s)
+df_lrqp_rst_s <- model_process(df_model,temp.lr.qp_s)
+df_nn_rst_s <- model_process(df_model,nn_model_s)
+
+df_rf_r_s <- model_result(df_model,temp.rf_s) %>%mutate(model = 'RF')
+df_lr_r_s <- model_result(df_model,temp.lr_s) %>%mutate(model = 'LR')
+df_lrqs_r_s <- model_result(df_model,temp.lr.qs_s)%>%mutate(model = 'LR_quasi')
+df_lrqp_r_s <- model_result(df_model,temp.lr.qp_s)%>%mutate(model = 'LR_quasipoisson')
+df_nn_r_s <- model_result(df_model,nn_model_s)%>%mutate(model = 'Neural Net')
+df_r_tt_s <- do.call("rbind", list(df_rf_r_s, df_lr_r_s, df_lrqs_r_s,df_lrqp_r_s,df_nn_r_s))
+
+df_rf_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_rf_rst_s, by="uniqueID")
+df_lr_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lr_rst_s, by="uniqueID")
+df_lrqs_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqs_rst_s, by="uniqueID")
+df_lrqp_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqp_rst_s, by="uniqueID")
+```
+
+```{r}
+temp <- tt_net %>%
+  st_transform('EPSG:4326')
+
+exportJSON <- toJSON(temp)
+write(exportJSON, "/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/test_0401.json")
+#write_csv(temp,'/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/test_new.csv')
+```
