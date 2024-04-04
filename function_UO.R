@@ -476,4 +476,28 @@ partytime <- function(dataset){
 create_fish <- function(boudary){
   fishnet <- st_make_grid(boudary,
                           cellsize = 500, 
-                          square = TRUE) %>
+                          square = TRUE) %>%
+    .[boudary] %>%            
+    st_sf() %>%
+    mutate(uniqueID = 1:n())
+  return(fishnet)
+}
+
+# the boundary is not after projection 
+get_bbox <- function(boundary){
+  bbox_temp <- st_bbox(boundary)
+  bbox_list_unnamed <- unname(as.list(bbox_temp))
+  bbox_list <- c(bbox_list_unnamed[[1]][1],bbox_list_unnamed[[2]][1],bbox_list_unnamed[[3]][1],bbox_list_unnamed[[4]][1])
+  return(bbox_list)
+}
+
+raster_process <- function(img,boundary){
+  tifCropped <- crop(img, extent(boundary)) # extract raster based on boundary
+  tifClipped <- mask(tifCropped, boundary) # clip the raster based on boundary
+  polys1 = rasterToPolygons(tifClipped) # convert raster to polygon (it will take some time, it's OK)
+  sf_object <- st_as_sf(polys1) 
+  temp <- as.data.frame(sf_object) # convert to sf dataframe
+  temp_sf <- st_as_sf(temp)
+  df_points <- st_centroid(temp_sf)
+  return(df_points)
+}
