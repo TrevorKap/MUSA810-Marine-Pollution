@@ -164,7 +164,68 @@ leisure <- c('park')
 act <- c('maxspeed') 
 ```
 
+
 # SHOULD BE PCA
+
+```{r visualize count& continuous}
+visual_count(chen_net,'waste')
+visual_count(chen_net,'water')
+visual_count(chen_net,"restaurant")
+visual_count(chen_net,'road')
+visual_count(chen_net,'industrial')
+visual_count(chen_net,"residential")
+visual_count(chen_net,'retail')
+
+visual_cotinuous(chen_net,'waste_nn')
+visual_cotinuous(chen_net,'water_nn')
+visual_cotinuous(chen_net,"restaurant_nn")
+visual_cotinuous(chen_net,'road_nn')
+visual_cotinuous(chen_net,'industrial_nn')
+visual_cotinuous(chen_net,"residential_nn")
+visual_cotinuous(chen_net,'retail_nn')
+
+visual_count(chen_net,'waste_sig')
+visual_count(chen_net,'water_sig')
+visual_count(chen_net,"restaurant_sig")
+visual_count(chen_net,'road_sig')
+visual_count(chen_net,'industrial_sig')
+visual_count(chen_net,"residential_sig")
+visual_count(chen_net,'retail_sig')
+
+visual_cotinuous(chen_net,'waste_sig_dis')
+visual_cotinuous(chen_net,'water_sig_dis')
+visual_cotinuous(chen_net,"restaurant_sig_dis")
+visual_cotinuous(chen_net,'road_sig_dis')
+visual_cotinuous(chen_net,'industrial_sig_dis')
+visual_cotinuous(chen_net,"residential_sig_dis")
+visual_cotinuous(chen_net,'retail_sig_dis')
+
+```
+
+```{r correlation matrix}
+cor_chen <- st_drop_geometry(chen_net) %>% dplyr::select(!c(uniqueID,cvID,city,country))
+cor_nor_chen<- scale(cor_chen)
+corr_matrix <- cor(cor_nor_chen)
+ggcorrplot(corr_matrix,type = 'upper')
+```
+
+```{r PCA analysis}
+data.pca <- princomp(corr_matrix)
+summary(data.pca)
+data.pca$loadings[, 1:2]
+
+fviz_eig(data.pca, addlabels = TRUE)
+
+fviz_pca_var(data.pca, col.var = "black")
+
+fviz_cos2(data.pca, choice = "var", axes = 1:2)
+
+fviz_pca_var(data.pca, col.var = "cos2",
+            gradient.cols = c("black", "orange", "green"),
+            repel = TRUE)
+```
+
+
 
 # Model part
 ```{r}
