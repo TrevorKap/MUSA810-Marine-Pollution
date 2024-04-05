@@ -70,37 +70,33 @@ stor_df <- add_row('landuse',list('retail'), 'retail')
 
 # Load data
 
-```{r chennai data (LITTER P)}
+```{r chennai data}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 
 # data filter and projection transformation
-litter_p <- litter%>%
-  filter(master_material == 'PLASTIC')%>%
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
-  st_transform('EPSG:32643')
+litter_p <- litter%>%filter(master_material == 'PLASTIC')%>%
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%st_transform('EPSG:32643')
 
-img <- raster("https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/rs_img/population_10_lon_80_general-v1.5.tif")
+img <- raster("/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/population_ind_pak_general/population_10_lon_80_general-v1.5.tif")
 
 chen_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/archive%20data/gcc-divisions-latest.kml')
-chen_bdry <- st_set_crs(chen_bdry, 4326)%>%
-  st_transform('EPSG:32643')
-
+chen_bdry <- st_set_crs(chen_bdry, 4326)%>%st_transform('EPSG:32643')
 temp_bd <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/archive%20data/cma_layer.kml')
 
 temp_bbox <- get_bbox(temp_bd) # get the bounding box (the projection of temp_bd should be epsg4326)
 temp_fish <- create_fish(chen_bdry) # get the fishnet of the city (the projection of chen_bdry should be meter degree)
 final_net <- countfishnet(temp_fish, litter_p) # create base fishnet with litter (also the one used as final one)
 final_net <- pn_gen(stor_df) # add osm point data and knn calculation result into the final dataset
-#temp_point <- raster_process(img,temp_bd) # convert the raster file to point one 
-#pop_result <- pop_process(temp_point, temp_fish, 32643) # summary the population result
-#final_net <- add_pop(pop_result,final_net) # add the pop result into the final dataset
+temp_point <- raster_process(img,temp_bd) # convert the raster file to point one 
+pop_result <- pop_process(temp_point, temp_fish, 32643) # summary the population result
+final_net <- add_pop(pop_result,final_net) # add the pop result into the final dataset
 final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into the dataset
 # DONE!
 chen_net <- final_net
 ```
 
-```{r bangkok data (LITTER B)}
+```{r bangkok data}
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataBangkok.csv')
 
 litter_b <- litter%>%
@@ -123,7 +119,7 @@ final_net <- moran_gen(final_net,stor_df)
 bok_net <- final_net
 ```
 
-```{r santiago data (LITTER S)}
+```{r santiago data}
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataSantiago.csv')
 
 # data filter and projection transformation
@@ -148,9 +144,9 @@ final_net <- moran_gen(final_net,stor_df)
 san_net <- final_net
 ```
 
-```{r}
+```{r aggregate data}
 chen_net <- chen_net %>%
-  #dplyr::select(!c(avg_pop,sum_pop))%>%
+  dplyr::select(!c(avg_pop,sum_pop))%>%
   mutate(city = 'Chennai',
          country = 'India')
 
@@ -162,15 +158,14 @@ bok_net <- bok_net %>%
   mutate(city = 'Bangkok',
          country = 'Thailand')
 
-tt_net <- rbind(chen_net,san_net,bok_net)
+tt_net <- rbind(chen_net,san_net,bok_net) %>% mutate(uniqueID = 1:n())
 
 # reference: https://wiki.openstreetmap.org/wiki/Map_features#Entertainment,_Arts_&_Culturee 
 leisure <- c('park')
 act <- c('maxspeed') 
 ```
 
-
-# SHOULD BE PCA
+# EDA & PCA
 
 ```{r visualize count& continuous}
 visual_count(chen_net,'waste')
@@ -233,7 +228,8 @@ fviz_pca_var(data.pca, col.var = "cos2",
 
 
 # Model part
-```{r}
+## model build 
+```{r model build}
 # prepare for model data
 df_model <- st_drop_geometry(tt_net)%>%dplyr::select(!cvID)
 df_model <- dummy_cols(df_model, select_columns = "city")
@@ -257,36 +253,51 @@ linear.output = TRUE
 temp.hbr <- fit.1<- brm(count~ ., data=df_model%>%dplyr::select(!uniqueID), family=gaussian(),warmup=500, iter=1000, chains=2,cores=2,seed = 1115)
 ```
 
-```{r}
-fit.1<- brm(count~ ., data=df_model%>%dplyr::select(!uniqueID), family=gaussian(),
-              warmup=500, #burnin for 500 interations for each chain = 1000 burnin
-              iter=1000, chains=2, #2*1000 =2000 - 1000 burnin = 1000 total iterations
-              cores=2,seed = 1115) #number of computer cores, 1 per chain is good.
+```{r small model build}
+df_model_shorten <- df_model %>%
+  dplyr::select(c(count,uniqueID,waste_sig_dis,restaurant_sig_dis,residential_sig_dis,water_sig_dis,residential_nn,industrial_sig_dis,industrial_sig,restaurant_sig,industrial_nn,road_sig_dis,residential_sig,restaurant_sig,restaurant,city_Bangkok,city_Chennai,country_Chile,country_India))
+
+temp.rf.s <- randomForest(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID), mtry = 10,ntree=70, 
+                         importance = TRUE, na.action = na.omit) 
+
+temp.lr.s <- glm(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID),family = "poisson", na.action = na.omit) 
+
+temp.lr.qs.s <- glm(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID),family = "quasi", na.action = na.omit) 
+
+temp.lr.qp.s <- glm(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID),family = "quasipoisson", na.action = na.omit) 
+
+nn_model.s = neuralnet(count ~ .,data=df_model_shorten%>%dplyr::select(!uniqueID),hidden=c(5,2),
+linear.output = TRUE
+)
+
+temp.hbr.s <- fit.1<- brm(count~ ., data=df_model_shorten%>%dplyr::select(!uniqueID), family=gaussian(),warmup=500, iter=1000, chains=2,cores=2,seed = 1115)
 ```
 
-```{r}
-df_brm_rst <- model_process(df_model,fit.1)
-df_brm_r <- model_result(df_model,fit.1) %>%mutate(model = 'BRM')
-df_brm_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_brm_rst, by="uniqueID")
+```{r chennai_only model}
+# prepare for model data
+df_model_chen <- st_drop_geometry(chen_net)%>%dplyr::select(!cvID)
+df_model_chen <- dummy_cols(df_model_chen, select_columns = "city")
+df_model_chen <- dummy_cols(df_model_chen, select_columns = "country")
+df_model_chen <- df_model_chen %>% dplyr::select(!c(city,country)) %>% mutate(uniqueID = 1:n())
 
-estimates_list <- list()
-# Iterate over each row by index
-for(i in 1:nrow(df_brm_rst)) {
-  # Extract the 'Prediction' for the current row
-  current_prediction <- df_brm_rst$Prediction[[i]][1]
-  estimates_list[[i]] <- current_prediction
-}
+# several model 
+temp.rf.c <- randomForest(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID), mtry = 10,ntree=70, 
+                         importance = TRUE, na.action = na.omit) 
 
-df_brm_rst$Estimate <- estimates_list
-df_brm_rst <- df_brm_rst %>%
-  dplyr::select(uniqueID,count,geometry,Estimate)%>%
-  rename(Prediction = Estimate)
+temp.lr.c <- glm(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID),family = "poisson", na.action = na.omit) 
 
-df_brm_rst$Prediction <- as.numeric(unlist(df_brm_rst$Prediction))
+temp.lr.qs.c <- glm(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID),family = "quasi", na.action = na.omit) 
 
+temp.lr.qp.c <- glm(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID),family = "quasipoisson", na.action = na.omit) 
+
+nn_model.c = neuralnet(count ~ .,data=df_model_chen%>%dplyr::select(!uniqueID),hidden=c(5,2),
+linear.output = TRUE
+)
+
+temp.hbr.c <- fit.1<- brm(count~ ., data=df_model_chen%>%dplyr::select(!uniqueID), family=gaussian(),warmup=500, iter=1000, chains=2,cores=2,seed = 1115)
 ```
 
-```{r}
+```{r decision tree model}
 set.seed(123)
 data_split <- initial_split(df_model, prop = 0.75)
 train_data <- training(data_split)
@@ -323,49 +334,197 @@ df_dt_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_dt_rst, by="unique
 risk_v(df_dt_rst,litter_p,"kmeans")
 ```
 
-```{r}
+## model result
+```{r model result}
 df_rf_rst <- model_process(df_model,temp.rf)
 df_lr_rst <- model_process(df_model,temp.lr)
 df_lrqs_rst <- model_process(df_model,temp.lr.qs)
 df_lrqp_rst <- model_process(df_model,temp.lr.qp)
 df_nn_rst <- model_process(df_model,nn_model)
 
-df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
-df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
-df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
-df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
-df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
-df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
+df_brm_rst <- model_process(df_model,temp.hbr)
+estimates_list <- list()
+# Iterate over each row by index
+for(i in 1:nrow(df_brm_rst)) {
+  # Extract the 'Prediction' for the current row
+  current_prediction <- df_brm_rst$Prediction[[i]][1]
+  estimates_list[[i]] <- current_prediction
+}
+
+df_brm_rst$Estimate <- estimates_list
+df_brm_rst <- df_brm_rst %>%
+  dplyr::select(uniqueID,count,Estimate)%>%
+  rename(Prediction = Estimate)
+
+df_brm_rst$Prediction <- as.numeric(unlist(df_brm_rst$Prediction))
+#df_brm_r <- model_result(df_model,fit.1) %>%mutate(model = 'BRM')
+
+
+#df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
+#df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
+#df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
+#df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
+#df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
+#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
 
 df_rf_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst, by="uniqueID")
 df_lr_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst, by="uniqueID")
 df_lrqs_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst, by="uniqueID")
 df_lrqp_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst, by="uniqueID")
+df_brm_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst, by="uniqueID")
+
 ```
 
-```{r hmm.., eval=FALSE, include=FALSE}
+```{r small model result}
+df_rf_rst.s <- model_process(df_model_shorten,temp.rf.s)
+df_lr_rst.s <- model_process(df_model_shorten,temp.lr.s)
+df_lrqs_rst.s <- model_process(df_model_shorten,temp.lr.qs.s)
+df_lrqp_rst.s <- model_process(df_model_shorten,temp.lr.qp.s)
+df_nn_rst.s <- model_process(df_model_shorten,nn_model.s)
+
+df_brm_rst.s <- model_process(df_model_shorten,temp.hbr.s)
+estimates_list <- list()
+# Iterate over each row by index
+for(i in 1:nrow(df_brm_rst.s)) {
+  # Extract the 'Prediction' for the current row
+  current_prediction <- df_brm_rst.s$Prediction[[i]][1]
+  estimates_list[[i]] <- current_prediction
+}
+
+df_brm_rst.s$Estimate <- estimates_list
+df_brm_rst.s <- df_brm_rst.s %>%
+  dplyr::select(uniqueID,count,Estimate)%>%
+  rename(Prediction = Estimate)
+
+df_brm_rst.s$Prediction <- as.numeric(unlist(df_brm_rst.s$Prediction))
+
+#df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
+#df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
+#df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
+#df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
+#df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
+#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
+
+df_rf_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst.s, by="uniqueID")
+df_lr_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst.s, by="uniqueID")
+df_lrqs_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst.s, by="uniqueID")
+df_lrqp_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst.s, by="uniqueID")
+df_brm_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst.s, by="uniqueID")
+```
+
+```{r chennai_only model result}
+df_rf_rst.c <- model_process(df_model,temp.rf.c)
+df_lr_rst.c <- model_process(df_model,temp.lr.c)
+df_lrqs_rst.c <- model_process(df_model,temp.lr.qs.c)
+df_lrqp_rst.c <- model_process(df_model,temp.lr.qp.c)
+df_nn_rst.c <- model_process(df_model,nn_model.c)
+
+df_brm_rst.c <- model_process(df_model,temp.hbr.c)
+estimates_list <- list()
+# Iterate over each row by index
+for(i in 1:nrow(df_brm_rst)) {
+  # Extract the 'Prediction' for the current row
+  current_prediction <- df_brm_rst.c$Prediction[[i]][1]
+  estimates_list[[i]] <- current_prediction
+}
+
+df_brm_rst.c$Estimate <- estimates_list
+df_brm_rst.c <- df_brm_rst.c %>%
+  dplyr::select(uniqueID,count,Estimate)%>%
+  rename(Prediction = Estimate)
+
+df_brm_rst.c$Prediction <- as.numeric(unlist(df_brm_rst.c$Prediction))
+#df_brm_r <- model_result(df_model,fit.1) %>%mutate(model = 'BRM')
+
+
+#df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
+#df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
+#df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
+#df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
+#df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
+#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
+
+df_rf_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst.c, by="uniqueID")
+df_lr_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst.c, by="uniqueID")
+df_lrqs_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst.c, by="uniqueID")
+df_lrqp_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst.c, by="uniqueID")
+df_brm_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst.c, by="uniqueID")
+
+```
+
+## risk visualization
+```{r chennai risk_normal, eval=FALSE, include=FALSE}
 df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
 df_lr_c <- df_lr_rst %>% filter(city == 'Chennai')
 df_lrqs_c <- df_lrqs_rst %>% filter(city == 'Chennai')
 df_lrqp_c <- df_lrqp_rst %>% filter(city == 'Chennai')
+df_brm_c <- df_brm_rst %>% filter(city == 'Chennai')
+
 grid.arrange(
   risk_v(df_rf_c,litter_p,"kmeans"),
   risk_v(df_lr_c,litter_p,"kmeans"),
   risk_v(df_lrqs_c,litter_p,"kmeans"),
-  risk_v(df_lrqp_c,litter_p,"kmeans"), nrow = 2
+  risk_v(df_lrqp_c,litter_p,"kmeans"), 
+  risk_v(df_brm_c,litter_p,"kmeans"),nrow = 2
 )
 ```
 
-```{r hmm..}
+```{r chennai risk_shorten}
+df_rf_c.s <- df_rf_rst.s %>% filter(city == 'Chennai')
+df_lr_c.s <- df_lr_rst.s %>% filter(city == 'Chennai')
+df_lrqs_c.s <- df_lrqs_rst.s %>% filter(city == 'Chennai')
+df_lrqp_c.s <- df_lrqp_rst.s %>% filter(city == 'Chennai')
+grid.arrange(
+  risk_v(df_rf_c.s,litter_p,"kmeans"),
+  risk_v(df_lr_c.s,litter_p,"kmeans"),
+  risk_v(df_lrqs_c.s,litter_p,"kmeans"),
+  risk_v(df_lrqp_c.s,litter_p,"kmeans"),
+  risk_v(df_brm_c,litter_p,"kmeans"),nrow = 2
+)
+```
+
+```{r chennai risk_chennai_only}
+df_rf_c.c <- df_rf_rst.c %>% filter(city == 'Chennai')
+df_lr_c.c <- df_lr_rst.c %>% filter(city == 'Chennai')
+df_lrqs_c.c <- df_lrqs_rst.c %>% filter(city == 'Chennai')
+df_lrqp_c.c <- df_lrqp_rst.c %>% filter(city == 'Chennai')
+df_brm_c.c <- df_brm_rst.c %>% filter(city == 'Chennai')
+grid.arrange(
+  risk_v(df_rf_c.c,litter_p,"kmeans"),
+  risk_v(df_lr_c.c,litter_p,"kmeans"),
+  risk_v(df_lrqs_c.c,litter_p,"kmeans"),
+  risk_v(df_lrqp_c.c,litter_p,"kmeans"),
+  risk_v(df_brm_c.c,litter_p,"kmeans"),nrow = 2
+)
+```
+
+```{r bangkok risk_normal}
 df_rf_b <- df_rf_rst %>% filter(city == 'Bangkok')
 df_lr_b <- df_lr_rst %>% filter(city == 'Bangkok')
 df_lrqs_b <- df_lrqs_rst %>% filter(city == 'Bangkok')
 df_lrqp_b <- df_lrqp_rst %>% filter(city == 'Bangkok')
+df_brm_b <- df_brm_rst %>% filter(city == 'Bangkok')
 grid.arrange(
   risk_v(df_rf_b,litter_b,"kmeans"),
   risk_v(df_lr_b,litter_b,"kmeans"),
   risk_v(df_lrqs_b,litter_b,"kmeans"),
-  risk_v(df_lrqp_b,litter_b,"kmeans"), nrow = 2
+  risk_v(df_lrqp_b,litter_b,"kmeans"),
+  risk_v(df_brm_b,litter_b,"kmeans"),nrow = 2
+)
+```
+
+```{r bangkok risk_chennai_only}
+df_rf_b.c <- df_rf_rst.c %>% filter(city == 'Bangkok')
+df_lr_b.c <- df_lr_rst.c %>% filter(city == 'Bangkok')
+df_lrqs_b.c <- df_lrqs_rst.c %>% filter(city == 'Bangkok')
+df_lrqp_b.c <- df_lrqp_rst.c %>% filter(city == 'Bangkok')
+df_brm_b.c <- df_brm_rst.c %>% filter(city == 'Bangkok')
+grid.arrange(
+  risk_v(df_rf_b.c,litter_b,"kmeans"),
+  risk_v(df_lr_b.c,litter_b,"kmeans"),
+  risk_v(df_lrqs_b.c,litter_b,"kmeans"),
+  risk_v(df_lrqp_b.c,litter_b,"kmeans"),
+  risk_v(df_brm_b.c,litter_b,"kmeans"),nrow = 2
 )
 ```
 
@@ -388,7 +547,29 @@ risk_v(df_lrqp_s,litter_s,'kmeans'),
 nrow = 2)
 ```
 
-```{r}
+```{r normal_compare}
+grid.arrange(
+risk_v(df_rf_s,litter_s,'kmeans'),
+risk_v(df_rf_c,litter_p,'kmeans'),
+risk_v(df_rf_b,litter_b,'kmeans'),nrow = 1)
+
+grid.arrange(
+risk_v(df_lr_s,litter_s,'kmeans'),
+risk_v(df_lr_c,litter_p,'kmeans'),
+risk_v(df_lr_b,litter_b,'kmeans'),nrow = 1)
+
+grid.arrange(
+risk_v(df_lrqs_s,litter_s,'kmeans'),
+risk_v(df_lrqs_c,litter_p,'kmeans'),
+risk_v(df_lrqs_b,litter_b,'kmeans'),nrow = 1)
+
+grid.arrange(
+risk_v(df_lrqp_s,litter_s,'kmeans'),
+risk_v(df_lrqp_c,litter_p,'kmeans'),
+risk_v(df_lrqp_b,litter_b,'kmeans'),nrow = 1)
+```
+
+```{r shorten_compare}
 grid.arrange(
 risk_v(df_rf_s,litter_s,'kmeans'),
 risk_v(df_rf_c,litter_p,'kmeans'),
