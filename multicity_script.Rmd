@@ -72,24 +72,24 @@ stor_df <- add_row('landuse',list('retail'), 'retail')
 
 ```{r chennai data}
 #step to load city's data
-litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
+litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataSemarang.csv')
 
 # data filter and projection transformation
 litter_p <- litter%>%filter(master_material == 'PLASTIC')%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%st_transform('EPSG:32643')
 
-img <- raster("/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/population_ind_pak_general/population_10_lon_80_general-v1.5.tif")
+#img <- raster("/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/population_ind_pak_general/population_10_lon_80_general-v1.5.tif")
 
-chen_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/archive%20data/gcc-divisions-latest.kml')
-chen_bdry <- st_set_crs(chen_bdry, 4326)%>%st_transform('EPSG:32643')
-temp_bd <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/archive%20data/cma_layer.kml')
+chen_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Semarang.kml')
+chen_bdry <- st_set_crs(chen_bdry, 4326)%>%st_transform('EPSG:23849')
+temp_bd <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Semarang.kml')
 
 temp_bbox <- get_bbox(temp_bd) # get the bounding box (the projection of temp_bd should be epsg4326)
 temp_fish <- create_fish(chen_bdry) # get the fishnet of the city (the projection of chen_bdry should be meter degree)
 final_net <- countfishnet(temp_fish, litter_p) # create base fishnet with litter (also the one used as final one)
 final_net <- pn_gen(stor_df) # add osm point data and knn calculation result into the final dataset
 temp_point <- raster_process(img,temp_bd) # convert the raster file to point one 
-pop_result <- pop_process(temp_point, temp_fish, 32643) # summary the population result
+pop_result <- pop_process(temp_point, temp_fish, 23849) # summary the population result
 final_net <- add_pop(pop_result,final_net) # add the pop result into the final dataset
 final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into the dataset
 # DONE!
