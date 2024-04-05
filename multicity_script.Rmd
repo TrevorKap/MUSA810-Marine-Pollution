@@ -70,7 +70,7 @@ stor_df <- add_row('landuse',list('retail'), 'retail')
 
 # Load data
 
-```{r chennai data}
+```{r chennai data (LITTER P)}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 
@@ -100,14 +100,14 @@ final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into 
 chen_net <- final_net
 ```
 
-```{r bangkok data}
+```{r bangkok data (LITTER B)}
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataBangkok.csv')
 
-litter_p <- litter%>%
+litter_b <- litter%>%
   filter(master_material == 'PLASTIC')%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
   st_transform('EPSG:32643')
-litter_p <- subset(litter_p, select = -c(event_name, project_name))
+litter_b <- subset(litter_b, select = -c(event_name, project_name))
 
 bok_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Bangkok.kml')
 bok_bdry <- st_set_crs(bok_bdry, 4326)%>%
@@ -117,21 +117,21 @@ bok_bd <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/mai
 
 temp_bbox <- get_bbox(bok_bd) 
 temp_fish <- create_fish(bok_bdry)
-final_net <- countfishnet(temp_fish, litter_p) 
+final_net <- countfishnet(temp_fish, litter_b) 
 final_net <- pn_gen(stor_df) 
 final_net <- moran_gen(final_net,stor_df)
 bok_net <- final_net
 ```
 
-```{r santiago data}
+```{r santiago data (LITTER S)}
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataSantiago.csv')
 
 # data filter and projection transformation
-litter_p <- litter%>%
+litter_s <- litter%>%
   filter(master_material == 'PLASTIC')%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
   st_transform('EPSG:32643')
-litter_p <- subset(litter_p, select = -c(event_name, project_name))
+litter_s <- subset(litter_s, select = -c(event_name, project_name))
 
 # load boundary data
 ## ATTENTION! this part should be the boundry of YOUR CITY
@@ -142,7 +142,7 @@ san_bdry <- st_set_crs(san_bdry, 4326)%>%
 
 temp_bbox <- get_bbox(san_bd) 
 temp_fish <- create_fish(san_bdry)
-final_net <- countfishnet(temp_fish, litter_p) 
+final_net <- countfishnet(temp_fish, litter_s) 
 final_net <- pn_gen(stor_df) 
 final_net <- moran_gen(final_net,stor_df)
 san_net <- final_net
@@ -211,7 +211,7 @@ visual_cotinuous(bok_net,'retail_sig_dis')
 cor_chen <- st_drop_geometry(chen_net) %>% dplyr::select(!c(uniqueID,cvID,city,country))
 cor_nor_chen<- scale(cor_chen)
 corr_matrix <- cor(cor_nor_chen)
-#ggcorrplot(corr_matrix)
+ggcorrplot(corr_matrix)
 ```
 
 ```{r PCA analysis}
@@ -343,7 +343,7 @@ df_lrqs_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst, by="
 df_lrqp_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst, by="uniqueID")
 ```
 
-```{r hmm..}
+```{r hmm.., eval=FALSE, include=FALSE}
 df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
 df_lr_c <- df_lr_rst %>% filter(city == 'Chennai')
 df_lrqs_c <- df_lrqs_rst %>% filter(city == 'Chennai')
