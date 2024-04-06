@@ -235,6 +235,11 @@ visual_count(bok_net,"restaurant_sig")
 ## Correlation Analysis 
 
 Do we actually want this? This lowkey doesnt show any correlations
+-- the answer is yes. cuz it shows the feature of our model -- we can't find a variable to represent the litter data well. both from a comprehensive question and the lack of data. 
+
+that's the reason why we need to try to include more variables in our model to try to imitate the 'real world situation' about litter distribution.
+
+for another, the corr matrix is the basic to do the further PCA and variables selection for comparsion model.
 
 ```{r correlation matrix}
 cor_chen <- st_drop_geometry(chen_net) %>% dplyr::select(!c(uniqueID,cvID,city,country))
@@ -247,6 +252,13 @@ ggcorrplot(corr_matrix)
 
 The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. 
 
+1. reason why we want to do PCA is to decrease dimension of variable. (this is a common way in model build and variable selection) 
+
+2. the result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. we can find some different variables can show the similar features. 
+
+3. based on the result, select 'waste_sig_dis,restaurant_sig_dis,residential_sig_dis,water_sig_dis,residential_nn,industrial_sig_dis,industrial_sig,restaurant_sig,industrial_nn,road_sig_dis,residential_sig,restaurant_sig,restaurant' as the 'shorten model' independent variables. 
+
+(but the actual purpose of the PCA is to show that the model does not perform well in this case and make a comparison with the full-variable model )
 
 ```{r PCA analysis}
 data.pca <- princomp(corr_matrix)
