@@ -3,9 +3,25 @@ title: "Ocean Conservancy, Urban Ocean Marine Debris Prediction"
 subtitle: "Trevor Kapuvari, Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Xiaofan Liu"
 author: "University of Pennsylvania"
 date: "2024-02-22"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: "hide"
+    theme: flatly
+    highlight: tango
+    number_sections: yes
+mainfont: DejaVu Sans
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
-# environment setting
+
+
+# Introduction
+
+The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and have collected waste management information. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -69,7 +85,11 @@ stor_df <- add_row('landuse',list('residential'), 'residential')
 stor_df <- add_row('landuse',list('retail'), 'retail')
 ```
 
-# Load data
+# Initial Analysis and Preperation
+
+For our model, we directed our focus on various cities apart of the Urban Oceans program. The cities we display in this demonstration are Chennai India; Bangkok, Thailand; and Santiago, Chile. The data regarding the region and its attributes was sourced from OpenStreetMaps (OSM) to ensure a repeatable framework & quality consistency. For each selected city we developed a 'boundary box' automated by OSM simply by specifying the name of the area (city & nation) and using the output coordinates as the scope of data acquisition. From there, further attributes of the area with respect to structures, networks, or political divisions can be extracted for use.
+
+In terms of our dependent variable, litter data, the process required manually downloading data from Marine Debris Tracker (<https://www.debristracker.org/data/>). Each selected city required its own evaluation in terms of quantitative debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early-stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors.    
 
 ```{r chennai data}
 #step to load city's data
@@ -147,7 +167,7 @@ san_net <- final_net
 
 ```{r aggregate data, eval=FALSE, include=FALSE}
 chen_net <- chen_net %>%
- # dplyr::select(!c(avg_pop,sum_pop))%>%
+ # dplyr::select(!c(avg_pop ,sum_pop))%>%
   mutate(city = 'Chennai',
          country = 'India')
 
@@ -166,42 +186,55 @@ leisure <- c('park')
 act <- c('maxspeed') 
 ```
 
-# EDA & PCA
+# Data Sources and Methodology
+
+The litter data featured a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present.
+
+## Marine Debris Data, in Summary
+
+Each chart below visualizes a dependent variable reformatted for repeatable use  an in a statistical context that better represents its relation to litter. The examples are, restaurants, roads, retail proximity, and significant presence of restaurants. Our variable selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
+
+Restaurants are used as a point of significance because of their relation to commercial activity. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
+
 
 ```{r visualize count& continuous}
-visual_count(chen_net,'waste')
-visual_count(chen_net,'water')
+#visual_count(chen_net,'waste')
+#visual_count(chen_net,'water')
 visual_count(chen_net,"restaurant")
 visual_count(chen_net,'road')
-visual_count(bok_net,'industrial')
-visual_count(chen_net,"residential")
-visual_count(chen_net,'retail')
+#visual_count(bok_net,'industrial')
+#visual_count(chen_net,"residential")
+#visual_count(chen_net,'retail')
 
-visual_cotinuous(chen_net,'waste_nn')
-visual_cotinuous(san_net,'water_nn')
-visual_cotinuous(san_net,"restaurant_nn")
-visual_cotinuous(san_net,'road_nn')
-visual_cotinuous(san_net,'industrial_nn')
-visual_cotinuous(san_net,"residential_nn")
+#visual_cotinuous(chen_net,'waste_nn')
+#visual_cotinuous(san_net,'water_nn')
+#visual_cotinuous(san_net,"restaurant_nn")
+#visual_cotinuous(san_net,'road_nn')
+#visual_cotinuous(san_net,'industrial_nn')
+#visual_cotinuous(san_net,"residential_nn")
 visual_cotinuous(san_net,'retail_nn')
 
-visual_count(bok_net,'waste_sig')
-visual_count(bok_net,'water_sig')
+#visual_count(bok_net,'waste_sig')
+#visual_count(bok_net,'water_sig')
 visual_count(bok_net,"restaurant_sig")
-visual_count(bok_net,'road_sig')
-visual_count(bok_net,'industrial_sig')
-visual_count(bok_net,"residential_sig")
-visual_count(bok_net,'retail_sig')
+#visual_count(bok_net,'road_sig')
+#visual_count(bok_net,'industrial_sig')
+#visual_count(bok_net,"residential_sig")
+#visual_count(bok_net,'retail_sig')
 
-visual_cotinuous(bok_net,'waste_sig_dis')
-visual_cotinuous(bok_net,'water_sig_dis')
-visual_cotinuous(bok_net,"restaurant_sig_dis")
-visual_cotinuous(bok_net,'road_sig_dis')
-visual_cotinuous(bok_net,'industrial_sig_dis')
-visual_cotinuous(bok_net,"residential_sig_dis")
-visual_cotinuous(bok_net,'retail_sig_dis')
+#visual_cotinuous(bok_net,'waste_sig_dis')
+#visual_cotinuous(bok_net,'water_sig_dis')
+#visual_cotinuous(bok_net,"restaurant_sig_dis")
+#visual_cotinuous(bok_net,'road_sig_dis')
+#visual_cotinuous(bok_net,'industrial_sig_dis')
+#visual_cotinuous(bok_net,"residential_sig_dis")
+#visual_cotinuous(bok_net,'retail_sig_dis')
 
 ```
+
+## Correlation Analysis 
+
+Do we actually want this? This lowkey doesnt show any correlations
 
 ```{r correlation matrix}
 cor_chen <- st_drop_geometry(chen_net) %>% dplyr::select(!c(uniqueID,cvID,city,country))
@@ -209,6 +242,11 @@ cor_nor_chen<- scale(cor_chen)
 corr_matrix <- cor(cor_nor_chen)
 ggcorrplot(corr_matrix)
 ```
+
+## Principal Component Analysis 
+
+The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. 
+
 
 ```{r PCA analysis}
 data.pca <- princomp(corr_matrix)
@@ -229,7 +267,9 @@ fviz_pca_var(data.pca, col.var = "cos2",
 
 
 # Model part
-## model build 
+
+In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators. 
+
 ```{r model build}
 # prepare for model data
 df_model <- st_drop_geometry(tt_net)%>%dplyr::select(!cvID)
@@ -332,10 +372,9 @@ df_dt_rst <- df_model%>%
 
 df_dt_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_dt_rst, by="uniqueID")
 
-risk_v(df_dt_rst,litter_p,"kmeans")
+#risk_v(df_dt_rst,litter_p,"kmeans")
 ```
 
-## model result
 ```{r model result}
 df_rf_rst <- model_process(df_model,temp.rf)
 df_lr_rst <- model_process(df_model,temp.lr)
@@ -453,8 +492,13 @@ df_brm_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst.c, by
 
 ```
 
-## risk visualization
-```{r chennai risk_normal, eval=FALSE, include=FALSE}
+## Model Test Through Examples
+
+For our various models, we have tested them on Chennai, Bangkok, and Santiago. The results are displayed below. Each model has a different level of sensitivity 
+
+```{r model test}
+
+
 df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
 df_lr_c <- df_lr_rst %>% filter(city == 'Chennai')
 df_lrqs_c <- df_lrqs_rst %>% filter(city == 'Chennai')
