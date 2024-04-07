@@ -31,24 +31,63 @@ firstDropdown.addEventListener("change", function () {
       secondDropdown.innerHTML = `
                 <option value="Select City" disabled selected>Select City</option>
                 <option value="Chennai">Chennai</option>
-                <option value="Bangkok">Bangkok</option>
-                <option value="Santiago">Santiago</option>
+                <option value="Mumbai">Mumbai</option>
+                <option value="Surat">Surat</option>
+                <option value="Pune">Pune</option>
             `;
       break;
     case "Chile":
       secondDropdown.innerHTML = `
                 <option value="Select City" disabled selected>Select City</option>
                 <option value="Santiago">Santiago</option>
-                <option value="subcategory5">Subcategory 5</option>
-                <option value="subcategory6">Subcategory 6</option>
             `;
       break;
     case "Thailand":
       secondDropdown.innerHTML = `
                 <option value="Select City" disabled selected>Select City</option>
                 <option value="Bangkok">Bangkok</option>
-                <option value="subcategory8">Subcategory 8</option>
-                <option value="subcategory9">Subcategory 9</option>
+            `;
+      break;
+    case "Vietnam":
+      secondDropdown.innerHTML = `
+                <option value="Select City" disabled selected>Select City</option>
+                <option value="Can_Tho">Can_Tho</option>
+            `;
+      break;
+    case "Malaysia":
+      secondDropdown.innerHTML = `
+                <option value="Select City" disabled selected>Select City</option>
+                <option value="Melaka">Melaka</option>
+            `;
+      break;
+    case "Panama":
+      secondDropdown.innerHTML = `
+                <option value="Select City" disabled selected>Select City</option>
+                <option value="Panama_City">Panama_City</option>
+            `;
+      break;
+    case "El Salvador":
+      secondDropdown.innerHTML = `
+                <option value="Select City" disabled selected>Select City</option>
+                <option value="Salvador">Salvador</option>
+            `;
+      break;
+    case "New Mexico":
+      secondDropdown.innerHTML = `
+                <option value="Select City" disabled selected>Select City</option>
+                <option value="Santa_Fe">Santa_Fe</option>
+            `;
+      break;
+    case "Chile":
+      secondDropdown.innerHTML = `
+                <option value="Select City" disabled selected>Select City</option>
+                <option value="Santiago">Santiago</option>
+            `;
+      break;
+    case "Indonesia":
+      secondDropdown.innerHTML = `
+                <option value="Select City" disabled selected>Select City</option>
+                <option value="Semarang">Semarang</option>
             `;
       break;
     default:
