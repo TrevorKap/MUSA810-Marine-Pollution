@@ -1,5 +1,9 @@
 import { matchCity } from "./chart.js";
-import { updateIndicator } from "./indicatorUpdate.js";
+import {
+  updateIndicator,
+  percentageLvl,
+  totalCount,
+} from "./indicatorUpdate.js";
 import { changeMap } from "./map.js";
 
 // Get references to the 1 and 2 dropdowns
@@ -10,6 +14,7 @@ const secondDropdown = document.getElementById("second-dropdown");
 document.addEventListener("DOMContentLoaded", function () {
   matchCity(secondDropdown.value);
   updateIndicator(secondDropdown.value);
+  percentageLvl(secondDropdown.value);
 });
 
 // Add event listener to the first dropdown
@@ -59,6 +64,8 @@ secondDropdown.addEventListener("change", function () {
 
   // update figures
   updateIndicator(secondDropdown.value);
+  percentageLvl(secondDropdown.value);
+  totalCount(secondDropdown.value);
 
   // update map
   changeMap(secondDropdown.value);

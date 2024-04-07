@@ -1,6 +1,31 @@
 import { cityObj } from "./sortData.js";
+import { litterData } from "../data/category.js";
 
-// Generic function to calculate average numbers
+// Risk Overview
+const riskLvl = document.querySelector(".js-number");
+riskLvl.innerHTML = `e`;
+// need a function here later to calculate the average risk level...
+
+// litter by type
+export function percentageLvl(cityName) {
+  const percentageLvl = document.querySelector(".js-percentage");
+  percentageLvl.innerHTML = `${litterData[cityName].plasticPerc}`;
+}
+
+// calculate total litter counts for each city
+export function totalCount(cityName) {
+  let total = 0;
+
+  cityObj[cityName].forEach((feature) => {
+    total += feature.properties.count;
+  });
+
+  const totalC = document.querySelector(".js-total-count");
+  totalC.innerHTML = `${total}`;
+}
+
+// key factors
+// calculate average numbers for each factor
 function calculateAverage(data, propertyName) {
   let totalCount = 0;
   const totalFeatures = data.length;
@@ -14,7 +39,7 @@ function calculateAverage(data, propertyName) {
 
 // Example usage:
 export function updateIndicator(data) {
-  const avgCount = calculateAverage(cityObj[data], "count").toFixed(2);
+  const avgWaste = calculateAverage(cityObj[data], "waste_nn").toFixed(2);
   const avgRestaurant = calculateAverage(cityObj[data], "restaurant").toFixed(
     2
   );
@@ -22,18 +47,22 @@ export function updateIndicator(data) {
   // add more later...
 
   // Update the indicators in the html
-  const countElm = document.querySelector(".js-count");
+  const countElm = document.querySelector(".js-waste");
   countElm.innerHTML = `
-        Count Avg Num: ${avgCount}
+        <span class="number">${avgWaste}</span>
+        <span class="number-stat">m</span>
+        <p>Waste Avg Distance</p>
     `;
 
   const restaurantElm = document.querySelector(".js-restaraunt");
   restaurantElm.innerHTML = `
-        Restaurant Avg Num: ${avgRestaurant}
+        <div class="number">${avgRestaurant}</div>
+        <p>Restaurant Avg Num</p>
     `;
 
   const waterElm = document.querySelector(".js-water");
   waterElm.innerHTML = `
-        Water Distance Average: ${avgWaterDis}m
+        <div class="number">${avgWaterDis}</div>
+        <p>Water Avg Distance</p>
     `;
 }

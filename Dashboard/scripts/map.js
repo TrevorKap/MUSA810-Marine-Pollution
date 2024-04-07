@@ -52,7 +52,7 @@ function style(feature) {
     opacity: 1,
     color: "#ffffff",
     dashArray: "",
-    fillOpacity: 1,
+    fillOpacity: 0.7,
   };
 }
 
@@ -113,10 +113,10 @@ function onEachFeature(feature, layer) {
           feature.properties.count +
           " count" +
           "</b><br />" +
-          feature.properties.water_nn.toFixed(2) +
+          feature.properties.water_nn.toFixed(1) +
           "m /water_nn" +
           "</b><br />" +
-          feature.properties.restaurant_nn.toFixed(2) +
+          feature.properties.restaurant_nn.toFixed(1) +
           "m /restaurant_nn"
         : "No data available")
   );

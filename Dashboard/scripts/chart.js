@@ -1,7 +1,7 @@
-import { litterCategory } from "../data/category.js";
+import { litterData } from "../data/category.js";
 
 // Extract the required data from your JSON
-const types = ["Plastic", "Paper", "Glass", "Cloth", "Cigarette"];
+const types = ["Cloth", "Glass", "Metal", "Paper", "Plastic", "Other"];
 
 // default empty state
 
@@ -17,7 +17,7 @@ render.innerHTML = `
 export function matchCity(cityName) {
   render.innerHTML = ``;
 
-  const percentages = litterCategory[cityName];
+  const percentages = litterData[cityName].category; // Accessing the category data
 
   // Define the chart configuration using the extracted data
   const options = {
@@ -28,7 +28,7 @@ export function matchCity(cityName) {
     ],
     chart: {
       type: "bar",
-      height: 200,
+      height: 180,
     },
     plotOptions: {
       bar: {
@@ -37,7 +37,7 @@ export function matchCity(cityName) {
       },
     },
     dataLabels: {
-      enabled: true,
+      enabled: false,
     },
     xaxis: {
       categories: types,
@@ -51,7 +51,7 @@ export function matchCity(cityName) {
     tooltip: {
       y: {
         formatter: function (val) {
-          return "Percentage: " + val + "%";
+          return "Count: " + val;
         },
       },
     },
