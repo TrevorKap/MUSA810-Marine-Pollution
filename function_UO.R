@@ -430,7 +430,7 @@ model_result <- function(dataset,model){
 # model_data: the dataset with Prediction column
 # litter_data: the litter data
 # appraoch: see from above
-risk_v <- function(model_data,litter_data,approach){
+risk_v <- function(model_data,litter_data,approach,model){
   ml_breaks <- classIntervals(model_data$Prediction, 
                               n = 5, approach)
   
@@ -449,7 +449,7 @@ risk_v <- function(model_data,litter_data,approach){
     geom_sf(data = litter_data, size = .3, colour = "red") +
     scale_fill_viridis(discrete = TRUE) +
     labs(title=paste("Litter Risk Predictions",approach,sep = '--'),
-         subtitle="") +
+         subtitle= model) +
     mapTheme(title_size = 8)
 }
 
