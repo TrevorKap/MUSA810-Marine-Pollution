@@ -18,7 +18,7 @@ editor_options:
 ---
 
 
-# Introduction
+# 1. Introduction
 
 The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and have collected waste management information. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
 
@@ -47,11 +47,11 @@ library(RCurl)
 library(httr)
 library(osmdata)
 library(randomForest)
-library(tidygraph)
+#library(tidygraph)
 library(XML)
 library(neuralnet)
 library(MASS)
-library(tidymodels)
+#library(tidymodels)
 library(brms)
 library(jsonlite)
 library(QuickJSR)
@@ -85,13 +85,15 @@ stor_df <- add_row('landuse',list('residential'), 'residential')
 stor_df <- add_row('landuse',list('retail'), 'retail')
 ```
 
-# Initial Analysis and Preperation
+# 2. Initial Analysis and Preperation
 
-For our model, we directed our focus on various cities apart of the Urban Oceans program. The cities we display in this demonstration are Chennai India; Bangkok, Thailand; and Santiago, Chile. The data regarding the region and its attributes was sourced from OpenStreetMaps (OSM) to ensure a repeatable framework & quality consistency. For each selected city we developed a 'boundary box' automated by OSM simply by specifying the name of the area (city & nation) and using the output coordinates as the scope of data acquisition. From there, further attributes of the area with respect to structures, networks, or political divisions can be extracted for use.
+## 2.1 Data Sources and Methodology
+
+For our model, we directed our focus on various cities apart of the Resilient Cities Network. The cities we display in this demonstration are Chennai India; Bangkok, Thailand; and Santiago, Chile. The data regarding the region and its attributes was sourced from OpenStreetMap (OSM) to ensure a repeatable framework & quality consistency. For each selected city we developed a 'boundary box' automated by OSM simply by specifying the name of the area (city & nation) and using the output coordinates as the scope of data acquisition. From there, further attributes of the area with respect to structures, networks, or political divisions can be extracted for use.
 
 In terms of our dependent variable, litter data, the process required manually downloading data from Marine Debris Tracker (<https://www.debristracker.org/data/>). Each selected city required its own evaluation in terms of quantitative debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early-stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors.    
 
-```{r chennai data}
+```{r chennai data, warning = FALSE, message = FALSE}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 
@@ -117,7 +119,7 @@ final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into 
 chen_net <- final_net
 ```
 
-```{r bangkok data}
+```{r bangkok data, warning = FALSE, message = FALSE}
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataBangkok.csv')
 
 litter_b <- litter%>%
@@ -140,7 +142,7 @@ final_net <- moran_gen(final_net,stor_df)
 bok_net <- final_net
 ```
 
-```{r santiago data}
+```{r santiago data, warning = FALSE, message = FALSE}
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataSantiago.csv')
 
 # data filter and projection transformation
@@ -151,7 +153,7 @@ litter_s <- litter%>%
 litter_s <- subset(litter_s, select = -c(event_name, project_name))
 
 # load boundary data
-## ATTENTION! this part should be the boundry of YOUR CITY
+
 san_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Santiago.kml')
 san_bd <- san_bdry
 san_bdry <- st_set_crs(san_bdry, 4326)%>%
@@ -186,11 +188,10 @@ leisure <- c('park')
 act <- c('maxspeed') 
 ```
 
-# Data Sources and Methodology
 
 The litter data featured a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present.
 
-## Marine Debris Data, in Summary
+## 2.2 Marine Debris Data, in Summary
 
 Each chart below visualizes a dependent variable reformatted for repeatable use  an in a statistical context that better represents its relation to litter. The examples are, restaurants, roads, retail proximity, and significant presence of restaurants. Our variable selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
@@ -232,14 +233,9 @@ visual_count(bok_net,"restaurant_sig")
 
 ```
 
-## Correlation Analysis 
+## 2.3 Correlation Analysis 
 
-Do we actually want this? This lowkey doesnt show any correlations
--- the answer is yes. cuz it shows the feature of our model -- we can't find a variable to represent the litter data well. both from a comprehensive question and the lack of data. 
-
-that's the reason why we need to try to include more variables in our model to try to imitate the 'real world situation' about litter distribution.
-
-for another, the corr matrix is the basic to do the further PCA and variables selection for comparsion model.
+The following correlation analysis shows the various features of our model. This matrix allows for further PCA analysis and variable selection.
 
 ```{r correlation matrix}
 cor_chen <- st_drop_geometry(chen_net) %>% dplyr::select(!c(uniqueID,cvID,city,country))
@@ -248,17 +244,9 @@ corr_matrix <- cor(cor_nor_chen)
 ggcorrplot(corr_matrix)
 ```
 
-## Principal Component Analysis 
+## 2.4 Principal Component Analysis 
 
-The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. 
-
-1. reason why we want to do PCA is to decrease dimension of variable. (this is a common way in model build and variable selection) 
-
-2. the result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. we can find some different variables can show the similar features. 
-
-3. based on the result, select 'waste_sig_dis,restaurant_sig_dis,residential_sig_dis,water_sig_dis,residential_nn,industrial_sig_dis,industrial_sig,restaurant_sig,industrial_nn,road_sig_dis,residential_sig,restaurant_sig,restaurant' as the 'shorten model' independent variables. 
-
-(but the actual purpose of the PCA is to show that the model does not perform well in this case and make a comparison with the full-variable model )
+The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. The reason why we perform PCA is to decrease the dimension of variable. The following result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
 
 ```{r PCA analysis}
 data.pca <- princomp(corr_matrix)
@@ -276,11 +264,11 @@ fviz_pca_var(data.pca, col.var = "cos2",
             repel = TRUE)
 ```
 
+# 3. Model Building
 
+## 3.1 Reduced Bias Model
 
-# Model part
-
-In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators. 
+In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators.
 
 ```{r model build}
 # prepare for model data
@@ -306,49 +294,9 @@ linear.output = TRUE
 temp.hbr <- fit.1<- brm(count~ ., data=df_model%>%dplyr::select(!uniqueID), family=gaussian(),warmup=500, iter=1000, chains=2,cores=2,seed = 1115)
 ```
 
-```{r small model build}
-df_model_shorten <- df_model %>%
-  dplyr::select(c(count,uniqueID,waste_sig_dis,restaurant_sig_dis,residential_sig_dis,water_sig_dis,residential_nn,industrial_sig_dis,industrial_sig,restaurant_sig,industrial_nn,road_sig_dis,residential_sig,restaurant_sig,restaurant,city_Bangkok,city_Chennai,country_Chile,country_India))
+## 3.2 Model Results
 
-temp.rf.s <- randomForest(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID), mtry = 10,ntree=70, 
-                         importance = TRUE, na.action = na.omit) 
-
-temp.lr.s <- glm(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID),family = "poisson", na.action = na.omit) 
-
-temp.lr.qs.s <- glm(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID),family = "quasi", na.action = na.omit) 
-
-temp.lr.qp.s <- glm(count ~ ., data = df_model_shorten%>%dplyr::select(!uniqueID),family = "quasipoisson", na.action = na.omit) 
-
-nn_model.s = neuralnet(count ~ .,data=df_model_shorten%>%dplyr::select(!uniqueID),hidden=c(5,2),
-linear.output = TRUE
-)
-
-temp.hbr.s <- fit.1<- brm(count~ ., data=df_model_shorten%>%dplyr::select(!uniqueID), family=gaussian(),warmup=500, iter=1000, chains=2,cores=2,seed = 1115)
-```
-
-```{r chennai_only model}
-# prepare for model data
-df_model_chen <- st_drop_geometry(chen_net)%>%dplyr::select(!cvID)
-df_model_chen <- dummy_cols(df_model_chen, select_columns = "city")
-df_model_chen <- dummy_cols(df_model_chen, select_columns = "country")
-df_model_chen <- df_model_chen %>% dplyr::select(!c(city,country)) %>% mutate(uniqueID = 1:n())
-
-# several model 
-temp.rf.c <- randomForest(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID), mtry = 10,ntree=70, 
-                         importance = TRUE, na.action = na.omit) 
-
-temp.lr.c <- glm(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID),family = "poisson", na.action = na.omit) 
-
-temp.lr.qs.c <- glm(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID),family = "quasi", na.action = na.omit) 
-
-temp.lr.qp.c <- glm(count ~ ., data = df_model_chen%>%dplyr::select(!uniqueID),family = "quasipoisson", na.action = na.omit) 
-
-nn_model.c = neuralnet(count ~ .,data=df_model_chen%>%dplyr::select(!uniqueID),hidden=c(5,2),
-linear.output = TRUE
-)
-
-temp.hbr.c <- fit.1<- brm(count~ ., data=df_model_chen%>%dplyr::select(!uniqueID), family=gaussian(),warmup=500, iter=1000, chains=2,cores=2,seed = 1115)
-```
+The following model results of each of the models was added to the dataframe. We test a range of statistical models for a comparative analysis, including random forest, linear model, quasi poisson, hierarchical bayes regression. This section also includes a decision tree model. While this model has a strong visualization of the risk area, its accuracy was not strong.
 
 ```{r decision tree model}
 set.seed(123)
@@ -427,86 +375,12 @@ df_brm_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst, by="un
 
 ```
 
-```{r small model result}
-df_rf_rst.s <- model_process(df_model_shorten,temp.rf.s)
-df_lr_rst.s <- model_process(df_model_shorten,temp.lr.s)
-df_lrqs_rst.s <- model_process(df_model_shorten,temp.lr.qs.s)
-df_lrqp_rst.s <- model_process(df_model_shorten,temp.lr.qp.s)
-df_nn_rst.s <- model_process(df_model_shorten,nn_model.s)
+## 3.3 Model Testing Across Different Cities
 
-df_brm_rst.s <- model_process(df_model_shorten,temp.hbr.s)
-estimates_list <- list()
-# Iterate over each row by index
-for(i in 1:nrow(df_brm_rst.s)) {
-  # Extract the 'Prediction' for the current row
-  current_prediction <- df_brm_rst.s$Prediction[[i]][1]
-  estimates_list[[i]] <- current_prediction
-}
+For our various models, we have tested them on Bangkok as well. The results are displayed below. Each model has a different level of sensitivity.
 
-df_brm_rst.s$Estimate <- estimates_list
-df_brm_rst.s <- df_brm_rst.s %>%
-  dplyr::select(uniqueID,count,Estimate)%>%
-  rename(Prediction = Estimate)
+Below shows the various models for Chennai and their predictions of litter risk across 5 categories of intensity.
 
-df_brm_rst.s$Prediction <- as.numeric(unlist(df_brm_rst.s$Prediction))
-
-#df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
-#df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
-#df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
-#df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
-#df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
-#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
-
-df_rf_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst.s, by="uniqueID")
-df_lr_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst.s, by="uniqueID")
-df_lrqs_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst.s, by="uniqueID")
-df_lrqp_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst.s, by="uniqueID")
-df_brm_rst.s <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst.s, by="uniqueID")
-```
-
-```{r chennai_only model result}
-df_rf_rst.c <- model_process(df_model,temp.rf.c)
-df_lr_rst.c <- model_process(df_model,temp.lr.c)
-df_lrqs_rst.c <- model_process(df_model,temp.lr.qs.c)
-df_lrqp_rst.c <- model_process(df_model,temp.lr.qp.c)
-df_nn_rst.c <- model_process(df_model,nn_model.c)
-
-df_brm_rst.c <- model_process(df_model,temp.hbr.c)
-estimates_list <- list()
-# Iterate over each row by index
-for(i in 1:nrow(df_brm_rst)) {
-  # Extract the 'Prediction' for the current row
-  current_prediction <- df_brm_rst.c$Prediction[[i]][1]
-  estimates_list[[i]] <- current_prediction
-}
-
-df_brm_rst.c$Estimate <- estimates_list
-df_brm_rst.c <- df_brm_rst.c %>%
-  dplyr::select(uniqueID,count,Estimate)%>%
-  rename(Prediction = Estimate)
-
-df_brm_rst.c$Prediction <- as.numeric(unlist(df_brm_rst.c$Prediction))
-#df_brm_r <- model_result(df_model,fit.1) %>%mutate(model = 'BRM')
-
-
-#df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
-#df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
-#df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
-#df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
-#df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
-#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
-
-df_rf_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst.c, by="uniqueID")
-df_lr_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst.c, by="uniqueID")
-df_lrqs_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst.c, by="uniqueID")
-df_lrqp_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst.c, by="uniqueID")
-df_brm_rst.c <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst.c, by="uniqueID")
-
-```
-
-## Model Test Through Examples
-
-For our various models, we have tested them on Chennai, Bangkok, and Santiago. The results are displayed below. Each model has a different level of sensitivity 
 
 ```{r model test}
 
@@ -518,42 +392,15 @@ df_lrqp_c <- df_lrqp_rst %>% filter(city == 'Chennai')
 df_brm_c <- df_brm_rst %>% filter(city == 'Chennai')
 
 grid.arrange(
-  risk_v(df_rf_c,litter_p,"kmeans"),
-  risk_v(df_lr_c,litter_p,"kmeans"),
-  risk_v(df_lrqs_c,litter_p,"kmeans"),
-  risk_v(df_lrqp_c,litter_p,"kmeans"), 
-  risk_v(df_brm_c,litter_p,"kmeans"),nrow = 2
+  risk_v(df_rf_c,litter_p,"kmeans",'random forest'),
+  risk_v(df_lr_c,litter_p,"kmeans",'linear regression'),
+  risk_v(df_lrqs_c,litter_p,"kmeans",'Lr-quasi'),
+  risk_v(df_lrqp_c,litter_p,"kmeans",'Lr-quasipossion'), 
+  risk_v(df_brm_c,litter_p,"kmeans",'HrB regression'),nrow = 2
 )
 ```
 
-```{r chennai risk_shorten}
-df_rf_c.s <- df_rf_rst.s %>% filter(city == 'Chennai')
-df_lr_c.s <- df_lr_rst.s %>% filter(city == 'Chennai')
-df_lrqs_c.s <- df_lrqs_rst.s %>% filter(city == 'Chennai')
-df_lrqp_c.s <- df_lrqp_rst.s %>% filter(city == 'Chennai')
-grid.arrange(
-  risk_v(df_rf_c.s,litter_p,"kmeans"),
-  risk_v(df_lr_c.s,litter_p,"kmeans"),
-  risk_v(df_lrqs_c.s,litter_p,"kmeans"),
-  risk_v(df_lrqp_c.s,litter_p,"kmeans"),
-  risk_v(df_brm_c,litter_p,"kmeans"),nrow = 2
-)
-```
-
-```{r chennai risk_chennai_only}
-df_rf_c.c <- df_rf_rst.c %>% filter(city == 'Chennai')
-df_lr_c.c <- df_lr_rst.c %>% filter(city == 'Chennai')
-df_lrqs_c.c <- df_lrqs_rst.c %>% filter(city == 'Chennai')
-df_lrqp_c.c <- df_lrqp_rst.c %>% filter(city == 'Chennai')
-df_brm_c.c <- df_brm_rst.c %>% filter(city == 'Chennai')
-grid.arrange(
-  risk_v(df_rf_c.c,litter_p,"kmeans"),
-  risk_v(df_lr_c.c,litter_p,"kmeans"),
-  risk_v(df_lrqs_c.c,litter_p,"kmeans"),
-  risk_v(df_lrqp_c.c,litter_p,"kmeans"),
-  risk_v(df_brm_c.c,litter_p,"kmeans"),nrow = 2
-)
-```
+Below shows the various models for Bangkok and their predictions of litter risk across 5 categories of intensity.
 
 ```{r bangkok risk_normal}
 df_rf_b <- df_rf_rst %>% filter(city == 'Bangkok')
@@ -570,259 +417,26 @@ grid.arrange(
 )
 ```
 
-```{r bangkok risk_chennai_only}
-df_rf_b.c <- df_rf_rst.c %>% filter(city == 'Bangkok')
-df_lr_b.c <- df_lr_rst.c %>% filter(city == 'Bangkok')
-df_lrqs_b.c <- df_lrqs_rst.c %>% filter(city == 'Bangkok')
-df_lrqp_b.c <- df_lrqp_rst.c %>% filter(city == 'Bangkok')
-df_brm_b.c <- df_brm_rst.c %>% filter(city == 'Bangkok')
-grid.arrange(
-  risk_v(df_rf_b.c,litter_b,"kmeans"),
-  risk_v(df_lr_b.c,litter_b,"kmeans"),
-  risk_v(df_lrqs_b.c,litter_b,"kmeans"),
-  risk_v(df_lrqp_b.c,litter_b,"kmeans"),
-  risk_v(df_brm_b.c,litter_b,"kmeans"),nrow = 2
-)
-```
-
-```{r hmm..}
-df_rf_s <- df_rf_rst %>% filter(city == 'Santiago')
-df_lr_s <- df_lr_rst %>% filter(city == 'Santiago')
-df_lrqs_s <- df_lrqs_rst %>% filter(city == 'Santiago')
-df_lrqp_s <- df_lrqp_rst %>% filter(city == 'Santiago')
-
-df_rf_s <- risk_level(df_rf_s,'kmeans')
-df_lr_s <- risk_level(df_lr_s,'kmeans')
-df_lrqs_s <- risk_level(df_lrqs_s,'kmeans')
-df_lrqp_s <- risk_level(df_lrqp_s,'kmeans')
-
-grid.arrange(
-risk_v(df_rf_s,litter_s,'kmeans'),
-risk_v(df_lr_s,litter_s,'kmeans'),
-risk_v(df_lrqs_s,litter_s,'kmeans'),
-risk_v(df_lrqp_s,litter_s,'kmeans'),
-nrow = 2)
-```
+The following comparative model visaulizes the strength of the model as it is used acrossed cities.
 
 ```{r normal_compare}
 grid.arrange(
-risk_v(df_rf_s,litter_s,'kmeans'),
+#risk_v(df_rf_s,litter_s,'kmeans'),
 risk_v(df_rf_c,litter_p,'kmeans'),
 risk_v(df_rf_b,litter_b,'kmeans'),nrow = 1)
 
 grid.arrange(
-risk_v(df_lr_s,litter_s,'kmeans'),
+#risk_v(df_lr_s,litter_s,'kmeans'),
 risk_v(df_lr_c,litter_p,'kmeans'),
 risk_v(df_lr_b,litter_b,'kmeans'),nrow = 1)
 
 grid.arrange(
-risk_v(df_lrqs_s,litter_s,'kmeans'),
+#risk_v(df_lrqs_s,litter_s,'kmeans'),
 risk_v(df_lrqs_c,litter_p,'kmeans'),
 risk_v(df_lrqs_b,litter_b,'kmeans'),nrow = 1)
 
 grid.arrange(
-risk_v(df_lrqp_s,litter_s,'kmeans'),
+#risk_v(df_lrqp_s,litter_s,'kmeans'),
 risk_v(df_lrqp_c,litter_p,'kmeans'),
 risk_v(df_lrqp_b,litter_b,'kmeans'),nrow = 1)
-```
-
-```{r shorten_compare}
-grid.arrange(
-risk_v(df_rf_s,litter_s,'kmeans'),
-risk_v(df_rf_c,litter_p,'kmeans'),
-risk_v(df_rf_b,litter_b,'kmeans'),nrow = 1)
-
-grid.arrange(
-risk_v(df_lr_s,litter_s,'kmeans'),
-risk_v(df_lr_c,litter_p,'kmeans'),
-risk_v(df_lr_b,litter_b,'kmeans'),nrow = 1)
-
-grid.arrange(
-risk_v(df_lrqs_s,litter_s,'kmeans'),
-risk_v(df_lrqs_c,litter_p,'kmeans'),
-risk_v(df_lrqs_b,litter_b,'kmeans'),nrow = 1)
-
-grid.arrange(
-risk_v(df_lrqp_s,litter_s,'kmeans'),
-risk_v(df_lrqp_c,litter_p,'kmeans'),
-risk_v(df_lrqp_b,litter_b,'kmeans'),nrow = 1)
-```
-
-
-# Previous version
-
-```{r eval=FALSE, include=FALSE}
-reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis") # the independent variables included
-
-## RUN REGRESSIONS
-reg.ss.spatialCV <- crossValidate(
-  dataset = final_net,
-  id = "uniqueID",                           
-  dependentVariable = "count", # this count is the litter count 
-  indVariables = reg.ss.vars) %>%
-    dplyr::select(uniqueID, count, Prediction, geometry)
-```
-
-```{r eval=FALSE, include=FALSE}
-error_visual(reg.ss.spatialCV) # visualize the MSE of prediction
-```
-
-```{r eval=FALSE, include=FALSE}
-risk_visualize(reg.ss.spatialCV,litter_p) # visualize the risk map
-```
-
-```{r eval=FALSE, include=FALSE}
-df_model <- st_drop_geometry(final_net)%>%dplyr::select(!cvID)
-
-temp.rf <- randomForest(count ~ ., data = df_model%>%dplyr::select(!uniqueID), mtry = 10,ntree=70, 
-                         importance = TRUE, na.action = na.omit) 
-
-temp.lr <- glm(count ~ ., data = df_model%>%dplyr::select(!uniqueID),family = "poisson", na.action = na.omit) 
-
-temp.lr.qs <- glm(count ~ ., data = df_model%>%dplyr::select(!uniqueID),family = "quasi", na.action = na.omit) 
-
-temp.lr.qp <- glm(count ~ ., data = df_model%>%dplyr::select(!uniqueID),family = "quasipoisson", na.action = na.omit) 
-
-nn_model = neuralnet(count ~ .,data=df_model%>%dplyr::select(!uniqueID),hidden=c(5,2),
-linear.output = TRUE
-)
-```
-
-```{r}
-fit.1<- brm(count~ ., data=df_model%>%dplyr::select(!uniqueID), family=gaussian(),
-              warmup=500, #burnin for 500 interations for each chain = 1000 burnin
-              iter=1000, chains=2, #2*1000 =2000 - 1000 burnin = 1000 total iterations
-              cores=2,seed = 1115) #number of computer cores, 1 per chain is good.
-```
-
-```{r}
-df_brm_rst <- model_process(df_model,fit.1)
-df_brm_r <- model_result(df_model,fit.1) %>%mutate(model = 'BRM')
-df_brm_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_brm_rst, by="uniqueID")
-
-estimates_list <- list()
-# Iterate over each row by index
-for(i in 1:nrow(df_brm_rst)) {
-  # Extract the 'Prediction' for the current row
-  current_prediction <- df_brm_rst$Prediction[[i]][1]
-  estimates_list[[i]] <- current_prediction
-}
-
-df_brm_rst$Estimate <- estimates_list
-df_brm_rst <- df_brm_rst %>%
-  dplyr::select(uniqueID,count,geometry,Estimate)%>%
-  rename(Prediction = Estimate)
-
-df_brm_rst$Prediction <- as.numeric(unlist(df_brm_rst$Prediction))
-
-grid.arrange(risk_v(df_brm_rst,litter_p,"kmeans"),
-             visual_count_net(water_net,water_point,chen_bdry,'water'),nrow=2)
-```
-
-```{r}
-# the model only use fishnet having data
-temp_net <- final_net %>%
-  filter(count != 0)
-
-temp_model <- st_drop_geometry(temp_net)%>%dplyr::select(!cvID)
-
-temp.rf_s <- randomForest(count ~ ., data = temp_model%>%dplyr::select(!uniqueID), mtry = 10,ntree=70, 
-                         importance = TRUE, na.action = na.omit) 
-
-temp.lr_s <- glm(count ~ ., data = temp_model%>%dplyr::select(!uniqueID),family = "poisson", na.action = na.omit) 
-
-temp.lr.qs_s <- glm(count ~ ., data = temp_model%>%dplyr::select(!uniqueID),family = "quasi", na.action = na.omit) 
-
-temp.lr.qp_s <- glm(count ~ ., data = temp_model%>%dplyr::select(!uniqueID),family = "quasipoisson", na.action = na.omit) 
-
-nn_model_s = neuralnet(count ~ .,data=temp_model%>%dplyr::select(!uniqueID),hidden=c(5,2),
-linear.output = TRUE
-)
-```
-
-```{r}
-set.seed(123)
-data_split <- initial_split(df_model, prop = 0.75)
-train_data <- training(data_split)
-test_data <- testing(data_split)
-
-# Create a decision tree model specification
-tree_spec <- decision_tree(mode = "regression", tree_depth = 4,engine = 'rpart') 
-
-# Fit the model to the training data
-tree_fit <- tree_spec %>%
- fit(count ~ ., data = train_data)
-
-predictions <- tree_fit %>%
- predict(test_data) %>%
- pull(.pred)
-
-metrics <- metric_set(rmse, rsq)
-model_performance <- test_data %>%
- mutate(predictions = predictions) %>%
- metrics(truth = count, estimate = predictions)
-
-print(model_performance)
-
-predictions <- tree_fit %>%
- predict(df_model)%>%
- pull(.pred)
-
-df_dt_rst <- df_model%>%
-  mutate(Prediction = predictions)%>%
-  dplyr::select(uniqueID,count,Prediction)
-
-df_dt_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_dt_rst, by="uniqueID")
-
-risk_v(df_dt_rst,litter_p,"kmeans")
-```
-
-```{r}
-df_rf_rst <- model_process(df_model,temp.rf)
-df_lr_rst <- model_process(df_model,temp.lr)
-df_lrqs_rst <- model_process(df_model,temp.lr.qs)
-df_lrqp_rst <- model_process(df_model,temp.lr.qp)
-df_nn_rst <- model_process(df_model,nn_model)
-
-df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
-df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
-df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
-df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
-df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
-df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
-
-df_rf_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_rf_rst, by="uniqueID")
-df_lr_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lr_rst, by="uniqueID")
-df_lrqs_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqs_rst, by="uniqueID")
-df_lrqp_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqp_rst, by="uniqueID")
-```
-
-```{r}
-# use the model only use fishnet having data to predict the whole area
-df_rf_rst_s <- model_process(df_model,temp.rf_s)
-df_lr_rst_s <- model_process(df_model,temp.lr_s)
-df_lrqs_rst_s <- model_process(df_model,temp.lr.qs_s)
-df_lrqp_rst_s <- model_process(df_model,temp.lr.qp_s)
-df_nn_rst_s <- model_process(df_model,nn_model_s)
-
-df_rf_r_s <- model_result(df_model,temp.rf_s) %>%mutate(model = 'RF')
-df_lr_r_s <- model_result(df_model,temp.lr_s) %>%mutate(model = 'LR')
-df_lrqs_r_s <- model_result(df_model,temp.lr.qs_s)%>%mutate(model = 'LR_quasi')
-df_lrqp_r_s <- model_result(df_model,temp.lr.qp_s)%>%mutate(model = 'LR_quasipoisson')
-df_nn_r_s <- model_result(df_model,nn_model_s)%>%mutate(model = 'Neural Net')
-df_r_tt_s <- do.call("rbind", list(df_rf_r_s, df_lr_r_s, df_lrqs_r_s,df_lrqp_r_s,df_nn_r_s))
-
-df_rf_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_rf_rst_s, by="uniqueID")
-df_lr_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lr_rst_s, by="uniqueID")
-df_lrqs_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqs_rst_s, by="uniqueID")
-df_lrqp_rst_s <- left_join(final_net%>%dplyr::select(uniqueID),df_lrqp_rst_s, by="uniqueID")
-```
-
-```{r}
-temp <- tt_net %>%
-  st_transform('EPSG:4326')
-
-exportJSON <- toJSON(temp)
-write(exportJSON, "/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/test_0401.json")
-#write_csv(temp,'/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/test_new.csv')
 ```
