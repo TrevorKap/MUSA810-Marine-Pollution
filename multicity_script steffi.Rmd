@@ -174,36 +174,20 @@ final_net_list <- mapply(final_net, city_data_list, bd_data_list, bd_data_list, 
 
 test <- final_net(city_data_list[[3]], bd_data_list[[3]], bd_data_meter_list[[3]])
 
-temp_bbox <- get_bbox(bd_data_list[[3]]) 
-temp_fish <- create_fish(bd_data_meter_list[[3]])
-final_net <- countfishnet(temp_fish, litter_p) 
-final_net <- pn_gen(stor_df) 
-final_net <- moran_gen(final_net,stor_df)
-bok_net <- final_net
-
-litter_p <- city_data_list[[3]] %>%
+litter_p <- city_data_list[[2]] %>%
     filter(master_material == 'PLASTIC') %>%
     st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")
-  litter_p <- subset(litter_p, select = -c(event_name, project_name))
-  
-
+litter_p <- subset(litter_p, select = -c(event_name, project_name))
+temp_bbox <- get_bbox(bd_data_list[[2]]) 
+temp_fish <- create_fish(bd_data_meter_list[[2]])
+litter_p <- st_transform(litter_p, crs = st_crs(temp_fish))
 final_net <- countfishnet(temp_fish, litter_p) 
-
-
-net <- dplyr::select(dataset) %>% 
-    mutate(count = 1) %>% 
-    aggregate(., fishnet, sum) %>%
-    mutate(count = replace_na(count, 0),
-           uniqueID = 1:n(),
-           cvID = sample(round(nrow(fishnet) / 24), 
-                         size=nrow(fishnet), replace = TRUE))
-
-
 final_net <- pn_gen(stor_df) 
 Sys.sleep(2)
 final_net <- moran_gen(final_net,stor_df)
 Sys.sleep(5)
 final_net <- st_transform(final_net, crs = 4326)
+
   
   final_net_list[[i]] <- final_net
 
