@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #install.packages("remotes")
 #remotes::install_github("IREA-CNR-MI/sprawl")
-install.packages("tidygraph")
+#install.packages("tidygraph")
 library(tidyverse)
 library(sf)
 library(RSocrata)
@@ -31,7 +31,7 @@ library(osmdata)
 library(randomForest)
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
-source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
+#source('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/function_UO.R')
 st_c    <- st_coordinates
 st_coid <- st_centroid
 ```
@@ -49,7 +49,7 @@ litter_p <- subset(litter_p, select = -c(event_name, project_name))
 
 # load boundary data
 ## ATTENTION! this part should be the boundry of YOUR CITY
-mumb_bdry <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mumbai-wards-map.kml')
+mumb_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Mumbai2.kml')
 mumb_bdry <- st_set_crs(mumb_bdry, 4326)%>%
   st_transform('EPSG:32643')
 
@@ -294,7 +294,7 @@ nrow = 1)
 ```
 
 ```{r}
-reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis",'sum_pop') # the independent variables included
+reg.ss.vars <- c("restaurant_nn", "rst_sig_dis","road_nn", "road_sig_dis","watr_nn", "wtr_sig_dis") # the independent variables included
 
 ## RUN REGRESSIONS
 reg.ss.spatialCV <- crossValidate(
@@ -330,7 +330,7 @@ error_by_reg_and_fold %>% filter(MAE <= 10)%>%
 ```
 
 ```{r}
-error_visual(reg.ss.spatialCV) # visualize the MSE of prediction
+risk_v(reg.ss.spatialCV,litter_p,'kmeans') # visualize the MSE of prediction
 ```
 
 ```
