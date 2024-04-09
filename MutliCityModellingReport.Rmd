@@ -47,11 +47,11 @@ library(RCurl)
 library(httr)
 library(osmdata)
 library(randomForest)
-#library(tidygraph)
+library(tidygraph)
 library(XML)
 library(neuralnet)
 library(MASS)
-#library(tidymodels)
+library(tidymodels)
 library(brms)
 library(jsonlite)
 library(QuickJSR)
@@ -167,7 +167,7 @@ final_net <- moran_gen(final_net,stor_df)
 san_net <- final_net
 ```
 
-```{r aggregate data, eval=FALSE, include=FALSE}
+```{r aggregate data}
 chen_net <- chen_net %>%
  # dplyr::select(!c(avg_pop ,sum_pop))%>%
   mutate(city = 'Chennai',
@@ -409,11 +409,11 @@ df_lrqs_b <- df_lrqs_rst %>% filter(city == 'Bangkok')
 df_lrqp_b <- df_lrqp_rst %>% filter(city == 'Bangkok')
 df_brm_b <- df_brm_rst %>% filter(city == 'Bangkok')
 grid.arrange(
-  risk_v(df_rf_b,litter_b,"kmeans"),
-  risk_v(df_lr_b,litter_b,"kmeans"),
-  risk_v(df_lrqs_b,litter_b,"kmeans"),
-  risk_v(df_lrqp_b,litter_b,"kmeans"),
-  risk_v(df_brm_b,litter_b,"kmeans"),nrow = 2
+  risk_v(df_rf_b,litter_b,"kmeans",'random forest'),
+  risk_v(df_lr_b,litter_b,"kmeans",'linear regression'),
+  risk_v(df_lrqs_b,litter_b,"kmeans",'Lr-quasi'),
+  risk_v(df_lrqp_b,litter_b,"kmeans",'Lr-quasipossion'),
+  risk_v(df_brm_b,litter_b,"kmeans",'HrB regression'),nrow = 2
 )
 ```
 
@@ -422,21 +422,21 @@ The following comparative model visaulizes the strength of the model as it is us
 ```{r normal_compare}
 grid.arrange(
 #risk_v(df_rf_s,litter_s,'kmeans'),
-risk_v(df_rf_c,litter_p,'kmeans'),
-risk_v(df_rf_b,litter_b,'kmeans'),nrow = 1)
+risk_v(df_rf_c,litter_p,'kmeans','random forest'),
+risk_v(df_rf_b,litter_b,'kmeans','random forest'),nrow = 1)
 
 grid.arrange(
 #risk_v(df_lr_s,litter_s,'kmeans'),
-risk_v(df_lr_c,litter_p,'kmeans'),
-risk_v(df_lr_b,litter_b,'kmeans'),nrow = 1)
+risk_v(df_lr_c,litter_p,'kmeans','linear regression'),
+risk_v(df_lr_b,litter_b,'kmeans','linear regression'),nrow = 1)
 
 grid.arrange(
 #risk_v(df_lrqs_s,litter_s,'kmeans'),
-risk_v(df_lrqs_c,litter_p,'kmeans'),
-risk_v(df_lrqs_b,litter_b,'kmeans'),nrow = 1)
+risk_v(df_lrqs_c,litter_p,'kmeans','Lr-quasi'),
+risk_v(df_lrqs_b,litter_b,'kmeans','Lr-quasi'),nrow = 1)
 
 grid.arrange(
 #risk_v(df_lrqp_s,litter_s,'kmeans'),
-risk_v(df_lrqp_c,litter_p,'kmeans'),
-risk_v(df_lrqp_b,litter_b,'kmeans'),nrow = 1)
+risk_v(df_lrqp_c,litter_p,'kmeans','Lr-quasipossion'),
+risk_v(df_lrqp_b,litter_b,'kmeans','Lr-quasipossion'),nrow = 1)
 ```
