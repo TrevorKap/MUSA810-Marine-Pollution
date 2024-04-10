@@ -115,7 +115,7 @@ final_net <- pn_gen(stor_df) # add osm point data and knn calculation result int
 #pop_result <- pop_process(temp_point, temp_fish, 32643) # summary the population result
 #final_net <- add_pop(pop_result,final_net) # add the pop result into the final dataset
 final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into the dataset
-# DONE!
+# DONE! 
 chen_net <- final_net
 ```
 
@@ -138,7 +138,7 @@ temp_bbox <- get_bbox(bok_bd)
 temp_fish <- create_fish(bok_bdry)
 final_net <- countfishnet(temp_fish, litter_b) 
 final_net <- pn_gen(stor_df) 
-final_net <- moran_gen(final_net,stor_df)
+final_net <- moran_gen(final_net,stor_df) 
 bok_net <- final_net
 ```
 
