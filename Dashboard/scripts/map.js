@@ -8,15 +8,14 @@ export function changeMap(city) {
 // initialize map
 // mapbox access token
 const mapboxAccessToken =
-  "pk.eyJ1IjoieGlhb2Zhbi05OCIsImEiOiJjbG1tYTUyeDYwZ3Z0MnJsMXp5bzlhbmhuIn0.o4NFKmmhKwaWErRm16MjHA"; // Replace this with your Mapbox access token
+  "pk.eyJ1IjoieGlhb2Zhbi05OCIsImEiOiJjbG1tYTUyeDYwZ3Z0MnJsMXp5bzlhbmhuIn0.o4NFKmmhKwaWErRm16MjHA";
 
 // initialize map view
 const map = L.map("map").setView(cityLocation["Chennai"], 12);
 
-// add map tiles from mapbox
+// add map tiles from Mapbox
 L.tileLayer(
-  "https://api.mapbox.com/styles/v1/xiaofan-98/cltnsajw4028d01qe473s5rio/tiles/{z}/{x}/{y}?access_token=" +
-    mapboxAccessToken,
+  `https://api.mapbox.com/styles/v1/xiaofan-98/cltnsajw4028d01qe473s5rio/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoieGlhb2Zhbi05OCIsImEiOiJjbG1tYTUyeDYwZ3Z0MnJsMXp5bzlhbmhuIn0.o4NFKmmhKwaWErRm16MjHA`,
   {
     maxZoom: 19,
     tileSize: 512,
@@ -24,6 +23,8 @@ L.tileLayer(
     attribution:
       'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>',
+    id: "xiaofan-98/cltnsajw4028d01qe473s5rio", // Mapbox style ID
+    accessToken: mapboxAccessToken,
   }
 ).addTo(map);
 

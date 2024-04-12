@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="./style/general.css"> 
     <link rel="stylesheet" href="./style/sidebar.css"> 
     <link rel="stylesheet" href="./style/map.css"> 
+    <link rel="stylesheet" href="./style/popup.css"> 
 
     <!-- Leaflet css -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -18,6 +19,23 @@
 
 </head>
 <body>
+    <!-- The Modal -->
+    <div class="modal js-modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    Get Started
+                </div>
+                <button class="close js-close">&times;</button>
+            </div>
+            <div class="modal-instruction">
+                <p>Welcome to the Zero Waste Assessment Dashboard! Here, you'll find insights into a litter accumulation risk site-selection tool for the 12 Resilient Cities Network. Use the dropdown menu to select a city and explore its corresponding data. Navigate through interactive maps to visualize litter data and demographics, and dive deeper into specific metrics. Let's work together towards a cleaner and more sustainable future!</p>
+                <img src="./imgs/instruction.jpg" alt="Image Description" class="modal-img">
+            </div>
+         </div>
+    </div>
+    
     <div class="container">
         <!--left side panel -->
         <div class="sidebar">
@@ -79,7 +97,7 @@
                 </div>
             </div>
         </div>
-        
+
          <!-- map -->
          <div class="map-content">
             <div id="map"></div>
@@ -97,6 +115,7 @@
 
 
     <!-- main js should be after leaflet-->
+    <script src="./scripts/popup.js"></script>
     <script type="module" src="./data/final_net_0401.js"></script>
     <script type="module" src="./data/cityLatLon.js"></script>
     <script type="module" src=".data/category.js"></script>
@@ -108,5 +127,6 @@
     <script type="module" src="./scripts/indicatorUpdate.js"></script>
     <script type="module" src="./scripts/chart.js"></script>
     <script type="module" src="./scripts/selectCity.js"></script>
+    
 </body>
 </html>

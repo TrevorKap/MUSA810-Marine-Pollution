@@ -6,8 +6,6 @@ body, html {
   padding: 0;
   height: 100%;
   overflow: hidden; /* Prevent scrollbars */
-  margin-left: 5px;
-  margin-right: 5px;
 }
 
 p{
