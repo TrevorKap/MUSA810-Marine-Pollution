@@ -306,15 +306,18 @@ risk_visualize <- function(model_data,litter_data){
 # final_net
 # lm_data: the dataset created by local moran;s I analysis
 
-lm_col <- function(final_net,lm_data){
-  temp <- final_net %>% 
-    mutate(col_name = 
-             ifelse(lm_data[,5] <= 0.001, 1, 0)) %>%
-    mutate(col_name_dis = 
-             nn_function(st_c(st_coid(final_net)),
-                         st_c(st_coid(filter(final_net, 
-                                             col_name == 1))), 
-                         k = 1))
+lm_col <- function(final_net, lm_data) {
+  # First, handle the NAs in the lm_data fifth column
+  lm_data[, 5][is.na(lm_data[, 5])] <- 1 # Setting to 1 ensures they become 0 in col_name
+  
+  # Mutate to create col_name based on lm_data
+  temp <- final_net %>%
+    mutate(col_name = ifelse(lm_data[, 5] <= 0.001, 1, 0)) %>%
+    mutate(col_name_dis = ifelse(col_name == 1,
+                                 nn_function(st_c(st_coid(final_net)),
+                                             st_c(st_coid(filter(final_net, col_name == 1))), 
+                                             k = 1),
+                                 0)) # Set col_name_dis to 0 if col_name is 0
   return(temp)
 }
 
@@ -493,6 +496,7 @@ get_bbox <- function(boundary){
 }
 
 raster_process <- function(img,boundary){
+  boundary <- st_zm(boundary)
   tifCropped <- crop(img, extent(boundary)) # extract raster based on boundary
   tifClipped <- mask(tifCropped, boundary) # clip the raster based on boundary
   polys1 = rasterToPolygons(tifClipped) # convert raster to polygon (it will take some time, it's OK)
