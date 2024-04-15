@@ -307,17 +307,22 @@ risk_visualize <- function(model_data,litter_data){
 # lm_data: the dataset created by local moran;s I analysis
 
 lm_col <- function(final_net, lm_data) {
-  # First, handle the NAs in the lm_data fifth column
-  lm_data[, 5][is.na(lm_data[, 5])] <- 1 # Setting to 1 ensures they become 0 in col_name
-  
-  # Mutate to create col_name based on lm_data
-  temp <- final_net %>%
-    mutate(col_name = ifelse(lm_data[, 5] <= 0.001, 1, 0)) %>%
-    mutate(col_name_dis = ifelse(col_name == 1,
-                                 nn_function(st_c(st_coid(final_net)),
-                                             st_c(st_coid(filter(final_net, col_name == 1))), 
-                                             k = 1),
-                                 0)) # Set col_name_dis to 0 if col_name is 0
+  # Check if the fifth column has any NA values
+  if (all(is.na(lm_data[, 5]))) {
+    # If any NA values, set col_name and col_name_dis to 0 for all rows
+    temp <- final_net %>%
+      mutate(col_name = 0,
+             col_name_dis = 0)
+  } else {
+    # If no NA values, proceed with the original logic
+    temp <- final_net %>%
+      mutate(col_name = ifelse(lm_data[, 5] <= 0.001, 1, 0)) %>%
+      mutate(col_name_dis = 
+               nn_function(st_c(st_coid(final_net)),
+                           st_c(st_coid(filter(final_net, 
+                                               col_name == 1))), 
+                           k = 1)) # Use the original function logic for non-NA cases
+  }
   return(temp)
 }
 
