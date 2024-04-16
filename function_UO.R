@@ -115,7 +115,12 @@ knnfishnet <- function(fishnet,dataset,knum,label){
 pn_gen <- function(stor_df){
   for (i in 1:nrow(stor_df)) {
     tw_p <- point_data(temp_bbox,stor_df[i,1],unlist(stor_df[i,3]),stor_df[i,2])
-    tw_nn <- knnfishnet(temp_fish,tw_p,3,stor_df[i,2])
+    if (nrow(tw_p) >= 3){
+      tw_nn <- knnfishnet(temp_fish,tw_p,3,stor_df[i,2])
+    }
+    else{
+      tw_nn <- knnfishnet(temp_fish,tw_p,nrow(tw_p),stor_df[i,2])
+    }
     final_net <- left_join(final_net, st_drop_geometry(tw_nn), by="uniqueID") %>%
       rename_with(~ paste0(stor_df[i, 2], "_nn"), .cols = matches("item.nn"))}
   return(final_net)
