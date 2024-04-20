@@ -1,5 +1,5 @@
-import { testData } from "../data/final_net_0401.js";
 import { cityLocation } from "../data/cityLatLon.js";
+import { allCities } from "../data/allCitiesPred.js";
 
 export function changeMap(city) {
   map.setView(cityLocation[city], 12);
@@ -13,8 +13,22 @@ const mapboxAccessToken =
 // initialize map view
 const map = L.map("map").setView(cityLocation["Chennai"], 12);
 
-// add map tiles from Mapbox
-L.tileLayer(
+// add base maps and combine to groups
+const topoMap = L.tileLayer(
+  "https://api.mapbox.com/styles/v1/xiaofan-98/clv45r2lq025w01p6esq67faj/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoieGlhb2Zhbi05OCIsImEiOiJjbG1tYTUyeDYwZ3Z0MnJsMXp5bzlhbmhuIn0.o4NFKmmhKwaWErRm16MjHA",
+  {
+    maxZoom: 19,
+    tileSize: 512,
+    zoomOffset: -1,
+    attribution:
+      'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a> contributors, ' +
+      '<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>',
+    id: "xiaofan-98/cltnsajw4028d01qe473s5rio", // Mapbox style ID
+    accessToken: mapboxAccessToken,
+  }
+);
+
+const streetMap = L.tileLayer(
   `https://api.mapbox.com/styles/v1/xiaofan-98/cltnsajw4028d01qe473s5rio/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoieGlhb2Zhbi05OCIsImEiOiJjbG1tYTUyeDYwZ3Z0MnJsMXp5bzlhbmhuIn0.o4NFKmmhKwaWErRm16MjHA`,
   {
     maxZoom: 19,
@@ -26,34 +40,40 @@ L.tileLayer(
     id: "xiaofan-98/cltnsajw4028d01qe473s5rio", // Mapbox style ID
     accessToken: mapboxAccessToken,
   }
-).addTo(map);
+);
+
+const baseMaps = {
+  StreetMap: streetMap,
+  topoMap: topoMap,
+};
 
 // set color range func
 function getColor(x) {
-  return x > 100
-    ? "#9B2850"
-    : x > 80
-    ? "#CE284B"
-    : x > 60
-    ? "#E66F35"
-    : x > 40
-    ? "#F09A30"
-    : x > 20
-    ? "#FEC932"
-    : x > 0
-    ? "#F7DC8E"
-    : "#FFEDA0";
+  switch (x) {
+    case 5:
+      return "#A6325A";
+    case 4:
+      return "#D35269";
+    case 3:
+      return "#F3A881";
+    case 2:
+      return "#FAC98B";
+    case 1:
+      return "#FFEAAE";
+    default:
+      return "#FFEDA0";
+  }
 }
 
 // set style for grids
 function style(feature) {
   return {
-    fillColor: getColor(feature.properties.count), // color by range
+    fillColor: getColor(feature.properties.Risk_Category), // color by risk level
     weight: 1.5,
     opacity: 1,
     color: "#ffffff",
     dashArray: "",
-    fillOpacity: 0.7,
+    fillOpacity: 0.8,
   };
 }
 
@@ -108,60 +128,65 @@ function onEachFeature(feature, layer) {
   });
 
   layer.bindPopup(
-    "<h4>Litter Risk</h4>" +
+    "<h4>Grid Risk</h4>" +
       (feature.properties
         ? "<b>" +
+          feature.properties.Risk_Category +
+          " risk level</b><br />" +
           feature.properties.count +
-          " count" +
-          "</b><br />" +
+          " count<br />" +
           feature.properties.water_nn.toFixed(1) +
-          "m /water_nn" +
-          "</b><br />" +
+          "m /water_nn<br />" +
           feature.properties.restaurant_nn.toFixed(1) +
           "m /restaurant_nn"
         : "No data available")
   );
 }
 
-// Create layer groups for different count ranges
-const group1 = L.layerGroup();
-const group2 = L.layerGroup();
-const group3 = L.layerGroup();
-const group4 = L.layerGroup();
-const group5 = L.layerGroup();
-const group6 = L.layerGroup();
+// Create layer groups for different risk levels
+const group1 = L.layerGroup(); // Risk Level 1
+const group2 = L.layerGroup(); // Risk Level 2
+const group3 = L.layerGroup(); // Risk Level 3
+const group4 = L.layerGroup(); // Risk Level 4
+const group5 = L.layerGroup(); // Risk Level 5
 
-// Populate layer groups based on count ranges
-testData.features.forEach((feature) => {
-  const count = feature.properties.count;
+// Populate layer groups based on risk levels
+allCities.features.forEach((feature) => {
+  const riskLevel = feature.properties.Risk_Category;
   const layer = L.geoJson(feature, {
     style: style,
     onEachFeature: onEachFeature,
   });
 
-  if (count > 100) {
-    group1.addLayer(layer);
-  } else if (count > 80) {
-    group2.addLayer(layer);
-  } else if (count > 60) {
-    group3.addLayer(layer);
-  } else if (count > 40) {
-    group4.addLayer(layer);
-  } else if (count > 20) {
-    group5.addLayer(layer);
-  } else {
-    group6.addLayer(layer);
+  switch (riskLevel) {
+    case 1:
+      group1.addLayer(layer);
+      break;
+    case 2:
+      group2.addLayer(layer);
+      break;
+    case 3:
+      group3.addLayer(layer);
+      break;
+    case 4:
+      group4.addLayer(layer);
+      break;
+    case 5:
+      group5.addLayer(layer);
+      break;
+    default:
+      // Add to group6 if there's an unknown risk level
+      group6.addLayer(layer);
   }
 });
 
 // Define control for layer groups with all layers checked by default
 const overlayMaps = {
-  "Count > 100": group1,
-  "Count > 80": group2,
-  "Count > 60": group3,
-  "Count > 40": group4,
-  "Count > 20": group5,
-  "Count <= 20": group6,
+  "Risk Level 1": group1,
+  "Risk Level 2": group2,
+  "Risk Level 3": group3,
+  "Risk Level 4": group4,
+  "Risk Level 5": group5,
 };
 
 // add legend to map
@@ -169,28 +194,22 @@ const legend = L.control({ position: "bottomright" });
 
 legend.onAdd = function (map) {
   const div = L.DomUtil.create("div", "info legend"),
-    grades = [0, 20, 40, 60, 80, 100],
-    labels = [];
+    grades = [1, 2, 3, 4, 5]; // Adjusted grades array
 
   // loop through our density intervals and generate a label with a colored square for each interval
   for (var i = 0; i < grades.length; i++) {
     div.innerHTML +=
       '<i style="background:' +
-      getColor(grades[i] + 1) +
+      getColor(grades[i]) + // Use getColor function with the current grade
       '"></i> ' +
+      "Risk Level " +
       grades[i] +
-      (grades[i + 1] ? "&ndash;" + grades[i + 1] + "<br>" : "+");
+      "<br>";
   }
   return div;
 };
 
 legend.addTo(map);
-
-// add geojson to map
-// const geojson = L.geoJson(chennai, {
-//     style: style,
-//     onEachFeature: onEachFeature
-// }).addTo(map);
 
 // Iterate through overlayMaps and set all layers as checked
 Object.keys(overlayMaps).forEach((key) => {
@@ -199,5 +218,10 @@ Object.keys(overlayMaps).forEach((key) => {
 
 // Add layer control to the map with all layers checked by default
 const layercontrol = L.control
-  .layers(null, overlayMaps, { collapsed: false })
+  .layers({ StreetMap: streetMap, TopoMap: topoMap }, overlayMaps, {
+    collapsed: false,
+  })
   .addTo(map);
+
+// Select StreetMap by default
+streetMap.addTo(map);

@@ -1,11 +1,6 @@
 import { cityObj } from "./sortData.js";
 import { litterData } from "../data/category.js";
 
-// Risk Overview
-const riskLvl = document.querySelector(".js-number");
-riskLvl.innerHTML = `e`;
-// need a function here later to calculate the average risk level...
-
 // litter by type
 export function percentageLvl(cityName) {
   const percentageLvl = document.querySelector(".js-percentage");
@@ -39,12 +34,17 @@ function calculateAverage(data, propertyName) {
 
 // Example usage:
 export function updateIndicator(data) {
+  const avgRisk = calculateAverage(cityObj[data], "Risk_Category").toFixed(2);
   const avgWaste = calculateAverage(cityObj[data], "waste_nn").toFixed(2);
   const avgRestaurant = calculateAverage(cityObj[data], "restaurant").toFixed(
     2
   );
   const avgWaterDis = calculateAverage(cityObj[data], "water_nn").toFixed(2);
   // add more later...
+
+  // update risklevel
+  const riskElm = document.querySelector(".js-number");
+  riskElm.innerHTML = `${avgRisk}`;
 
   // Update the indicators in the html
   const countElm = document.querySelector(".js-waste");

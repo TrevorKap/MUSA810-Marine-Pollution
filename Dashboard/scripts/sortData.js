@@ -1,4 +1,4 @@
-import { testData } from "../data/final_net_0401.js";
+import { allCities } from "../data/allCitiesPred.js";
 
 // divide all data by city to be used for rendering key indicators
 
@@ -7,12 +7,20 @@ export const cityObj = {
   Chennai: [],
   Bangkok: [],
   Santiago: [], // Add more cities if needed
+  Bangkok: [],
+  Can_Tho: [],
+  Melaka: [],
+  Panana_City: [],
+  Pune: [],
+  Salvador: [],
+  Santa_Fe: [],
+  Semarang: [],
 };
 
 // Check if cityData contains the features property
-if (testData.features) {
+if (allCities.features) {
   // Iterate through the features and organize them by city_country
-  testData.features.forEach((feature) => {
+  allCities.features.forEach((feature) => {
     const city = feature.properties.city;
     if (cityObj.hasOwnProperty(city)) {
       cityObj[city].push(feature);

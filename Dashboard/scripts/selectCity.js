@@ -66,22 +66,16 @@ firstDropdown.addEventListener("change", function () {
                 <option value="Panama_City">Panama_City</option>
             `;
       break;
-    case "El Salvador":
-      secondDropdown.innerHTML = `
-                <option value="Select City" disabled selected>Select City</option>
-                <option value="Salvador">Salvador</option>
-            `;
-      break;
-    case "New Mexico":
+    case "Argentina":
       secondDropdown.innerHTML = `
                 <option value="Select City" disabled selected>Select City</option>
                 <option value="Santa_Fe">Santa_Fe</option>
             `;
       break;
-    case "Chile":
+    case "Brazil":
       secondDropdown.innerHTML = `
                 <option value="Select City" disabled selected>Select City</option>
-                <option value="Santiago">Santiago</option>
+                <option value="Salvador">Salvador</option>
             `;
       break;
     case "Indonesia":

@@ -1,132 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Urban Ocean Litter Dashboard</title>
 
     <!-- main css here-->
-    <link rel="stylesheet" href="./style/general.css"> 
-    <link rel="stylesheet" href="./style/sidebar.css"> 
-    <link rel="stylesheet" href="./style/map.css"> 
-    <link rel="stylesheet" href="./style/popup.css"> 
+    <link rel="stylesheet" href="./style/general.css" />
+    <link rel="stylesheet" href="./style/sidebar.css" />
+    <link rel="stylesheet" href="./style/map.css" />
+    <link rel="stylesheet" href="./style/popup.css" />
 
     <!-- Leaflet css -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""/>
-
-
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+  </head>
+  <body>
     <!-- The Modal -->
     <div class="modal js-modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">
-                    Get Started
-                </div>
-                <button class="close js-close">&times;</button>
-            </div>
-            <div class="modal-instruction">
-                <p>Welcome to the Zero Waste Assessment Dashboard! Here, you'll find insights into a litter accumulation risk site-selection tool for the 12 Resilient Cities Network. Use the dropdown menu to select a city and explore its corresponding data. Navigate through interactive maps to visualize litter data and demographics, and dive deeper into specific metrics. Let's work together towards a cleaner and more sustainable future!</p>
-                <img src="./imgs/instruction.jpg" alt="Image Description" class="modal-img">
-            </div>
-         </div>
+      <!-- Modal content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">Get Started</div>
+          <button class="close js-close">&times;</button>
+        </div>
+        <div class="modal-instruction">
+          <p>
+            Welcome to the Zero Waste Assessment Dashboard! Here, you'll find
+            insights into a litter accumulation risk site-selection tool for the
+            12 Resilient Cities Network. Use the dropdown menu to select a city
+            and explore its corresponding data. Navigate through interactive
+            maps to visualize litter data and demographics, and dive deeper into
+            specific metrics. Let's work together towards a cleaner and more
+            sustainable future!
+          </p>
+          <img
+            src="./imgs/instruction.jpg"
+            alt="Image Description"
+            class="modal-img"
+          />
+        </div>
+      </div>
     </div>
-    
+
     <div class="container">
-        <!--left side panel -->
-        <div class="sidebar">
-
-            <div class="sidebar-head">
-                <h4> Zero Waste Assessment </h4>
-            </div>
-
-            <div class="sidebar-city">
-                <!-- put drop down here-->
-                <!-- First dropdown -->
-                <select id="first-dropdown">
-                    <option value="India" selected>India</option>
-                    <option value="Chile">Chile</option>
-                    <option value="Thailand">Thailand</option>
-                    <option value="Vietnam">Vietnam</option>
-                    <option value="Malaysia">Malaysia</option>
-                    <option value="Panama">Panama</option>
-                    <option value="El Salvador">El Salvador</option>
-                    <option value="New Mexico">New Mexico</option>
-                    <option value="Chile">ThaiChileland</option>
-                    <option value="Indonesia">Indonesia</option>
-                </select>
-
-                <!-- Second dropdown (populated dynamically based on the selection in the first dropdown) -->
-                <select id="second-dropdown">
-                    <option value="Chennai" selected>Chennai</option>
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Surat">Surat</option>
-                    <option value="Pune">Surat</option>
-                </select>
-            </div>
-
-            <div class="sidebar-risk">
-                <p class="header-sidebar"> Risk Overview </p>
-                <span class="number js-number"></span>/5    <span class="risk-level">Risk Level</span>
-                <div class="separator"></div>
-                <p> existing pilot sites <span class="number-stat js-number-stat"> 2</span> </p>
-                <div class="separator"></div>
-                <p> Total pieces collected <span class="number-stat js-total-count"> 2053</span> </p>
-            </div>
-
-            <div class="sidebar-chart">
-                <p class="header-sidebar"> Litter by Type </p>
-                <p> <span class="number js-percentage"></span> 
-                    <span class="number-stat"> %</span> 
-                </p> 
-                <p> Plastic Percentage</p>
-                
-                <div class="js-chart"></div>
-            </div>
-
-            <div class="sidebar-factors">
-                <p class="header-sidebar"> Key Factors </p>
-                <div class="figures">
-                    <div class="js-waste"></div>
-                    <div class="js-restaraunt"></div>
-                    <div class="js-water"></div>
-                </div>
-            </div>
+      <!--left side panel -->
+      <div class="sidebar">
+        <div class="sidebar-head">
+          <h4>Zero Waste Assessment</h4>
         </div>
 
-         <!-- map -->
-         <div class="map-content">
-            <div id="map"></div>
-         </div>
+        <div class="sidebar-city">
+          <!-- put drop down here-->
+          <!-- First dropdown -->
+          <select id="first-dropdown">
+            <option value="India" selected>India</option>
+            <option value="Chile">Chile</option>
+            <option value="Thailand">Thailand</option>
+            <option value="Vietnam">Vietnam</option>
+            <option value="Malaysia">Malaysia</option>
+            <option value="Panama">Panama</option>
+            <option value="Argentina">Argentina</option>
+            <option value="Indonesia">Indonesia</option>
+            <option value="Brazil">Brazil</option>
+          </select>
+
+          <!-- Second dropdown (populated dynamically based on the selection in the first dropdown) -->
+          <select id="second-dropdown">
+            <option value="Chennai" selected>Chennai</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Surat">Surat</option>
+            <option value="Pune">Pune</option>
+          </select>
+        </div>
+
+        <div class="sidebar-risk">
+          <p class="header-sidebar">Risk Overview</p>
+          <span class="number js-number"></span>/5
+          <span class="risk-level">Risk Level</span>
+          <div class="separator"></div>
+          <p>
+            existing pilot sites
+            <span class="number-stat js-number-stat"> 2</span>
+          </p>
+          <div class="separator"></div>
+          <p>
+            Total pieces collected
+            <span class="number-stat js-total-count"> 2053</span>
+          </p>
+        </div>
+
+        <div class="sidebar-chart">
+          <p class="header-sidebar">Litter by Type</p>
+          <p>
+            <span class="number js-percentage"></span>
+            <span class="number-stat"> %</span>
+          </p>
+          <p>Plastic Percentage</p>
+
+          <div class="js-chart"></div>
+        </div>
+
+        <div class="sidebar-factors">
+          <p class="header-sidebar">Key Factors</p>
+          <div class="figures">
+            <div class="js-waste"></div>
+            <div class="js-restaraunt"></div>
+            <div class="js-water"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- map -->
+      <div class="map-content">
+        <div id="map"></div>
+      </div>
     </div>
 
-
     <!-- Leaflet js -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
 
     <!-- Apexchart js -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-
     <!-- main js should be after leaflet-->
     <script src="./scripts/popup.js"></script>
-    <script type="module" src="./data/final_net_0401.js"></script>
+    <script type="module" src="./data/allCitiesPred.js"></script>
     <script type="module" src="./data/cityLatLon.js"></script>
     <script type="module" src=".data/category.js"></script>
-    
-    <script type="module" src="./scripts/sortData.js"></script>
 
+    <script type="module" src="./scripts/sortData.js"></script>
 
     <script type="module" src="./scripts/map.js"></script>
     <script type="module" src="./scripts/indicatorUpdate.js"></script>
     <script type="module" src="./scripts/chart.js"></script>
     <script type="module" src="./scripts/selectCity.js"></script>
-    
-</body>
+    <!-- <script type="module" src="./scripts/extractLocations.js"></script> -->
+  </body>
 </html>
