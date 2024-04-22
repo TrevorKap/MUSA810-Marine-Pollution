@@ -331,20 +331,13 @@ lm_col <- function(final_net, lm_data) {
   return(temp)
 }
 
-risk_level <-function(model_data,approach){
-  ml_breaks <- classIntervals(model_data$Prediction, 
+risk_level <- function(df,approach){
+  ml_breaks <- classIntervals(df$Prediction, 
                               n = 5, approach)
-  
-  litter_risk_sf <- model_data %>%
-    mutate(label = "Risk Predictions",
-           Risk_Category =classInt::findCols(ml_breaks),
-           Risk_Category = case_when(
-             Risk_Category == 5 ~ "5th",
-             Risk_Category == 4 ~ "4th",
-             Risk_Category == 3 ~ "3rd",
-             Risk_Category == 2 ~ "2nd",
-             Risk_Category == 1 ~ "1st"))
-  return(litter_risk_sf)}
+  df_new <- df %>%
+    mutate(Risk_Category =classInt::findCols(ml_breaks))
+  return(df_new)
+}
 
 moran_agg <- function(final_net){
   final_net.nb <- poly2nb(as_Spatial(final_net), queen=TRUE) 
