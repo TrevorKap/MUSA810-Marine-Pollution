@@ -436,27 +436,20 @@ model_result <- function(dataset,model){
 # model_data: the dataset with Prediction column
 # litter_data: the litter data
 # appraoch: see from above
-risk_v <- function(model_data,litter_data,approach,model){
-  ml_breaks <- classIntervals(model_data$Prediction, 
-                              n = 5, approach)
-  
-  litter_risk_sf <- model_data %>%
-    mutate(label = "Risk Predictions",
-           Risk_Category =classInt::findCols(ml_breaks),
-           Risk_Category = case_when(
-             Risk_Category == 5 ~ "5th",
-             Risk_Category == 4 ~ "4th",
-             Risk_Category == 3 ~ "3rd",
-             Risk_Category == 2 ~ "2nd",
-             Risk_Category == 1 ~ "1st"))
-  
+risk_v <-function(model_data,litter_data,model,city){
+  model_data$Risk_Category <- as.factor(model_data$Risk_Category)
   ggplot() +
-    geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
+    geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_data, size = .3, colour = "red") +
     scale_fill_viridis(discrete = TRUE) +
-    labs(title=paste("Litter Risk Predictions",approach,sep = '--'),
+    labs(title=paste("Litter Risk Predictions",city,sep = '--'),
          subtitle= model) +
     mapTheme(title_size = 8)
+}
+
+city_viz <- function(cities,data,model){
+  temp <- data %>% filter(city == cities)
+  risk_v(temp,get(cities),model,cities)
 }
 
 # risk_v: visualize all the result of risk map
