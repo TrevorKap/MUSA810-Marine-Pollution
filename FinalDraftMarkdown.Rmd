@@ -5,7 +5,7 @@ author: "University of Pennsylvania"
 date: "2024-02-22"
 output: 
   html_document:
-    css: style.css
+    css: Draft.css
     toc: true
     toc_float: true
     code_folding: "hide"
@@ -30,8 +30,7 @@ Our objective is to develop a site assessment model that identifies effective ze
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-#install.packages("remotes")
-#remotes::install_github("IREA-CNR-MI/sprawl")
+
 
 library(tidyverse)
 library(sf)
@@ -51,7 +50,7 @@ library(RCurl)
 library(httr)
 library(osmdata)
 library(randomForest)
-library(tidygraph)
+#library(tidygraph)
 library(XML)
 library(neuralnet)
 library(MASS)
@@ -65,17 +64,13 @@ library(corrr)
 library(ggcorrplot)
 library(FactoMineR)
 library(factoextra)
+library(extrafont)
+loadfonts()
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
 st_c    <- st_coordinates
 st_coid <- st_centroid
-
-#lists!
-cities <- c("Bangkok", "Can_Tho", "Chennai", "Melaka", "Mumbai", "Panama_City", 
-            "Pune", "Salvador", "Santa_Fe", "Santiago", "Semarang", "Surat")
-bd <- c("Bangkok_bd", "Can_Tho_bd", "Chennai_bd", "Melaka_bd", "Mumbai_bd", "Panama_City_bd", "Pune_bd", "Salvador_bd", "Santa_Fe_bd", "Santiago_bd", "Semarang_bd", "Surat_bd")
-bdM <- c("Bangkok_bdM", "Can_Tho_bdM", "Chennai_bdM", "Melaka_bdM", "Mumbai_bdM", "Panama_City_bdM","Pune_bdM", "Salvador_bdM", "Santa_Fe_bdM", "Santiago_bdM", "Semarang_bdM", "Surat_bdM")
 
 # pre-store of osm data need to use 
 # a more expandable version of function
@@ -93,6 +88,42 @@ stor_df <- add_row('highway',list('residential'), 'road')
 stor_df <- add_row('landuse',list('industrial'), 'industrial')
 stor_df <- add_row('landuse',list('residential'), 'residential')
 stor_df <- add_row('landuse',list('retail'), 'retail')
+
+
+plotTheme <- theme(
+  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
+  plot.subtitle = element_text(size=8, family = "Open Sans"),
+  plot.caption = element_text(size = 6, family = "Open Sans"),
+  axis.text.x = element_text(size = 10, angle = 45, hjust = 1, family = "Open Sans"),
+  axis.text.y = element_text(size = 10, family = "Open Sans"),
+  axis.title.y = element_text(size = 10, family = "Open Sans"),
+  axis.title.x = element_text(size = 10, family = "Open Sans"),
+  plot.background = element_blank(),
+  panel.grid.major = element_line(colour = "#489cf4", size = .2),
+  axis.ticks = element_blank()
+)
+
+mapTheme <- theme(
+  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
+  plot.subtitle = element_text(size=7 , family = "Open Sans"),
+  plot.caption = element_text(size = 5 , family = "Open Sans"),
+  axis.line = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank(),
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.border = element_blank(),
+  panel.grid.major = element_line(colour = 'transparent'),
+  panel.grid.minor = element_blank(),
+  legend.direction = "vertical", 
+  legend.position = "right",
+  legend.text = element_text(size = 8, family = "Open Sans"), 
+  legend.title = element_text(size = 9, family = "Open Sans", face = "bold"),
+  plot.margin = margin(1, 1, 1, 1, 'cm'),
+  legend.key.height = unit(1, "cm"), 
+  legend.key.width = unit(0.3, "cm")
+)
 ```
 
 # Initial Analysis and Preperation
@@ -106,10 +137,6 @@ To develop our model for each respective city (or future use), each area was det
 In terms of our data & variables, acquiring litter data, our primary environmental health indicator, was acquired via manual download data from Marine Debris Tracker (<https://www.debristracker.org/data/>). The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors available to each region. 
 
 After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
-
-```{r}
-
-```
 
 
 ```{r chennai data, warning = FALSE, message = FALSE, results ='hide'}

@@ -208,7 +208,7 @@ visual_count <- function(net_one,variable){
   ggplot() +
     geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
     scale_fill_viridis_c() +
-    labs(title = paste(variable,"count for the fishnet")) +
+    labs(title = paste(variable,"Count for the Fishnet")) +
     mapTheme()
 }
 
@@ -216,7 +216,7 @@ visual_cotinuous <- function(net_one,variable){
   ggplot() +
     geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
     scale_fill_continuous() +
-    labs(title = paste(variable,"count for the fishnet")) +
+    labs(title = paste(variable,"Count for the Fishnet")) +
     mapTheme()
 }
 
@@ -232,7 +232,7 @@ visual_count_net <- function(net_one,point_one,boundary,variable_name){
     ggplot() +
       geom_sf(data = net_one, aes(fill = count), color = NA) +
       scale_fill_viridis() +
-      labs(title = paste(variable_name,"count for the fishnet")) +
+      labs(title = paste(variable_name,"Count for the Fishnet")) +
       mapTheme(),
     ggplot() + 
       geom_sf(data = boundary) +
