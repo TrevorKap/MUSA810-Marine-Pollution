@@ -1,0 +1,669 @@
+---
+title: "model part"
+author: "Tianxiao"
+date: "2024-04-22"
+output: html_document
+---
+# Data load part
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#install.packages("remotes")
+#remotes::install_github("IREA-CNR-MI/sprawl")
+
+library(tidyverse)
+library(sf)
+library(RSocrata)
+library(viridis)
+library(spatstat)
+library(raster)
+library(spdep)
+library(FNN)
+library(grid)
+library(gridExtra)
+library(knitr)
+library(kableExtra)
+library(tidycensus)
+library(classInt)
+library(RCurl)
+library(httr)
+library(osmdata)
+library(randomForest)
+library(tidygraph)
+library(XML)
+library(neuralnet)
+library(MASS)
+library(tidymodels)
+library(brms)
+library(jsonlite)
+library(QuickJSR)
+library(hash)
+library(fastDummies)
+library(corrr)
+library(ggcorrplot)
+library(FactoMineR)
+library(factoextra)
+library(caret)
+library(caTools)
+library(dials) 
+library(ranger)
+library(xgboost)
+library(Metrics)
+library(caret)
+
+source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
+source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
+st_c    <- st_coordinates
+st_coid <- st_centroid
+
+cities <- c("Bangkok", "Can_Tho", "Chennai", "Melaka", "Mumbai", "Panama_City", 
+            "Pune", "Salvador", "Santa_Fe", "Santiago", "Semarang", "Surat")
+
+bd <- c("Bangkok_bd", "Can_Tho_bd", "Chennai_bd", "Melaka_bd", "Mumbai_bd", "Panama_City_bd", "Pune_bd", "Salvador_bd", "Santa_Fe_bd", "Santiago_bd", "Semarang_bd", "Surat_bd")
+
+bdM <- c("Bangkok_bdM", "Can_Tho_bdM", "Chennai_bdM", "Melaka_bdM", "Mumbai_bdM", "Panama_City_bdM","Pune_bdM", "Salvador_bdM", "Santa_Fe_bdM", "Santiago_bdM", "Semarang_bdM", "Surat_bdM")
+
+# pre-store of osm data need to use 
+# a more expandable version of function
+# the actual store order is cate label, small cate
+stor_df <- data.frame(cato = character(), small =list(), label = character(),stringsAsFactors = FALSE)
+add_row <-function(cato,small,label){
+  new_row <- list(cato = cato, small = small, label = label)
+  stor_df <- bind_rows(stor_df, new_row)
+  return(stor_df)
+}
+stor_df <- add_row('water',list(c('canal','drain','ditch')), 'water')
+stor_df <- add_row('amenity',list(c('waste_basket','waste_disposal','waste_transfer_station','recycling')), 'waste')
+stor_df <- add_row('amenity',list(c('restaurant','pub','bar')), 'restaurant')
+stor_df <- add_row('highway',list('residential'), 'road')
+stor_df <- add_row('landuse',list('industrial'), 'industrial')
+stor_df <- add_row('landuse',list('residential'), 'residential')
+stor_df <- add_row('landuse',list('retail'), 'retail')
+```
+
+```{r}
+city_data_list <- lapply(cities, load_city_data)
+names(city_data_list) <- cities
+
+bd_data_list <- lapply(cities, load_city_kml)
+names(bd_data_list) <- bd
+
+bd_data_meter_list <- lapply(cities, load_city_kml_meter)
+names(bd_data_meter_list) <- bdM
+
+# load the dataframe with the proper name 
+for (i in seq_along(city_data_list)) {assign(cities[i], city_data_list[[i]])}
+
+for (i in seq_along(bd_data_list)) {assign(bd[i], bd_data_list[[i]])}
+
+for (i in seq_along(bd_data_meter_list)) {assign(bdM[i], bd_data_meter_list[[i]])}
+```
+
+```{r save & load}
+net_salvador <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/salvador_net.geojson')
+net_salvador <- st_set_crs(net_salvador,32643)
+
+net_santa_fe <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/santa_fe_net.geojson')
+net_santa_fe <- st_set_crs(net_santa_fe,32643)
+
+net_semarang <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/semarang_net.geojson')
+net_semarang <- st_set_crs(net_semarang,32643)
+
+net_panama <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/panama_net.geojson')
+net_panama <- st_set_crs(net_panama,32643)
+
+net_can_tho <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/can_tho_net.geojson')
+net_can_tho <- st_set_crs(net_can_tho,32643)
+
+net_malaka <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/malaka_net.geojson')
+net_malaka <- st_set_crs(net_malaka,32643)
+
+net_surat <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/surat_net.geojson')
+net_surat <- st_set_crs(net_surat,32643)
+
+net_santiago <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/santiago_net.geojson')
+net_santiago <- st_set_crs(net_santiago,32643)
+
+net_bangkok <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/bangkok_net.geojson')
+net_bangkok <- st_set_crs(net_bangkok,32643)
+
+net_chennai <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/chen_net.geojson')
+net_chennai <- st_set_crs(net_chennai,32643)
+
+net_mumbai <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/mumbai_net.geojson')
+net_mumbai <- st_set_crs(net_mumbai,32643)
+
+net_pune <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/pune_net.geojson')
+net_pune <- st_set_crs(net_pune,32643)
+```
+
+```{r}
+cnt_wt <- function(litter,net){
+  temp <- st_join(litter,net,join = st_within)
+  temp <- temp %>% filter(!is.na(uniqueID))
+  temp_sum <- temp %>%
+    group_by(uniqueID)%>%
+    summarise(count_un = n_distinct(username))
+  net <- left_join(net,st_drop_geometry(temp_sum),by = 'uniqueID')
+  net <- net %>%
+    mutate(count_un = replace_na(count_un, 0),
+         count = count/count_un,
+         count = replace_na(count, 0))
+  return(net)
+}
+
+net_mumbai <- cnt_wt(Mumbai,net_mumbai)
+net_chennai <- cnt_wt(Chennai,net_chennai)
+net_bangkok <- cnt_wt(Bangkok,net_bangkok)
+net_can_tho <- cnt_wt(Can_Tho,net_can_tho)
+net_malaka <- cnt_wt(Melaka,net_malaka)
+net_panama <- cnt_wt(Panama_City,net_panama)
+net_pune <- cnt_wt(Pune,net_pune)
+net_salvador <- cnt_wt(Salvador,net_salvador)
+net_santa_fe <- cnt_wt(Santa_Fe,net_santa_fe)
+net_santiago <- cnt_wt(Santiago,net_santiago)
+net_semarang <- cnt_wt(Semarang,net_semarang)
+net_surat <- cnt_wt(Surat,net_surat)
+```
+
+```{r}
+z_score_normalize <- function(x) {
+  (x - mean(x)) / sd(x)
+}
+
+normarl_city <- function(data){
+  data <- data%>% 
+    mutate(across(where(is.numeric) & -'count', z_score_normalize),
+           across(where(is.numeric), ~replace(., is.nan(.), 0)))
+  return(data)
+}
+
+net_salvador <- normarl_city(net_salvador)
+net_santa_fe <- normarl_city(net_santa_fe)
+net_santiago <- normarl_city(net_santiago)
+net_semarang <- normarl_city(net_semarang)
+net_surat <- normarl_city(net_surat)
+net_bangkok <- normarl_city(net_bangkok)
+net_can_tho <- normarl_city(net_can_tho)
+net_chennai <- normarl_city(net_chennai)
+net_malaka <- normarl_city(net_malaka)
+net_mumbai <- normarl_city(net_mumbai)
+net_panama <- normarl_city(net_panama)
+net_pune <- normarl_city(net_pune)
+```
+
+```{r aggregate data}
+net_bangkok <- net_bangkok %>% mutate(city = 'Bangkok',country = 'Thailand')
+net_can_tho <- net_can_tho %>% mutate(city = 'Can_Tho',country = 'Vietnam')
+net_chennai <- net_chennai %>% mutate(city = 'Chennai',country = 'India')
+net_melaka <- net_malaka %>% mutate(city = 'Melaka',country = 'Malaysia')
+net_mumbai <- net_mumbai %>% mutate(city = 'Mumbai',country = 'India')
+net_panama <- net_panama %>% mutate(city = 'Panama_City',country = 'Panama')
+net_pune <- net_pune %>% mutate(city = 'Pune',country = 'India')
+net_salvador <- net_salvador %>% mutate(city = 'Salvador',country = 'Brazil')
+net_santa_fe <- net_santa_fe %>% mutate(city = 'Santa_Fe',country = 'Argentina')
+net_santiago <- net_santiago %>% mutate(city = 'Santiago',country = 'Chile')
+net_semarang <- net_semarang %>% mutate(city = 'Semarang',country = 'Indonesia')
+net_surat <- net_surat %>% mutate(city = 'Surat',country = 'India')
+
+net_total <- rbind(net_bangkok,net_can_tho,net_chennai,net_melaka,net_mumbai,net_panama,net_pune,net_salvador,net_santa_fe,net_santiago,net_semarang,net_surat) %>% mutate(uniqueID = 1:n())
+
+net_total_li <- net_total %>% dplyr::filter(count != 0)
+net_total_li <- net_total_li %>%
+  mutate(count = (count - mean(count)) / sd(count))
+
+```
+
+
+# Model part
+## Linear Model
+```{r}
+set.seed(223)
+net_tt_nor <- st_drop_geometry(net_total_li) %>%
+  dplyr::select(-c(uniqueID,cvID,city,country))%>%
+   mutate(count = scale(count))
+net_tt_nor$city <- net_total_li$city
+net_tt_nor$uniqueID <- net_total_li$uniqueID
+
+sample <- sample.split(net_tt_nor$city, SplitRatio = 0.7)
+train  <- subset(net_tt_nor, sample == TRUE) 
+test   <- subset(net_tt_nor, sample == FALSE)
+
+train_control <- trainControl(method = "cv", number = 60)
+
+# Train the model
+model <- train(count ~ ., data = train%>%dplyr::select(-c('city','uniqueID')), method = "lm",family = "quasi",trControl = train_control)
+
+test_temp <- predict(model,net_total)
+test_cbind <- cbind(net_total,test_temp)%>%
+  rename(Prediction = test_temp)
+
+temp_risk_cat <- st_drop_geometry(risk_level(test_cbind,'kmeans')) %>%dplyr::select(Risk_Category)
+test_cbind <- cbind(test_cbind,temp_risk_cat)
+
+city_viz('Chennai',test_cbind,'rf_model')
+```
+
+## Random Forest Model -- based on tidymodels
+```{r}
+set.seed(123)
+net_tt_nor <- st_drop_geometry(net_total_li) %>%
+  dplyr::select(-c(uniqueID,cvID,city,country))
+net_tt_nor$city <- net_total_li$city
+net_tt_nor$uniqueID <- net_total_li$uniqueID
+net_tt_temp <- net_tt_nor%>%dplyr::select(!c(uniqueID,city))
+
+net_tt_split <- initial_split(net_tt_temp, prop = 0.75)
+train_data <- training(net_tt_split)
+test_data <- testing(net_tt_split)
+
+rf_model <- rand_forest(
+  mode = "regression",
+  trees = tune(),         
+  min_n = tune(),
+  mtry = tune(),
+) %>% set_engine("ranger")
+
+rf_recipe <- recipe(count ~ ., data = train_data)
+
+cv_folds <- vfold_cv(train_data, v = 10)
+
+rf_grid <- rf_grid <- grid_regular(
+  trees(range = c(500, 2000)),   
+  min_n(range = c(9, 15)),       
+  mtry(range = c(6, 30)),        
+  levels = c(4, 3, 5) 
+)
+
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(rf_recipe)
+
+rf_results <- tune_grid(
+  rf_workflow,
+  resamples = cv_folds,
+  grid = rf_grid
+)
+
+show_best(rf_results, metric = "rmse")
+```
+
+```{r}
+final_rf <- finalize_workflow(
+  rf_workflow,
+  select_best(rf_results, "rmse")
+)
+final_rf <- last_fit(final_rf, split = net_tt_split )
+
+#results <- collect_metrics(final_rf)
+#print(results)
+
+temp_ts <- predict(final_rf$.workflow[[1]], test_data) %>%
+  rename(Prediction = .pred)
+ts_bind <- cbind(test_data,temp_ts)
+
+#best_results <- select_best(rf_results, metric = "rmse")
+temp <- predict(final_rf$.workflow[[1]], net_total) %>%
+  rename(Prediction = .pred)
+temp_cat <- risk_level(temp,'kmeans')
+df_rf_rst <- cbind(net_total,temp_cat)
+```
+
+## multi-vision model
+```{r}
+test_cb_rst <- st_drop_geometry(test_cbind) %>%
+  dplyr::select(Prediction,Risk_Category)%>%
+  rename(Pre_lr = Prediction,
+         Risk_lr = Risk_Category)
+rst_total <- cbind(df_rf_rst,test_cb_rst)%>%
+  rename(Pre_rf = Prediction,
+         Risk_rf = Risk_Category)
+```
+
+```{r}
+rst_total <- rst_total %>%
+  mutate(Prediction = 0.6*Pre_rf + 0.4*Pre_lr)
+rst_total <- risk_level(rst_total,'kmeans')
+
+city_viz('Chennai',rst_total,'rf_model')
+city_viz('Chennai',df_rf_rst,'rf_model')
+city_viz('Chennai',rst_total,'rf_model')
+
+```
+
+```{r}
+city_viz('Chennai',df_rf_rst,'rf_model')
+city_viz('Bangkok',df_rf_rst,'rf_model')
+city_viz('Can_Tho',df_rf_rst,'rf_model')
+city_viz('Melaka',df_rf_rst,'rf_model')
+city_viz('Mumbai',df_rf_rst,'rf_model')
+city_viz('Panama_City',df_rf_rst,'rf_model')
+city_viz('Pune',df_rf_rst,'rf_model')
+city_viz('Salvador',df_rf_rst,'rf_model')
+city_viz('Santa_Fe',df_rf_rst,'rf_model')
+city_viz('Santiago',df_rf_rst,'rf_model')
+city_viz('Semarang',df_rf_rst,'rf_model')
+city_viz('Surat',df_rf_rst,'rf_model')
+```
+
+## Random Forest Model -- based on caret one
+### 3 variables trees
+```{r}
+
+sample <- sample.split(net_tt_nor$city, SplitRatio = 0.8)
+train  <- subset(net_tt_nor, sample == TRUE) 
+test   <- subset(net_tt_nor, sample == FALSE)
+
+df_model_tr <- train%>%dplyr::select(!c(uniqueID,city))
+
+train_control <- trainControl(
+  method = "cv",        # Cross-validation
+  number = 10,          # Number of folds in the cross-validation
+  verboseIter = TRUE    # Print training log
+)
+set.seed(4326)
+grid <- expand.grid(mtry = c(10,12,14,16))
+rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
+
+predictions <- predict(rf_model, test)
+actual <- test$count  # Assuming 'y' is the target variable in your test data
+
+rmse_value <- rmse(actual, predictions)
+r_squared <- cor(actual, predictions)^2
+
+df_rf_rst <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
+df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst,'kmeans')) %>%dplyr::select(Risk_Category)
+df_rf_rst <- cbind(df_rf_rst,df_rf_rst_temp)
+```
+
+```{r 3-variable rf}
+risk_v <-function(model_data,litter_data,model,city){
+  model_data$Risk_Category <- as.factor(model_data$Risk_Category)
+  ggplot() +
+    geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
+    geom_sf(data = litter_data, size = .3, colour = "red") +
+    scale_fill_viridis(discrete = TRUE) +
+    labs(title=paste("Litter Risk Predictions",city,sep = '--'),
+         subtitle= model) +
+    mapTheme(title_size = 8)
+}
+
+city_viz <- function(cities,data,model){
+  temp <- data %>% filter(city == cities)
+  risk_v(temp,get(cities),model,cities)
+}
+
+city_viz('Chennai',df_rf_rst,'rf_model')
+city_viz('Bangkok',df_rf_rst,'rf_model')
+city_viz('Can_Tho',df_rf_rst,'rf_model')
+city_viz('Melaka',df_rf_rst,'rf_model')
+city_viz('Mumbai',df_rf_rst,'rf_model')
+city_viz('Panama_City',df_rf_rst,'rf_model')
+city_viz('Pune',df_rf_rst,'rf_model')
+city_viz('Salvador',df_rf_rst,'rf_model')
+city_viz('Santa_Fe',df_rf_rst,'rf_model')
+city_viz('Santiago',df_rf_rst,'rf_model')
+city_viz('Semarang',df_rf_rst,'rf_model')
+city_viz('Surat',df_rf_rst,'rf_model')
+```
+
+### 4 variables tree
+```{r}
+grid <- expand.grid(mtry = c(4,5,6,7,8))
+rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
+
+df_rf_rst_2 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
+df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_2,'kmeans')) %>%dplyr::select(Risk_Category)
+df_rf_rst_2 <- cbind(df_rf_rst_2,df_rf_rst_temp)
+```
+
+```{r}
+city_viz('Chennai',df_rf_rst_2,'rf_model')
+city_viz('Bangkok',df_rf_rst_2,'rf_model')
+city_viz('Can_Tho',df_rf_rst_2,'rf_model')
+city_viz('Melaka',df_rf_rst_2,'rf_model')
+city_viz('Mumbai',df_rf_rst_2,'rf_model')
+city_viz('Panama_City',df_rf_rst_2,'rf_model')
+city_viz('Pune',df_rf_rst_2,'rf_model')
+city_viz('Salvador',df_rf_rst_2,'rf_model')
+city_viz('Santa_Fe',df_rf_rst_2,'rf_model')
+city_viz('Santiago',df_rf_rst_2,'rf_model')
+city_viz('Semarang',df_rf_rst_2,'rf_model')
+city_viz('Surat',df_rf_rst_2,'rf_model')
+```
+
+
+### 8 variables tree
+```{r}
+grid <- expand.grid(mtry = c(5,6,7,8))
+rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
+
+df_rf_rst_3 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
+df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_3,'kmeans')) %>%dplyr::select(Risk_Category)
+df_rf_rst_3 <- cbind(df_rf_rst_3,df_rf_rst_temp)
+```
+
+```{r}
+city_viz('Chennai',df_rf_rst_3,'rf_model')
+city_viz('Bangkok',df_rf_rst_3,'rf_model')
+city_viz('Can_Tho',df_rf_rst_3,'rf_model')
+city_viz('Melaka',df_rf_rst_3,'rf_model')
+city_viz('Mumbai',df_rf_rst_3,'rf_model')
+city_viz('Panama_City',df_rf_rst_3,'rf_model')
+city_viz('Pune',df_rf_rst_3,'rf_model')
+city_viz('Salvador',df_rf_rst_3,'rf_model')
+city_viz('Santa_Fe',df_rf_rst_3,'rf_model')
+city_viz('Santiago',df_rf_rst_3,'rf_model')
+city_viz('Semarang',df_rf_rst_3,'rf_model')
+city_viz('Surat',df_rf_rst_3,'rf_model')
+```
+
+### 12 variables tree
+```{r}
+grid <- expand.grid(mtry = c(10,12,14,16))
+rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
+
+df_rf_rst_4 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
+df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_4,'kmeans')) %>%dplyr::select(Risk_Category)
+df_rf_rst_4 <- cbind(df_rf_rst_4,df_rf_rst_temp)
+```
+
+```{r}
+city_viz('Chennai',df_rf_rst_4,'rf_model')
+city_viz('Bangkok',df_rf_rst_4,'rf_model')
+city_viz('Can_Tho',df_rf_rst_4,'rf_model')
+city_viz('Melaka',df_rf_rst_4,'rf_model')
+city_viz('Mumbai',df_rf_rst_4,'rf_model')
+city_viz('Panama_City',df_rf_rst_4,'rf_model')
+city_viz('Pune',df_rf_rst_4,'rf_model')
+city_viz('Salvador',df_rf_rst_4,'rf_model')
+city_viz('Santa_Fe',df_rf_rst_4,'rf_model')
+city_viz('Santiago',df_rf_rst_4,'rf_model')
+city_viz('Semarang',df_rf_rst_4,'rf_model')
+city_viz('Surat',df_rf_rst_4,'rf_model')
+```
+
+### 12 variables tree
+```{r}
+grid <- expand.grid(mtry = c(2,3,8,9,10,15,16,17))
+rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
+
+df_rf_rst_5 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
+df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_5,'kmeans')) %>%dplyr::select(Risk_Category)
+df_rf_rst_5 <- cbind(df_rf_rst_5,df_rf_rst_temp)
+```
+
+```{r}
+city_viz('Chennai',df_rf_rst_5,'rf_model')
+city_viz('Bangkok',df_rf_rst_5,'rf_model')
+city_viz('Can_Tho',df_rf_rst_5,'rf_model')
+city_viz('Melaka',df_rf_rst_5,'rf_model')
+city_viz('Mumbai',df_rf_rst_5,'rf_model')
+city_viz('Panama_City',df_rf_rst_5,'rf_model')
+city_viz('Pune',df_rf_rst_5,'rf_model')
+city_viz('Salvador',df_rf_rst_5,'rf_model')
+city_viz('Santa_Fe',df_rf_rst_5,'rf_model')
+city_viz('Santiago',df_rf_rst_5,'rf_model')
+city_viz('Semarang',df_rf_rst_5,'rf_model')
+city_viz('Surat',df_rf_rst_5,'rf_model')
+```
+
+### model comparison
+```{r}
+grid.arrange(city_viz('Chennai',df_rf_rst_5,'rf_model'),
+             city_viz('Chennai',df_rf_rst,'rf_model'), # 3 variables
+             city_viz('Chennai',df_rf_rst_2,'rf_model'), # 4 variables
+             city_viz('Chennai',df_rf_rst_3,'rf_model'), # 8 variables
+             city_viz('Chennai',df_rf_rst_4,'rf_model'),nrow=2) # 12 variables
+
+```
+
+```{r}
+city_viz('Surat',df_rf_rst,'rf_model') # 3 variables
+city_viz('Surat',df_rf_rst_2,'rf_model') # 4 variables
+city_viz('Surat',df_rf_rst_3,'rf_model') # 8 variables
+```
+
+```{r}
+city_viz('Santiago',df_rf_rst,'rf_model') # 3 variables
+city_viz('Santiago',df_rf_rst_2,'rf_model') # 4 variables
+city_viz('Santiago',df_rf_rst_3,'rf_model') # 8 variables
+```
+
+
+## XGBoosting Model
+### 100 iteration
+```{r}
+df_model <- net_tt_nor%>%dplyr::select(!c(uniqueID,city))
+dtrain <- xgb.DMatrix(data = as.matrix(df_model[,-1]), label = df_model$count)
+
+params <- list(
+  booster = "gbtree",
+  objective = "reg:squarederror",  # Use "reg:logistic" or "binary:logistic" for classification
+  eta = 0.1,
+  max_depth = 6,
+  min_child_weight = 1,
+  subsample = 0.5,
+  colsample_bytree = 0.5
+)
+
+nrounds <- 100
+nfold <- 5
+
+# Perform cross-validation
+cv_results <- xgb.cv(
+  params = params,
+  data = dtrain,
+  nrounds = nrounds,
+  nfold = nfold,
+  metrics = "rmse",  # Change to "mlogloss" for classification
+  early_stopping_rounds = 10,
+  print_every_n = 10,
+  verbose = 1
+)
+
+model <- xgb.train(params = params, data = dtrain, nrounds = nrounds)
+
+df_xg <- st_drop_geometry(net_total) %>%
+  dplyr::select(-c(count,cvID,city,country,uniqueID))
+dnew <- xgb.DMatrix(data = as.matrix(df_xg))
+
+df_xg_rst <- net_total%>%mutate(Prediction = predict(model, dnew))
+df_xg_rst_temp <- st_drop_geometry(risk_level(df_xg_rst,'kmeans')) %>%dplyr::select(Risk_Category)
+df_xg_rst <- cbind(df_xg_rst,df_xg_rst_temp)
+```
+
+```{r}
+city_viz('Chennai',df_xg_rst,'rf_model')
+city_viz('Bangkok',df_xg_rst,'rf_model')
+city_viz('Can_Tho',df_xg_rst,'rf_model')
+city_viz('Melaka',df_xg_rst,'rf_model')
+city_viz('Mumbai',df_xg_rst,'rf_model')
+city_viz('Panama_City',df_xg_rst,'rf_model')
+city_viz('Pune',df_xg_rst,'rf_model')
+city_viz('Salvador',df_xg_rst,'rf_model')
+city_viz('Santa_Fe',df_xg_rst,'rf_model')
+city_viz('Santiago',df_xg_rst,'rf_model')
+city_viz('Semarang',df_xg_rst,'rf_model')
+city_viz('Surat',df_xg_rst,'rf_model')
+```
+### 150 interation
+```{r}
+nrounds <- 150
+model2 <- xgb.train(params = params, data = dtrain, nrounds = nrounds)
+
+df_xg_rst_2 <- net_total%>%mutate(Prediction = predict(model2, dnew))
+df_xg_rst_temp <- st_drop_geometry(risk_level(df_xg_rst_2,'kmeans')) %>%dplyr::select(Risk_Category)
+df_xg_rst_2 <- cbind(df_xg_rst_2,df_xg_rst_temp)
+```
+
+```{r}
+city_viz('Chennai',df_xg_rst_2,'rf_model')
+city_viz('Bangkok',df_xg_rst_2,'rf_model')
+city_viz('Can_Tho',df_xg_rst_2,'rf_model')
+city_viz('Melaka',df_xg_rst_2,'rf_model')
+city_viz('Mumbai',df_xg_rst_2,'rf_model')
+city_viz('Panama_City',df_xg_rst_2,'rf_model')
+city_viz('Pune',df_xg_rst_2,'rf_model')
+city_viz('Salvador',df_xg_rst_2,'rf_model')
+city_viz('Santa_Fe',df_xg_rst_2,'rf_model')
+city_viz('Santiago',df_xg_rst_2,'rf_model')
+city_viz('Semarang',df_xg_rst_2,'rf_model')
+city_viz('Surat',df_xg_rst_2,'rf_model')
+```
+
+### 50 iteration
+```{r}
+nrounds <- 50
+model3 <- xgb.train(params = params, data = dtrain, nrounds = nrounds)
+
+df_xg_rst_3 <- net_total%>%mutate(Prediction = predict(model3, dnew))
+df_xg_rst_temp <- st_drop_geometry(risk_level(df_xg_rst_3,'kmeans')) %>%dplyr::select(Risk_Category)
+df_xg_rst_3 <- cbind(df_xg_rst_3,df_xg_rst_temp)
+```
+```{r}
+city_viz('Chennai',df_xg_rst_3,'rf_model')
+city_viz('Bangkok',df_xg_rst_3,'rf_model')
+city_viz('Can_Tho',df_xg_rst_3,'rf_model')
+city_viz('Melaka',df_xg_rst_3,'rf_model')
+city_viz('Mumbai',df_xg_rst_3,'rf_model')
+city_viz('Panama_City',df_xg_rst_3,'rf_model')
+city_viz('Pune',df_xg_rst_3,'rf_model')
+city_viz('Salvador',df_xg_rst_3,'rf_model')
+city_viz('Santa_Fe',df_xg_rst_3,'rf_model')
+city_viz('Santiago',df_xg_rst_3,'rf_model')
+city_viz('Semarang',df_xg_rst_3,'rf_model')
+city_viz('Surat',df_xg_rst_3,'rf_model')
+```
+### 200 iteration
+```{r}
+nrounds <- 200
+model4 <- xgb.train(params = params, data = dtrain, nrounds = nrounds)
+
+df_xg_rst_4 <- net_total%>%mutate(Prediction = predict(model4, dnew))
+df_xg_rst_temp <- st_drop_geometry(risk_level(df_xg_rst_4,'kmeans')) %>%dplyr::select(Risk_Category)
+df_xg_rst_4 <- cbind(df_xg_rst_4,df_xg_rst_temp)
+```
+```{r}
+city_viz('Chennai',df_xg_rst_4,'rf_model')
+city_viz('Bangkok',df_xg_rst_4,'rf_model')
+city_viz('Can_Tho',df_xg_rst_4,'rf_model')
+city_viz('Melaka',df_xg_rst_4,'rf_model')
+city_viz('Mumbai',df_xg_rst_4,'rf_model')
+city_viz('Panama_City',df_xg_rst_4,'rf_model')
+city_viz('Pune',df_xg_rst_4,'rf_model')
+city_viz('Salvador',df_xg_rst_4,'rf_model')
+city_viz('Santa_Fe',df_xg_rst_4,'rf_model')
+city_viz('Santiago',df_xg_rst_4,'rf_model')
+city_viz('Semarang',df_xg_rst_4,'rf_model')
+city_viz('Surat',df_xg_rst_4,'rf_model')
+```
+
+### model comparison
+```{r}
+grid.arrange(city_viz('Chennai',df_xg_rst_3,'xgb_model-50'),
+             city_viz('Chennai',df_xg_rst,'xgb_model-100'),
+             city_viz('Chennai',df_xg_rst_2,'xgb_model-150'),
+             city_viz('Chennai',df_xg_rst_4,'xgb_model-200'),
+             nrow = 2)
+```
