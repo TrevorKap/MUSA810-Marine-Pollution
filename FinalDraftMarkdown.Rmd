@@ -285,7 +285,7 @@ visual_count(bok_net,"restaurant_sig")
 
 
 
-## Principal Component Analysis 
+## Principal Component Analysis (idk this part, steph help)
 
 The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. The reason why we perform PCA is to decrease the dimension of variable. The following result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
 
