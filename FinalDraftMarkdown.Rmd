@@ -5,6 +5,7 @@ author: "University of Pennsylvania"
 date: "2024-02-22"
 output: 
   html_document:
+    css: style.css
     toc: true
     toc_float: true
     code_folding: "hide"
@@ -67,6 +68,12 @@ source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/mai
 st_c    <- st_coordinates
 st_coid <- st_centroid
 
+#lists!
+cities <- c("Bangkok", "Can_Tho", "Chennai", "Melaka", "Mumbai", "Panama_City", 
+            "Pune", "Salvador", "Santa_Fe", "Santiago", "Semarang", "Surat")
+bd <- c("Bangkok_bd", "Can_Tho_bd", "Chennai_bd", "Melaka_bd", "Mumbai_bd", "Panama_City_bd", "Pune_bd", "Salvador_bd", "Santa_Fe_bd", "Santiago_bd", "Semarang_bd", "Surat_bd")
+bdM <- c("Bangkok_bdM", "Can_Tho_bdM", "Chennai_bdM", "Melaka_bdM", "Mumbai_bdM", "Panama_City_bdM","Pune_bdM", "Salvador_bdM", "Santa_Fe_bdM", "Santiago_bdM", "Semarang_bdM", "Surat_bdM")
+
 # pre-store of osm data need to use 
 # a more expandable version of function
 # the actual store order is cate label, small cate
@@ -92,6 +99,11 @@ stor_df <- add_row('landuse',list('retail'), 'retail')
 For our model, we directed our focus on various cities apart of the Resilient Cities Network. The cities we display in this demonstration are Chennai India; Bangkok, Thailand; and Santiago, Chile. The data regarding the region and its attributes was sourced from OpenStreetMap (OSM) to ensure a repeatable framework & quality consistency. For each selected city we developed a 'boundary box' automated by OSM simply by specifying the name of the area (city & nation) and using the output coordinates as the scope of data acquisition. From there, further attributes of the area with respect to structures, networks, or political divisions can be extracted for use.
 
 In terms of our dependent variable, litter data, the process required manually downloading data from Marine Debris Tracker (<https://www.debristracker.org/data/>). Each selected city required its own evaluation in terms of quantitative debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early-stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors.    
+
+```{r}
+
+```
+
 
 ```{r chennai data, warning = FALSE, message = FALSE}
 #step to load city's data
