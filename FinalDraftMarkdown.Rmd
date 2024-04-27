@@ -234,15 +234,19 @@ leisure <- c('park')
 act <- c('maxspeed') 
 ```
 
-
-The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present.
-
 ## 2.2 Marine Debris Data, in Summary
 
-Each chart below visualizes a dependent variable reformatted for repeatable use  an in a statistical context that better represents its relation to litter. The examples are, restaurants, roads, retail proximity, and significant presence of restaurants. Our variable selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. These variables, similarly to litter, are analyzed on a fishnet grid where the quantity is counted per cell. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
+The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate based on the data available. 
 
-Restaurants are used as a point of significance because of their relation to commercial activity. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
+Each chart below visualizes a dependent variable reformatted for repeatable use in context that relates to its association with litter accumulation. The examples are, restaurants, roads, retail proximity, and 'significant presence' of restaurants. These are simply the visualized examples and our variables broadly include land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. Our variable selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter. 
 
+The first map shows the count of restaurants in Chennai, India, similar to the litter data collected, there are few restaurants in any single area, but have tens of each counted throughout that provide insight of the general density/areas of high-activity. 
+
+The second map shows the roads in Chennai, India. Roads indicate urban development and density. All forms of data, whether points, lines, or polygons, are represented onto the fishnet grid to allow for comprehensive data in a uniformed format that allows for ease of comparison and analysis.
+
+The third map shows the 'nearest neighbor' distance of retail in Santiago, Chile. The nearest neighbor analysis is used to find the closest points of the same type. This allows us to find the proximity of another variant to determine commercial/high activity spots in the area. The nearest neighbor factor was repeated for restaurants, land-use, and water. 
+
+Lastly, a significance analysis was conducted on the presence of restaurants in Bangkok, Thailand. The same variables (land-use, water, etc) used for their nearest neighbor factor was also used in their significance aspect. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
 
 ```{r visualize count& continuous}
 #visual_count(chen_net,'waste')
@@ -279,18 +283,9 @@ visual_count(bok_net,"restaurant_sig")
 
 ```
 
-## 2.3 Correlation Analysis 
 
-The following correlation analysis shows the various features of our model. This matrix allows for further PCA analysis and variable selection.
 
-```{r correlation matrix}
-cor_chen <- st_drop_geometry(chen_net) %>% dplyr::select(!c(uniqueID,cvID,city,country))
-cor_nor_chen<- scale(cor_chen)
-corr_matrix <- cor(cor_nor_chen)
-ggcorrplot(corr_matrix)
-```
-
-## 2.4 Principal Component Analysis 
+## Principal Component Analysis 
 
 The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. The reason why we perform PCA is to decrease the dimension of variable. The following result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
 
