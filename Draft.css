@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+ /*------------- Whole Document---------------- */
+
+body, html {
+  font-family: "Open Sans";
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/*----------LOGO above TOC---------*/
+
+#TOC::before {
+  content: "";
+  display: block;
+  height: 200px;
+  margin: 20px 20px 40px 20px;
+  background-image: url("logo.png");
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+/*-------------------*/
+
+
+
+
+
+p{
+  font-size: 12px;
+  margin-left: 5px;
+  margin-right: 5px;
+  color: #696969;
+
+}
+
+#map {
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgb(237, 237, 237);
+  border-radius: 5px;
+}
+
+.header-sidebar{
+  padding-top: 10px ;
+  font-size: 12px;
+  font-weight: bolder;
+}
+
+
+/*Side float-y*/
+.dropdown-container {
+  height:100px;
+  background-color: rgb(255, 255, 255);
+  position: relative; /* Ensure absolute positioning works */
+    top: 20px; /* Adjust top position as needed */
+    right: 20px;
+}
+
+.dropdown {
+  position: absolute;
+  right: 0;
+  background-color: rgb(221, 219, 218);
+  width: 150px;
+
+}
+
+/*------------Table of Contents (TOC)----------- */
+
+
+.tocify {
+  border: none;   /*Removes border */
+  border-radius: 0px; /* Gets rid of rounded corners on TOC */
+  font-size: 16px;
+}
