@@ -20,7 +20,10 @@ editor_options:
 
 # 1. Introduction
 
-The Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot solutions in multiple cities where they have partnerships and have collected waste management information. Our objective is to develop a litter-accumulation assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+Pollution is a global problem that takes many forms contaminating every aspect of the environment. Some of this pollution, specifically plastic-waste, ends up in our oceans, harming marine life, contaminating drinking water, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
+
+Our objective is to develop a site assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+
 
 
 ```{r setup, include=FALSE}
@@ -85,13 +88,15 @@ stor_df <- add_row('landuse',list('residential'), 'residential')
 stor_df <- add_row('landuse',list('retail'), 'retail')
 ```
 
-# 2. Initial Analysis and Preperation
+# Initial Analysis and Preperation
 
-## 2.1 Data Sources and Methodology
+For our model, we directed our focus on various cities based from the Resilient Cities Network. These cities displayed are Chennai India; Bangkok, Thailand; and Santiago, Chile. The three cities mentioned are apart of a 12 city networking with the goal of proactively enhancing their sanitation infrastructure to combat plastic pollution in their region. The data regarding each region and its attributes was sourced from OpenStreetMap (OSM) to ensure a repeatable framework & quality consistency. 
 
-For our model, we directed our focus on various cities apart of the Resilient Cities Network. The cities we display in this demonstration are Chennai India; Bangkok, Thailand; and Santiago, Chile. The data regarding the region and its attributes was sourced from OpenStreetMap (OSM) to ensure a repeatable framework & quality consistency. For each selected city we developed a 'boundary box' automated by OSM simply by specifying the name of the area (city & nation) and using the output coordinates as the scope of data acquisition. From there, further attributes of the area with respect to structures, networks, or political divisions can be extracted for use.
+To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using Google My Maps (<https://www.google.com/mymaps>). Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard. 
+ 
+## Data Sources and Methodology
 
-In terms of our dependent variable, litter data, the process required manually downloading data from Marine Debris Tracker (<https://www.debristracker.org/data/>). Each selected city required its own evaluation in terms of quantitative debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early-stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors.    
+In terms of our data & variables, acquiring litter data, our primary environmental health indicator, was acquired via manual download data from Marine Debris Tracker (<https://www.debristracker.org/data/>). The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors available to each region.     
 
 ```{r chennai data, warning = FALSE, message = FALSE}
 #step to load city's data
