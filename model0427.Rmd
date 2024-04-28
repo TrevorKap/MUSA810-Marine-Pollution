@@ -325,9 +325,10 @@ rst_total <- rst_total %>%
   mutate(Prediction = 0.6*Pre_rf + 0.4*Pre_lr)
 rst_total <- risk_level(rst_total,'kmeans')
 
-city_viz('Chennai',rst_total,'rf_model')
-city_viz('Chennai',df_rf_rst,'rf_model')
-city_viz('Chennai',rst_total,'rf_model')
+grid.arrange(
+city_viz('Chennai',test_cbind,'lr_model'),
+city_viz('Chennai',df_rf_rst,'rf_model'),
+city_viz('Chennai',rst_total,'mixed_model'),nrow = 1)
 
 ```
 
