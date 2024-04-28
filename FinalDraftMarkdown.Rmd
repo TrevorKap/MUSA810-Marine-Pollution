@@ -481,3 +481,79 @@ grid.arrange(
 risk_v(df_lrqp_c,litter_p,'kmeans','Lr-quasipossion'),
 risk_v(df_lrqp_b,litter_b,'kmeans','Lr-quasipossion'),nrow = 1)
 ```
+Neural Net')
+#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
+
+df_rf_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst, by="uniqueID")
+df_lr_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst, by="uniqueID")
+df_lrqs_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst, by="uniqueID")
+df_lrqp_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst, by="uniqueID")
+df_brm_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst, by="uniqueID")
+
+```
+
+## 3.3 Model Testing Across Different Cities
+
+For our various models, we have tested them on Bangkok as well. The results are displayed below. Each model has a different level of sensitivity.
+
+Below shows the various models for Chennai and their predictions of litter risk across 5 categories of intensity.
+
+
+```{r model test}
+
+
+df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
+df_lr_c <- df_lr_rst %>% filter(city == 'Chennai')
+df_lrqs_c <- df_lrqs_rst %>% filter(city == 'Chennai')
+df_lrqp_c <- df_lrqp_rst %>% filter(city == 'Chennai')
+df_brm_c <- df_brm_rst %>% filter(city == 'Chennai')
+
+grid.arrange(
+  risk_v(df_rf_c,litter_p,"kmeans",'random forest'),
+  risk_v(df_lr_c,litter_p,"kmeans",'linear regression'),
+  risk_v(df_lrqs_c,litter_p,"kmeans",'Lr-quasi'),
+  risk_v(df_lrqp_c,litter_p,"kmeans",'Lr-quasipossion'), 
+  risk_v(df_brm_c,litter_p,"kmeans",'HrB regression'),nrow = 2
+)
+```
+
+Below shows the various models for Bangkok and their predictions of litter risk across 5 categories of intensity.
+
+```{r bangkok risk_normal}
+df_rf_b <- df_rf_rst %>% filter(city == 'Bangkok')
+df_lr_b <- df_lr_rst %>% filter(city == 'Bangkok')
+df_lrqs_b <- df_lrqs_rst %>% filter(city == 'Bangkok')
+df_lrqp_b <- df_lrqp_rst %>% filter(city == 'Bangkok')
+df_brm_b <- df_brm_rst %>% filter(city == 'Bangkok')
+grid.arrange(
+  risk_v(df_rf_b,litter_b,"kmeans",'random forest'),
+  risk_v(df_lr_b,litter_b,"kmeans",'linear regression'),
+  risk_v(df_lrqs_b,litter_b,"kmeans",'Lr-quasi'),
+  risk_v(df_lrqp_b,litter_b,"kmeans",'Lr-quasipossion'),
+  risk_v(df_brm_b,litter_b,"kmeans",'HrB regression'),nrow = 2
+)
+```
+
+The following comparative model visaulizes the strength of the model as it is used acrossed cities.
+
+```{r normal_compare}
+grid.arrange(
+#risk_v(df_rf_s,litter_s,'kmeans'),
+risk_v(df_rf_c,litter_p,'kmeans','random forest'),
+risk_v(df_rf_b,litter_b,'kmeans','random forest'),nrow = 1)
+
+grid.arrange(
+#risk_v(df_lr_s,litter_s,'kmeans'),
+risk_v(df_lr_c,litter_p,'kmeans','linear regression'),
+risk_v(df_lr_b,litter_b,'kmeans','linear regression'),nrow = 1)
+
+grid.arrange(
+#risk_v(df_lrqs_s,litter_s,'kmeans'),
+risk_v(df_lrqs_c,litter_p,'kmeans','Lr-quasi'),
+risk_v(df_lrqs_b,litter_b,'kmeans','Lr-quasi'),nrow = 1)
+
+grid.arrange(
+#risk_v(df_lrqp_s,litter_s,'kmeans'),
+risk_v(df_lrqp_c,litter_p,'kmeans','Lr-quasipossion'),
+risk_v(df_lrqp_b,litter_b,'kmeans','Lr-quasipossion'),nrow = 1)
+```
