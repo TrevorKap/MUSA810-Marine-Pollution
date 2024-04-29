@@ -1,8 +1,8 @@
 ---
-title: "Ocean Conservancy, Urban Ocean Marine Debris Prediction"
-subtitle: "Trevor Kapuvari, Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Xiaofan Liu"
-author: "University of Pennsylvania"
-date: "2024-02-22"
+title: "Zero-Waste Pilot Site-Selection in Urban Ocean Program Cities"
+subtitle: "Analyses for the Marine Litter Assessment Dashboard for Urban Ocean"
+author: "Trevor Kapuvari, Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Xiaofan Liu"
+date: "2024-05-10"
 output: 
   html_document:
     css: Draft.css
@@ -18,16 +18,14 @@ editor_options:
     wrap: 72
 ---
 
-
-# 1. Introduction
+# Introduction
 
 Pollution is a global problem that takes many forms contaminating every aspect of the environment. Some of this pollution, specifically plastic-waste, ends up in our oceans, harming marine life, contaminating drinking water, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
 
 Our objective is to develop a site assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
 
 
-
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
 knitr::opts_chunk$set(echo = TRUE)
 
 
@@ -139,7 +137,7 @@ In terms of our data & variables, acquiring litter data, our primary environment
 After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
 
 
-```{r chennai data, warning = FALSE, message = FALSE, results ='hide'}
+```{r chennai data, warning = FALSE, message = FALSE, results ='hide', cache = TRUE}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 
@@ -165,74 +163,6 @@ final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into 
 chen_net <- final_net
 ```
 
-```{r bangkok data, warning = FALSE, message = FALSE}
-litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataBangkok.csv')
-
-litter_b <- litter%>%
-  filter(master_material == 'PLASTIC')%>%
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
-  st_transform('EPSG:32643')
-litter_b <- subset(litter_b, select = -c(event_name, project_name))
-
-bok_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Bangkok.kml')
-bok_bdry <- st_set_crs(bok_bdry, 4326)%>%
-  st_transform('EPSG:32643')
-
-bok_bd <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Bangkok.kml')
-
-temp_bbox <- get_bbox(bok_bd) 
-temp_fish <- create_fish(bok_bdry)
-final_net <- countfishnet(temp_fish, litter_b) 
-final_net <- pn_gen(stor_df) 
-final_net <- moran_gen(final_net,stor_df) 
-bok_net <- final_net
-```
-
-```{r santiago data, warning = FALSE, message = FALSE}
-litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataSantiago.csv')
-
-# data filter and projection transformation
-litter_s <- litter%>%
-  filter(master_material == 'PLASTIC')%>%
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%
-  st_transform('EPSG:32643')
-litter_s <- subset(litter_s, select = -c(event_name, project_name))
-
-# load boundary data
-
-san_bdry <- st_read('https://github.com/TrevorKap/MUSA810-Marine-Pollution/raw/main/Data/Santiago.kml')
-san_bd <- san_bdry
-san_bdry <- st_set_crs(san_bdry, 4326)%>%
-  st_transform('EPSG:32643')
-
-temp_bbox <- get_bbox(san_bd) 
-temp_fish <- create_fish(san_bdry)
-final_net <- countfishnet(temp_fish, litter_s) 
-final_net <- pn_gen(stor_df) 
-final_net <- moran_gen(final_net,stor_df)
-san_net <- final_net
-```
-
-```{r aggregate data}
-chen_net <- chen_net %>%
- # dplyr::select(!c(avg_pop ,sum_pop))%>%
-  mutate(city = 'Chennai',
-         country = 'India')
-
-san_net <- san_net %>%
-  mutate(city = 'Santiago',
-         country = 'Chile')
-
-bok_net <- bok_net %>%
-  mutate(city = 'Bangkok',
-         country = 'Thailand')
-
-tt_net <- rbind(chen_net,san_net,bok_net) %>% mutate(uniqueID = 1:n())
-
-# reference: https://wiki.openstreetmap.org/wiki/Map_features#Entertainment,_Arts_&_Culturee 
-leisure <- c('park')
-act <- c('maxspeed') 
-```
 
 ## 2.2 Marine Debris Data, in Summary
 
@@ -248,7 +178,7 @@ The third map shows the 'nearest neighbor' distance of retail in Santiago, Chile
 
 Lastly, a significance analysis was conducted on the presence of restaurants in Bangkok, Thailand. The same variables (land-use, water, etc) used for their nearest neighbor factor was also used in their significance aspect. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
 
-```{r visualize count& continuous}
+```{r visualize count & continuous, warning = FALSE, message = FALSE, cache = TRUE }
 #visual_count(chen_net,'waste')
 #visual_count(chen_net,'water')
 visual_count(chen_net,"restaurant")
@@ -289,7 +219,7 @@ visual_count(bok_net,"restaurant_sig")
 
 The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. The reason why we perform PCA is to decrease the dimension of variable. The following result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
 
-```{r PCA analysis, message=FALSE, warning=FALSE}
+```{r PCA analysis, warning = FALSE, message = FALSE, cache = TRUE }
 data.pca <- princomp(corr_matrix)
 summary(data.pca)
 data.pca$loadings[, 1:2]
@@ -311,7 +241,7 @@ fviz_pca_var(data.pca, col.var = "cos2",
 
 In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators.
 
-```{r model build}
+```{r model build, warning = FALSE, message = FALSE, cache = TRUE }
 # prepare for model data
 df_model <- st_drop_geometry(tt_net)%>%dplyr::select(!cvID)
 df_model <- dummy_cols(df_model, select_columns = "city")
@@ -339,7 +269,7 @@ temp.hbr <- fit.1<- brm(count~ ., data=df_model%>%dplyr::select(!uniqueID), fami
 
 The following model results of each of the models was added to the dataframe. We test a range of statistical models for a comparative analysis, including random forest, linear model, quasi poisson, hierarchical bayes regression. This section also includes a decision tree model. While this model has a strong visualization of the risk area, its accuracy was not strong.
 
-```{r decision tree model}
+```{r decision tree model, warning = FALSE, message = FALSE, cache = TRUE }
 set.seed(123)
 data_split <- initial_split(df_model, prop = 0.75)
 train_data <- training(data_split)
@@ -376,7 +306,7 @@ df_dt_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_dt_rst, by="unique
 #risk_v(df_dt_rst,litter_p,"kmeans")
 ```
 
-```{r model result}
+```{r model result, warning = FALSE, message = FALSE, cache = TRUE }
 df_rf_rst <- model_process(df_model,temp.rf)
 df_lr_rst <- model_process(df_model,temp.lr)
 df_lrqs_rst <- model_process(df_model,temp.lr.qs)
@@ -423,7 +353,7 @@ For our various models, we have tested them on Bangkok as well. The results are 
 Below shows the various models for Chennai and their predictions of litter risk across 5 categories of intensity.
 
 
-```{r model test}
+```{r model test, warning = FALSE, message = FALSE, cache = TRUE }
 
 
 df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
@@ -443,7 +373,7 @@ grid.arrange(
 
 Below shows the various models for Bangkok and their predictions of litter risk across 5 categories of intensity.
 
-```{r bangkok risk_normal}
+```{r bangkok risk_normal, warning = FALSE, message = FALSE, cache = TRUE }
 df_rf_b <- df_rf_rst %>% filter(city == 'Bangkok')
 df_lr_b <- df_lr_rst %>% filter(city == 'Bangkok')
 df_lrqs_b <- df_lrqs_rst %>% filter(city == 'Bangkok')
@@ -460,7 +390,7 @@ grid.arrange(
 
 The following comparative model visaulizes the strength of the model as it is used acrossed cities.
 
-```{r normal_compare}
+```{r normal_compare, warning = FALSE, message = FALSE, cache = TRUE }
 grid.arrange(
 #risk_v(df_rf_s,litter_s,'kmeans'),
 risk_v(df_rf_c,litter_p,'kmeans','random forest'),
@@ -480,7 +410,6 @@ grid.arrange(
 #risk_v(df_lrqp_s,litter_s,'kmeans'),
 risk_v(df_lrqp_c,litter_p,'kmeans','Lr-quasipossion'),
 risk_v(df_lrqp_b,litter_b,'kmeans','Lr-quasipossion'),nrow = 1)
-```
 Neural Net')
 #df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
 
@@ -499,7 +428,7 @@ For our various models, we have tested them on Bangkok as well. The results are 
 Below shows the various models for Chennai and their predictions of litter risk across 5 categories of intensity.
 
 
-```{r model test}
+```{r model test, warning = FALSE, message = FALSE, cache = TRUE }
 
 
 df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
@@ -519,7 +448,7 @@ grid.arrange(
 
 Below shows the various models for Bangkok and their predictions of litter risk across 5 categories of intensity.
 
-```{r bangkok risk_normal}
+```{r bangkok risk_normal, warning = FALSE, message = FALSE, cache = TRUE }
 df_rf_b <- df_rf_rst %>% filter(city == 'Bangkok')
 df_lr_b <- df_lr_rst %>% filter(city == 'Bangkok')
 df_lrqs_b <- df_lrqs_rst %>% filter(city == 'Bangkok')
@@ -534,9 +463,9 @@ grid.arrange(
 )
 ```
 
-The following comparative model visaulizes the strength of the model as it is used acrossed cities.
+The following comparative model visaulizes the strength of the model as it is used across cities.
 
-```{r normal_compare}
+```{r normal_compare, warning = FALSE, message = FALSE, cache = TRUE }
 grid.arrange(
 #risk_v(df_rf_s,litter_s,'kmeans'),
 risk_v(df_rf_c,litter_p,'kmeans','random forest'),
