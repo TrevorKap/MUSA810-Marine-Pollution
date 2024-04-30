@@ -405,8 +405,66 @@ city_viz_new <- function(cities,data,model){
   risk_v_new(temp,get(cities),model,cities)
 }
 
+<<<<<<< Updated upstream
 risk_v_new <- function(model_data,litter_data,model,city){
   model_data$Risk_Category <- factor(model_data$Risk_Category,levels = c(5,4,3,2,1))
+=======
+grid.arrange(
+city_viz('Chennai',test_cbind,'lr_model'),
+city_viz('Chennai',df_rf_rst,'rf_model'),
+city_viz('Chennai',rst_total,'mixed_model'),nrow = 1)
+
+```
+
+```{r}
+city_viz('Chennai',df_rf_rst,'rf_model')
+city_viz('Bangkok',df_rf_rst,'rf_model')
+city_viz('Can_Tho',df_rf_rst,'rf_model')
+city_viz('Melaka',df_rf_rst,'rf_model')
+city_viz('Mumbai',df_rf_rst,'rf_model')
+city_viz('Panama_City',df_rf_rst,'rf_model')
+city_viz('Pune',df_rf_rst,'rf_model')
+city_viz('Salvador',df_rf_rst,'rf_model')
+city_viz('Santa_Fe',df_rf_rst,'rf_model')
+city_viz('Santiago',df_rf_rst,'rf_model')
+city_viz('Semarang',df_rf_rst,'rf_model')
+city_viz('Surat',df_rf_rst,'rf_model')
+```
+
+## Random Forest Model -- based on caret one
+### 3 variables trees
+```{r}
+
+sample <- sample.split(net_tt_nor$city, SplitRatio = 0.8)
+train  <- subset(net_tt_nor, sample == TRUE) 
+test   <- subset(net_tt_nor, sample == FALSE)
+
+df_model_tr <- train%>%dplyr::select(!c(uniqueID,city))
+
+train_control <- trainControl(
+  method = "cv",        # Cross-validation
+  number = 10,          # Number of folds in the cross-validation
+  verboseIter = TRUE    # Print training log
+)
+set.seed(4326)
+grid <- expand.grid(mtry = c(10,12,14,16))
+rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
+
+predictions <- predict(rf_model, test)
+actual <- test$count  # Assuming 'y' is the target variable in your test data
+
+rmse_value <- rmse(actual, predictions)
+r_squared <- cor(actual, predictions)^2
+
+df_rf_rst <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
+df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst,'kmeans')) %>%dplyr::select(Risk_Category)
+df_rf_rst <- cbind(df_rf_rst,df_rf_rst_temp)
+```
+
+```{r 3-variable rf}
+risk_v <-function(model_data,litter_data,model,city){
+  model_data$Risk_Category <- as.factor(model_data$Risk_Category)
+>>>>>>> Stashed changes
   ggplot() +
     geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_data, size = .3, colour = "red") +
