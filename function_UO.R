@@ -502,3 +502,38 @@ raster_process <- function(img,boundary){
   df_points <- st_centroid(temp_sf)
   return(df_points)
 }
+
+plotTheme <- theme(
+  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
+  plot.subtitle = element_text(size=8, family = "Open Sans"),
+  plot.caption = element_text(size = 6, family = "Open Sans"),
+  axis.text.x = element_text(size = 10, angle = 45, hjust = 1, family = "Open Sans"),
+  axis.text.y = element_text(size = 10, family = "Open Sans"),
+  axis.title.y = element_text(size = 10, family = "Open Sans"),
+  axis.title.x = element_text(size = 10, family = "Open Sans"),
+  plot.background = element_blank(),
+  panel.grid.major = element_line(colour = "#489cf4", size = .2),
+  axis.ticks = element_blank()
+)
+
+mapTheme <- theme(
+  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
+  plot.subtitle = element_text(size=7 , family = "Open Sans"),
+  plot.caption = element_text(size = 5 , family = "Open Sans"),
+  axis.line = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks = element_blank(),
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.border = element_blank(),
+  panel.grid.major = element_line(colour = 'transparent'),
+  panel.grid.minor = element_blank(),
+  legend.direction = "vertical", 
+  legend.position = "right",
+  legend.text = element_text(size = 8, family = "Open Sans"), 
+  legend.title = element_text(size = 9, family = "Open Sans", face = "bold"),
+  # plot.margin = margin(1, 1, 1, 1, 'cm'),
+  legend.key.height = unit(1, "cm"), 
+  legend.key.width = unit(0.3, "cm")
+)

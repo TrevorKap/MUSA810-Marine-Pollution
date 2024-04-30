@@ -1,7 +1,7 @@
 ---
 title: "Zero-Waste Pilot Site-Selection in Urban Ocean Program Cities"
 subtitle: "Analyses for the Marine Litter Assessment Dashboard for Urban Ocean"
-author: "Trevor Kapuvari, Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Xiaofan Liu"
+author: "Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Trevor Kapuvari, Xiaofan Liu"
 date: "2024-05-10"
 output: 
   html_document:
@@ -28,6 +28,38 @@ Our objective is to develop a site assessment model that identifies effective ze
 ```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
 knitr::opts_chunk$set(echo = TRUE)
 
+install.packages("tidyverse")
+install.packages("sf")
+install.packages("RSocrata")
+install.packages("viridis")
+install.packages("spatstat")
+install.packages("raster")
+install.packages("spdep")
+install.packages("FNN")
+install.packages("grid")
+install.packages("gridExtra")
+install.packages("knitr")
+install.packages("kableExtra")
+install.packages("tidycensus")
+install.packages("classInt")
+install.packages("RCurl")
+install.packages("corrr")
+install.packages("httr")
+install.packages("osmdata")
+install.packages("randomForest")
+install.packages("XML")
+install.packages("neuralnet")
+install.packages("MASS")
+install.packages("tidymodels")
+install.packages("jsonlite")
+install.packages("QuickJSR")
+install.packages("hash")
+install.packages("fastDummies")
+install.packages("ggcorrplot")
+install.packages("FactoMineR")
+install.packages("factoextra")
+install.packages("extrafont")
+install.packages("grid")
 
 
 library(tidyverse)
@@ -48,12 +80,10 @@ library(RCurl)
 library(httr)
 library(osmdata)
 library(randomForest)
-#library(tidygraph)
 library(XML)
 library(neuralnet)
 library(MASS)
 library(tidymodels)
-library(brms)
 library(jsonlite)
 library(QuickJSR)
 library(hash)
@@ -63,12 +93,15 @@ library(ggcorrplot)
 library(FactoMineR)
 library(factoextra)
 library(extrafont)
+library(grid)
 loadfonts()
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
 st_c    <- st_coordinates
 st_coid <- st_centroid
+
+risk_palette <- c("#BF6F8A", "#DE8595", "#F3C0A6", "#F8D7AD", "#FBEDC6")
 
 # pre-store of osm data need to use 
 # a more expandable version of function
@@ -118,7 +151,7 @@ mapTheme <- theme(
   legend.position = "right",
   legend.text = element_text(size = 8, family = "Open Sans"), 
   legend.title = element_text(size = 9, family = "Open Sans", face = "bold"),
-  plot.margin = margin(1, 1, 1, 1, 'cm'),
+   # plot.margin = margin(1, 1, 1, 1, 'cm'),
   legend.key.height = unit(1, "cm"), 
   legend.key.width = unit(0.3, "cm")
 )
@@ -163,45 +196,26 @@ final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into 
 chen_net <- final_net
 ```
 
-```{r save & load}
-net_salvador <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/salvador_net.geojson')
+```{r loading other nets}
+net_salvador <- st_read('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/stored_city/salvador_net.geojson')
 net_salvador <- st_set_crs(net_salvador,32643)
 
-net_santa_fe <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/santa_fe_net.geojson')
-net_santa_fe <- st_set_crs(net_santa_fe,32643)
+base_path <- "https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/stored_city/"
+city_names <- c("santa_fe", "semarang", "panama", "can_tho", "malaka", 
+                "surat", "santiago", "bangkok", "chen", "mumbai", "pune")
+city_data <- list()
 
-net_semarang <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/semarang_net.geojson')
-net_semarang <- st_set_crs(net_semarang,32643)
+for (city in city_names) {
+  file_path <- paste0(base_path, city, "_net.geojson")
+  net_sf <- st_read(file_path)
+  net_sf <- st_set_crs(net_sf, 32643)
+  city_data[[city]] <- net_sf
+}
+list2env(setNames(city_data, paste0("net_", city_names)), envir = .GlobalEnv)
 
-net_panama <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/panama_net.geojson')
-net_panama <- st_set_crs(net_panama,32643)
-
-net_can_tho <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/can_tho_net.geojson')
-net_can_tho <- st_set_crs(net_can_tho,32643)
-
-net_malaka <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/malaka_net.geojson')
-net_malaka <- st_set_crs(net_malaka,32643)
-
-net_surat <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/surat_net.geojson')
-net_surat <- st_set_crs(net_surat,32643)
-
-net_santiago <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/santiago_net.geojson')
-net_santiago <- st_set_crs(net_santiago,32643)
-
-net_bangkok <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/bangkok_net.geojson')
-net_bangkok <- st_set_crs(net_bangkok,32643)
-
-net_chennai <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/chen_net.geojson')
-net_chennai <- st_set_crs(net_chennai,32643)
-
-net_mumbai <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/mumbai_net.geojson')
-net_mumbai <- st_set_crs(net_mumbai,32643)
-
-net_pune <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/pune_net.geojson')
-net_pune <- st_set_crs(net_pune,32643)
 ```
 
-## 2.2 Marine Debris Data, in Summary
+## Marine Debris Data, in Summary
 
 The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate based on the data available. 
 
