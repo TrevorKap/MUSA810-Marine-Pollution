@@ -163,6 +163,43 @@ final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into 
 chen_net <- final_net
 ```
 
+```{r save & load}
+net_salvador <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/salvador_net.geojson')
+net_salvador <- st_set_crs(net_salvador,32643)
+
+net_santa_fe <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/santa_fe_net.geojson')
+net_santa_fe <- st_set_crs(net_santa_fe,32643)
+
+net_semarang <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/semarang_net.geojson')
+net_semarang <- st_set_crs(net_semarang,32643)
+
+net_panama <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/panama_net.geojson')
+net_panama <- st_set_crs(net_panama,32643)
+
+net_can_tho <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/can_tho_net.geojson')
+net_can_tho <- st_set_crs(net_can_tho,32643)
+
+net_malaka <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/malaka_net.geojson')
+net_malaka <- st_set_crs(net_malaka,32643)
+
+net_surat <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/surat_net.geojson')
+net_surat <- st_set_crs(net_surat,32643)
+
+net_santiago <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/santiago_net.geojson')
+net_santiago <- st_set_crs(net_santiago,32643)
+
+net_bangkok <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/bangkok_net.geojson')
+net_bangkok <- st_set_crs(net_bangkok,32643)
+
+net_chennai <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/chen_net.geojson')
+net_chennai <- st_set_crs(net_chennai,32643)
+
+net_mumbai <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/mumbai_net.geojson')
+net_mumbai <- st_set_crs(net_mumbai,32643)
+
+net_pune <- st_read('/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/data/store/pune_net.geojson')
+net_pune <- st_set_crs(net_pune,32643)
+```
 
 ## 2.2 Marine Debris Data, in Summary
 
