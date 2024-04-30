@@ -216,9 +216,9 @@ net_total_li <- net_total_li %>%
 
 
 # Model part
-## Linear Model
-```{r}
-set.seed(223)
+
+
+
 net_tt_nor <- st_drop_geometry(net_total_li) %>%
   dplyr::select(-c(uniqueID,cvID,city,country))%>%
    mutate(count = scale(count))
@@ -229,20 +229,7 @@ sample <- sample.split(net_tt_nor$city, SplitRatio = 0.7)
 train  <- subset(net_tt_nor, sample == TRUE) 
 test   <- subset(net_tt_nor, sample == FALSE)
 
-train_control <- trainControl(method = "cv", number = 60)
 
-# Train the model
-model <- train(count ~ ., data = train%>%dplyr::select(-c('city','uniqueID')), method = "lm",family = "quasi",trControl = train_control)
-
-test_temp <- predict(model,net_total)
-test_cbind <- cbind(net_total,test_temp)%>%
-  rename(Prediction = test_temp)
-
-temp_risk_cat <- st_drop_geometry(risk_level(test_cbind,'kmeans')) %>%dplyr::select(Risk_Category)
-test_cbind <- cbind(test_cbind,temp_risk_cat)
-
-city_viz('Chennai',test_cbind,'rf_model')
-```
 
 ## Random Forest Model -- based on tidymodels
 ```{r}
@@ -309,7 +296,99 @@ temp_cat <- risk_level(temp,'kmeans')
 df_rf_rst <- cbind(net_total,temp_cat)
 ```
 
-## multi-vision model
+## Linear Model
+```{r}
+set.seed(223)
+train_control <- trainControl(method = "cv", number = 60)
+
+# Train the model
+model <- train(count ~ ., data = train_data, method = "lm",family = "quasi",trControl = train_control)
+
+test_temp <- predict(model,net_total)
+test_cbind <- cbind(net_total,test_temp)%>%
+  rename(Prediction = test_temp)
+
+temp_risk_cat <- st_drop_geometry(risk_level(test_cbind,'kmeans')) %>%dplyr::select(Risk_Category)
+test_cbind <- cbind(test_cbind,temp_risk_cat)
+
+city_viz('Chennai',test_cbind,'rf_model')
+```
+
+## multi-vision model evaluation
+```{r}
+# rf model result -- ts_bind
+
+rf_test <- ts_bind %>% dplyr::select(count,Prediction)
+
+lr_rst <- predict(model,test_data)
+lr_test <- cbind(test_data,lr_rst)%>% rename(Prediction = lr_rst) %>% dplyr::select(count,Prediction)
+
+rf_test$Residuals <- rf_test$count - rf_test$Prediction
+lr_test$Residuals <- lr_test$count - lr_test$Prediction
+
+ggplot(rf_test, aes(x = count, y = Prediction)) +
+  geom_point() +  # Add points
+  geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
+               linetype = "dotted", color = "red") +  # Residual lines
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
+  labs(x = "Actual Value", y = "Predicted Value", title = "RandomForest Model Residuals") +
+  theme_minimal()
+
+ggplot(lr_test, aes(x = count, y = Prediction)) +
+  geom_point() +  # Add points
+  geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
+               linetype = "dotted", color = "red") +  # Residual lines
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
+  labs(x = "Actual Value", y = "Predicted Value", title = "Linear Regression Model Residuals") +
+  theme_minimal()
+
+ggplot(lr_test, aes(x = Residuals)) + 
+  geom_histogram(bins = 30, fill = "grey")
+
+ggplot(rf_test, aes(x = Residuals)) + 
+  geom_histogram(bins = 30, fill = "grey")
+```
+
+```{r}
+mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
+  rename(lr_pred = Prediction,
+         rf_pred = 'rf_test$Prediction') %>%
+  mutate(Prediction = 0.5*rf_pred + 0.5*lr_pred,
+         Residuals = count - Prediction)
+
+ggplot(mixed_rst, aes(x = Residuals)) + 
+  geom_histogram(bins = 30, fill = "grey")+ 
+  ggtitle("Histogram of Residuals") +  # Add a title
+  xlab("Values") +  # Label for the x-axis
+  ylab("Frequency") +  # Label for the y-axis
+  theme_minimal() 
+
+grid.arrange(
+ggplot(mixed_rst, aes(x = Residuals)) + 
+  geom_histogram(bins = 30, fill = "grey"),
+ggplot(lr_test, aes(x = Residuals)) + 
+  geom_histogram(bins = 30, fill = "grey"),
+ggplot(rf_test, aes(x = Residuals)) + 
+  geom_histogram(bins = 30, fill = "grey"),nrow = 3)
+
+ggplot(mixed_rst, aes(x = count, y = Prediction)) +
+  geom_point() +  # Add points
+  geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
+               linetype = "dotted", color = "red") +  # Residual lines
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
+  labs(x = "Actual Value", y = "Predicted Value", title = 'Mixed Model Residuals') +
+  theme_minimal()
+
+ggplot(mixed_rst, aes(sample = Residuals)) +
+  stat_qq() +
+  stat_qq_line(colour = "red") +
+  ggtitle("Normal Q-Q Plot") +
+  xlab("Theoretical Quantiles") +
+  ylab("Sample Quantiles") +
+  theme_minimal()
+```
+
+## multi-vision model build 
 ```{r}
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
   dplyr::select(Prediction,Risk_Category)%>%
@@ -321,64 +400,13 @@ rst_total <- cbind(df_rf_rst,test_cb_rst)%>%
 ```
 
 ```{r}
-rst_total <- rst_total %>%
-  mutate(Prediction = 0.6*Pre_rf + 0.4*Pre_lr)
-rst_total <- risk_level(rst_total,'kmeans')
+city_viz_new <- function(cities,data,model){
+  temp <- data %>% filter(city == cities)
+  risk_v_new(temp,get(cities),model,cities)
+}
 
-city_viz('Chennai',rst_total,'rf_model')
-city_viz('Chennai',df_rf_rst,'rf_model')
-city_viz('Chennai',rst_total,'rf_model')
-
-```
-
-```{r}
-city_viz('Chennai',df_rf_rst,'rf_model')
-city_viz('Bangkok',df_rf_rst,'rf_model')
-city_viz('Can_Tho',df_rf_rst,'rf_model')
-city_viz('Melaka',df_rf_rst,'rf_model')
-city_viz('Mumbai',df_rf_rst,'rf_model')
-city_viz('Panama_City',df_rf_rst,'rf_model')
-city_viz('Pune',df_rf_rst,'rf_model')
-city_viz('Salvador',df_rf_rst,'rf_model')
-city_viz('Santa_Fe',df_rf_rst,'rf_model')
-city_viz('Santiago',df_rf_rst,'rf_model')
-city_viz('Semarang',df_rf_rst,'rf_model')
-city_viz('Surat',df_rf_rst,'rf_model')
-```
-
-## Random Forest Model -- based on caret one
-### 3 variables trees
-```{r}
-
-sample <- sample.split(net_tt_nor$city, SplitRatio = 0.8)
-train  <- subset(net_tt_nor, sample == TRUE) 
-test   <- subset(net_tt_nor, sample == FALSE)
-
-df_model_tr <- train%>%dplyr::select(!c(uniqueID,city))
-
-train_control <- trainControl(
-  method = "cv",        # Cross-validation
-  number = 10,          # Number of folds in the cross-validation
-  verboseIter = TRUE    # Print training log
-)
-set.seed(4326)
-grid <- expand.grid(mtry = c(10,12,14,16))
-rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
-
-predictions <- predict(rf_model, test)
-actual <- test$count  # Assuming 'y' is the target variable in your test data
-
-rmse_value <- rmse(actual, predictions)
-r_squared <- cor(actual, predictions)^2
-
-df_rf_rst <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
-df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst,'kmeans')) %>%dplyr::select(Risk_Category)
-df_rf_rst <- cbind(df_rf_rst,df_rf_rst_temp)
-```
-
-```{r 3-variable rf}
-risk_v <-function(model_data,litter_data,model,city){
-  model_data$Risk_Category <- as.factor(model_data$Risk_Category)
+risk_v_new <- function(model_data,litter_data,model,city){
+  model_data$Risk_Category <- factor(model_data$Risk_Category,levels = c(5,4,3,2,1))
   ggplot() +
     geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_data, size = .3, colour = "red") +
@@ -387,148 +415,38 @@ risk_v <-function(model_data,litter_data,model,city){
          subtitle= model) +
     mapTheme(title_size = 8)
 }
-
-city_viz <- function(cities,data,model){
-  temp <- data %>% filter(city == cities)
-  risk_v(temp,get(cities),model,cities)
-}
-
-city_viz('Chennai',df_rf_rst,'rf_model')
-city_viz('Bangkok',df_rf_rst,'rf_model')
-city_viz('Can_Tho',df_rf_rst,'rf_model')
-city_viz('Melaka',df_rf_rst,'rf_model')
-city_viz('Mumbai',df_rf_rst,'rf_model')
-city_viz('Panama_City',df_rf_rst,'rf_model')
-city_viz('Pune',df_rf_rst,'rf_model')
-city_viz('Salvador',df_rf_rst,'rf_model')
-city_viz('Santa_Fe',df_rf_rst,'rf_model')
-city_viz('Santiago',df_rf_rst,'rf_model')
-city_viz('Semarang',df_rf_rst,'rf_model')
-city_viz('Surat',df_rf_rst,'rf_model')
-```
-
-### 4 variables tree
-```{r}
-grid <- expand.grid(mtry = c(4,5,6,7,8))
-rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
-
-df_rf_rst_2 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
-df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_2,'kmeans')) %>%dplyr::select(Risk_Category)
-df_rf_rst_2 <- cbind(df_rf_rst_2,df_rf_rst_temp)
 ```
 
 ```{r}
-city_viz('Chennai',df_rf_rst_2,'rf_model')
-city_viz('Bangkok',df_rf_rst_2,'rf_model')
-city_viz('Can_Tho',df_rf_rst_2,'rf_model')
-city_viz('Melaka',df_rf_rst_2,'rf_model')
-city_viz('Mumbai',df_rf_rst_2,'rf_model')
-city_viz('Panama_City',df_rf_rst_2,'rf_model')
-city_viz('Pune',df_rf_rst_2,'rf_model')
-city_viz('Salvador',df_rf_rst_2,'rf_model')
-city_viz('Santa_Fe',df_rf_rst_2,'rf_model')
-city_viz('Santiago',df_rf_rst_2,'rf_model')
-city_viz('Semarang',df_rf_rst_2,'rf_model')
-city_viz('Surat',df_rf_rst_2,'rf_model')
+rst_total <- rst_total %>%
+  mutate(Prediction = 0.4*Pre_rf + 0.6*Pre_lr)
+rst_total <- risk_level(rst_total,'kmeans')
+
+
+city_viz_new('Chennai',test_cbind,'lr_model')
+city_viz_new('Chennai',df_rf_rst,'rf_model')
+city_viz_new('Chennai',rst_total,'mixed_model')
 ```
 
-
-### 8 variables tree
-```{r}
-grid <- expand.grid(mtry = c(5,6,7,8))
-rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
-
-df_rf_rst_3 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
-df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_3,'kmeans')) %>%dplyr::select(Risk_Category)
-df_rf_rst_3 <- cbind(df_rf_rst_3,df_rf_rst_temp)
-```
 
 ```{r}
-city_viz('Chennai',df_rf_rst_3,'rf_model')
-city_viz('Bangkok',df_rf_rst_3,'rf_model')
-city_viz('Can_Tho',df_rf_rst_3,'rf_model')
-city_viz('Melaka',df_rf_rst_3,'rf_model')
-city_viz('Mumbai',df_rf_rst_3,'rf_model')
-city_viz('Panama_City',df_rf_rst_3,'rf_model')
-city_viz('Pune',df_rf_rst_3,'rf_model')
-city_viz('Salvador',df_rf_rst_3,'rf_model')
-city_viz('Santa_Fe',df_rf_rst_3,'rf_model')
-city_viz('Santiago',df_rf_rst_3,'rf_model')
-city_viz('Semarang',df_rf_rst_3,'rf_model')
-city_viz('Surat',df_rf_rst_3,'rf_model')
+rst_total4 <- rst_total %>%
+  st_transform(4326)
+
+city_viz_new('Chennai',rst_total4,'mixed_model')
+city_viz_new('Bangkok',rst_total4,'mixed_model')
+city_viz_new('Can_Tho',rst_total4,'mixed_model')
+city_viz_new('Melaka',rst_total4,'mixed_model')
+city_viz_new('Mumbai',rst_total4,'mixed_model')
+city_viz_new('Panama_City',rst_total4,'mixed_model')
+city_viz_new('Pune',rst_total4,'mixed_model')
+city_viz_new('Salvador',rst_total4,'mixed_model')
+city_viz_new('Santa_Fe',rst_total4,'mixed_model')
+city_viz_new('Santiago',rst_total4,'mixed_model')
+city_viz_new('Semarang',rst_total4,'mixed_model')
+city_viz_new('Surat',rst_total4,'mixed_model')
 ```
 
-### 12 variables tree
-```{r}
-grid <- expand.grid(mtry = c(10,12,14,16))
-rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
-
-df_rf_rst_4 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
-df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_4,'kmeans')) %>%dplyr::select(Risk_Category)
-df_rf_rst_4 <- cbind(df_rf_rst_4,df_rf_rst_temp)
-```
-
-```{r}
-city_viz('Chennai',df_rf_rst_4,'rf_model')
-city_viz('Bangkok',df_rf_rst_4,'rf_model')
-city_viz('Can_Tho',df_rf_rst_4,'rf_model')
-city_viz('Melaka',df_rf_rst_4,'rf_model')
-city_viz('Mumbai',df_rf_rst_4,'rf_model')
-city_viz('Panama_City',df_rf_rst_4,'rf_model')
-city_viz('Pune',df_rf_rst_4,'rf_model')
-city_viz('Salvador',df_rf_rst_4,'rf_model')
-city_viz('Santa_Fe',df_rf_rst_4,'rf_model')
-city_viz('Santiago',df_rf_rst_4,'rf_model')
-city_viz('Semarang',df_rf_rst_4,'rf_model')
-city_viz('Surat',df_rf_rst_4,'rf_model')
-```
-
-### 12 variables tree
-```{r}
-grid <- expand.grid(mtry = c(2,3,8,9,10,15,16,17))
-rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
-
-df_rf_rst_5 <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
-df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst_5,'kmeans')) %>%dplyr::select(Risk_Category)
-df_rf_rst_5 <- cbind(df_rf_rst_5,df_rf_rst_temp)
-```
-
-```{r}
-city_viz('Chennai',df_rf_rst_5,'rf_model')
-city_viz('Bangkok',df_rf_rst_5,'rf_model')
-city_viz('Can_Tho',df_rf_rst_5,'rf_model')
-city_viz('Melaka',df_rf_rst_5,'rf_model')
-city_viz('Mumbai',df_rf_rst_5,'rf_model')
-city_viz('Panama_City',df_rf_rst_5,'rf_model')
-city_viz('Pune',df_rf_rst_5,'rf_model')
-city_viz('Salvador',df_rf_rst_5,'rf_model')
-city_viz('Santa_Fe',df_rf_rst_5,'rf_model')
-city_viz('Santiago',df_rf_rst_5,'rf_model')
-city_viz('Semarang',df_rf_rst_5,'rf_model')
-city_viz('Surat',df_rf_rst_5,'rf_model')
-```
-
-### model comparison
-```{r}
-grid.arrange(city_viz('Chennai',df_rf_rst_5,'rf_model'),
-             city_viz('Chennai',df_rf_rst,'rf_model'), # 3 variables
-             city_viz('Chennai',df_rf_rst_2,'rf_model'), # 4 variables
-             city_viz('Chennai',df_rf_rst_3,'rf_model'), # 8 variables
-             city_viz('Chennai',df_rf_rst_4,'rf_model'),nrow=2) # 12 variables
-
-```
-
-```{r}
-city_viz('Surat',df_rf_rst,'rf_model') # 3 variables
-city_viz('Surat',df_rf_rst_2,'rf_model') # 4 variables
-city_viz('Surat',df_rf_rst_3,'rf_model') # 8 variables
-```
-
-```{r}
-city_viz('Santiago',df_rf_rst,'rf_model') # 3 variables
-city_viz('Santiago',df_rf_rst_2,'rf_model') # 4 variables
-city_viz('Santiago',df_rf_rst_3,'rf_model') # 8 variables
-```
 
 
 ## XGBoosting Model
