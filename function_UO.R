@@ -300,7 +300,7 @@ risk_visualize <- function(model_data,litter_data){
   ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_data, size = .3, colour = "red") +
-    scale_fill_viridis(discrete = TRUE) +
+    scale_fill_manual(values = risk_palette) +
     labs(title="Litter Risk Predictions",
          subtitle="") +
     mapTheme(title_size = 14)
@@ -441,7 +441,7 @@ risk_v <-function(model_data,litter_data,model,city){
   ggplot() +
     geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_data, size = .3, colour = "red") +
-    scale_fill_viridis(discrete = TRUE) +
+    scale_fill_manual(values = risk_palette) +
     labs(title=paste("Litter Risk Predictions",city,sep = '--'),
          subtitle= model) +
     mapTheme(title_size = 8)
