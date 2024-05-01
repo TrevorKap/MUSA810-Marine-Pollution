@@ -135,16 +135,7 @@ The data gathered takes various formats, mostly in vector-based formats such as 
 
 In terms of our dependent variable, litter data, the process required manually downloading data from Marine Debris Tracker (<https://www.debristracker.org/data/>). Each selected city required its own evaluation in terms of quantitative debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early-stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors.
 
-```{r, warning=FALSE, message=FALSE,  }
-grid.arrange(
-  ggplot() + 
-  geom_sf(data = chen_bdry) +
-  geom_sf(data = litter_p, colour="red", size=0.2, show.legend = "point") +
- # geom_sf(data = litter_p%>%filter(username == 'Chandranram'), colour="green", size=0.2, show.legend = "point") +
-  mapTheme(title_size = 14),
-  nrow = 1
-)
-```
+
 
 The litter data featured a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present.
 
@@ -160,45 +151,8 @@ Radius functioned as a confidence interval for coordinates and known accuracy of
 
 The bar chart of 'Main Item Category' measures each type of litter found in the dataset, the project goals focused heavily on plastic and plastic-related waste. As a result, the largest counts of items measured are plastic-based products.
 
-```{r warning=FALSE, message=FALSE,  }
-grid.arrange(
-  ggplot(litter_p, aes(x = quantity)) + 
-  geom_bar() +
-  theme_minimal() +
-  labs(title = "Count of Quantity Per Record",
-       x = "Category",
-       y = "Count"),
-  ggplot(litter_p, aes(x = altitude)) + 
-  geom_histogram() +
-  theme_minimal() +
-  labs(title = "Altitude Histogram",
-       x = "Category",
-       y = "Count"),
-  ggplot(litter_p, aes(x = radius)) + 
-  geom_histogram() +
-  theme_minimal() +
-  labs(title = "Radius Histogram",
-       x = "Category",
-       y = "Count"),
-  ncol = 3
-)
 
-ggplot(litter_p, aes(x = master_item_name)) + 
-  geom_bar() +
-  theme_minimal() +
-  labs(title = "Count of Main Item Category",
-       x = "Category",
-       y = "Count")+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggplot(litter_p, aes(x = location)) + 
-  geom_bar() +
-  theme_minimal() +
-  labs(title = "Count of Location in Litter Record",
-       x = "Category",
-       y = "Count")+
-  theme(axis.text.x = element_text(angle = 25,size = 6))
-```
 
 ## Chennai Debris Analysis
 
@@ -214,11 +168,7 @@ litter_net <-
          cvID = sample(round(nrow(fishnet) / 24), 
                        size=nrow(fishnet), replace = TRUE))
 
-ggplot() +
-  geom_sf(data = litter_net, aes(fill = countlitter), color = NA) +
-  scale_fill_viridis() +
-  labs(title = "Count of Litter for the fishnet") +
-  mapTheme()
+
 ```
 
 # Data Gathering and Variables
@@ -277,15 +227,13 @@ vars_net <- knnfishnet(fishnet,trans_point,3)
 
 To interpret data uniformly, we add our independent variables on a fishnet grid as shown below. Notably, using the raw value/geometry of each set does not assist with visual display or comprehension of data. 
 
-```{r trans visualization, message=FALSE, warning=FALSE}
-visual(road_net,trans_point,'residential road')
-```
+
 
 ```{r, warning=FALSE, message=FALSE}
 litter_no <- st_drop_geometry(litter_net)%>%dplyr::select(countlitter, uniqueID)
 corr_trans_net <- road_net %>%
   left_join(litter_no, by = "uniqueID")
-print(chisq.test(corr_trans_net$count,corr_trans_net$countlitter))
+
 ```
 
 ### Restaurants, Fishnet & Raw Data
@@ -301,14 +249,14 @@ restrt_point <- pluck(restrt,'osm_points')%>%
   mutate(legend = 'restaurant')
 
 rstrt_net <- countfishnet(fishnet,restrt_point)
-visual(rstrt_net,restrt_point,'restaurant')
+
 ```
 
 ```{r corr-rest-litter, warning=FALSE, message=FALSE}
 corr_net <- rstrt_net %>%
   left_join(litter_no, by = "uniqueID")
 
-print(chisq.test(corr_net$count,corr_net$countlitter))
+
 ```
 
 #### Nearest Neighbor Fishnet, Restaurants
@@ -322,11 +270,7 @@ vars_net_rstrt.long.nn <-
   dplyr::select(vars_net_rstrt, ends_with(".nn")) %>%
     gather(Variable, value, -geometry)
 
-ggplot() +
-      geom_sf(data = vars_net_rstrt.long.nn, aes(fill=value), colour=NA) +
-      scale_fill_viridis(name="Distance") +
-      labs(title="Restaurant Nearest Neighbor Distance") +
-      mapTheme()
+
 ```
 
 ### In-land Water Distribution
@@ -344,7 +288,7 @@ chen_water_point <- pluck(chen_water,'osm_points')%>%
   mutate(legend = 'water')
 
 water_net <- countfishnet(fishnet,chen_water_point)
-visual(water_net,chen_water_point,'water')
+
 ```
 
 ```{r water visualization, warning=FALSE}
@@ -364,11 +308,7 @@ vars_net_water.long.nn <-
   dplyr::select(vars_net_water, ends_with(".nn")) %>%
     gather(Variable, value, -geometry)
 
-ggplot() +
-      geom_sf(data = vars_net_water.long.nn, aes(fill=value), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Water Nearest Neighbor Distance") +
-      mapTheme()
+
 ```
 
 ### Waste Manageament
@@ -389,7 +329,6 @@ chen_waste_point <- pluck(chen_waste,'osm_points')%>%
   st_transform('EPSG:32643')
 
 waste_net <- countfishnet(fishnet,chen_waste_point)
-visual(waste_net,chen_waste_point,'waste management')
 ```
 
 ```{r waste visualization, warning=FALSE, message=FALSE}
@@ -409,11 +348,6 @@ vars_net_waste1.long.nn <-
   dplyr::select(vars_net_waste, ends_with(".nn")) %>%
     gather(Variable, value, -geometry)
 
-ggplot() +
-      geom_sf(data = vars_net_waste1.long.nn, aes(fill=value), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Waste 3NN Distance") +
-      mapTheme()
 ```
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -459,16 +393,7 @@ final_net.localMorans <-
 vars <- unique(final_net.localMorans$Variable)
 varList <- list()
 
-for(i in vars){
-  varList[[i]] <- 
-    ggplot() +
-      geom_sf(data = filter(final_net.localMorans, Variable == i), 
-              aes(fill = Value), colour=NA) +
-      scale_fill_viridis(name="") +
-      labs(title=i) +
-      mapTheme(title_size = 14) + theme(legend.position="bottom")}
 
-do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I statistics, Chennai"))
 ```
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -487,13 +412,6 @@ final_net <- final_net %>%
 
 Restaurants are used as a point of significance because of their relation to commercial activity. We notice here there is more 'NN Distance' in the north due to the lack of restaurants and general activity.  
 
-```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
-ggplot() +
-      geom_sf(data = rest_net_temp.long.nn, aes(fill=value), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Restaurant NN Distance")+
-      mapTheme()
-```
 
 ```{r, warning=FALSE, message=FALSE}
 weight_net <- 
@@ -562,26 +480,7 @@ water_net_temp.long.nn <-
   dplyr::select(water_net_temp, ends_with(".nn")) %>%
     gather(Variable, value, -geometry)
 
-grid.arrange(
-ggplot() +
-      geom_sf(data = rest_net_temp.long.nn, aes(fill=value), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Restaurant NN Distance")+
-      mapTheme()+
-      theme(plot.title = element_text(size = 10, hjust = 0)),
-ggplot() +
-      geom_sf(data = tran_net_temp.long.nn, aes(fill=value), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Road NN Distance") +
-      mapTheme()+
-      theme(plot.title = element_text(size = 10, hjust = 0)),
-ggplot() +
-      geom_sf(data = water_net_temp.long.nn, aes(fill=value), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Water NN Distance") +
-      mapTheme()+
-      theme(plot.title = element_text(size = 10, hjust = 0)),
-nrow = 1)
+
 ```
 
 
@@ -638,16 +537,6 @@ final_net.localMorans <-
 vars <- unique(final_net.localMorans$Variable)
 varList <- list()
 
-for(i in vars){
-  varList[[i]] <- 
-    ggplot() +
-      geom_sf(data = filter(final_net.localMorans, Variable == i), 
-              aes(fill = Value), colour=NA) +
-      scale_fill_viridis(name="") +
-      labs(title=i) +
-      mapTheme(title_size = 14) + theme(legend.position="bottom")}
-
-do.call(grid.arrange,c(varList, ncol = 4, top = "Local Morans I Statistics"))
 ```
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
@@ -679,25 +568,7 @@ final_net <- final_net %>%
                        k = 1))
 ```
 
-```{r eval=FALSE, include=FALSE, message=FALSE}
-grid.arrange(
-ggplot() +
-      geom_sf(data = final_net, aes(fill=rstrt.isSig.dist), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Restaurant NN Distance") +
-      mapTheme(),
-ggplot() +
-      geom_sf(data = final_net, aes(fill=road.isSig.dist), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Road NN Distance") +
-      mapTheme(),
-ggplot() +
-      geom_sf(data = final_net, aes(fill=wtr.isSig.dist), colour=NA) +
-      scale_fill_viridis(name="NN Distance") +
-      labs(title="Water NN Distance") +
-      mapTheme(),
-nrow = 1)
-```
+
 
 ```{r message=FALSE, warning=FALSE, results='hide'}
 reg.ss.vars <- c("rst_nn", "rstrt.isSig.dist","road_nn", "road.isSig.dist","wtr_nn", "wtr.isSig.dist")
@@ -728,22 +599,11 @@ error_by_reg_and_fold <-
               SD_MAE = mean(abs(Mean_Error), na.rm = T)) %>%
   ungroup()
 
-error_by_reg_and_fold %>% 
-  arrange(desc(MAE))
 
-error_by_reg_and_fold %>% 
-  arrange(MAE)
 
 ```
 
-```{r, warning=FALSE, message=FALSE}
-error_by_reg_and_fold %>% filter(MAE <=10) %>%
-  ggplot(aes(MAE)) + 
-    geom_histogram(bins = 60, colour="black", fill = "#FDE725FF") +
-  scale_x_continuous(breaks = seq(0, 11, by = 1)) + 
-    labs(title="Distribution of MAE", subtitle = "LOGO-CV",
-         x="Mean Absolute Error", y="Count")
-```
+
 
 ```{r, warning=FALSE, message=FALSE}
 ml_breaks <- classIntervals(reg.ss.spatialCV$Prediction, 
@@ -776,7 +636,7 @@ ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
     geom_sf(data = litter_p, size = .3, colour = "red") +
     scale_fill_viridis(discrete = TRUE) +
-    mapTheme(title_size = 24)
+    mapTheme(title_size = 40)
 ```
 
 
