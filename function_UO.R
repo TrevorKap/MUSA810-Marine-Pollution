@@ -198,7 +198,7 @@ nn_visual <- function(nn_data,titles){
   
   ggplot() +
     geom_sf(data = temp, aes(fill=value), colour=NA) +
-    scale_fill_viridis(name="NN Distance") +
+    scale_fill_viridis(name="NN Distance", option = "mako") +
     labs(title= paste(titles,"knn distance"))+
     mapTheme()+
     theme(plot.title = element_text(size = 10, hjust = 0))
@@ -207,7 +207,7 @@ nn_visual <- function(nn_data,titles){
 visual_count <- function(net_one,variable){
   ggplot() +
     geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
-    scale_fill_viridis_c() +
+    scale_fill_viridis_c(option = "mako") +
     labs(title = paste(variable,"Count for the Fishnet")) +
     mapTheme()
 }
@@ -231,7 +231,7 @@ visual_count_net <- function(net_one,point_one,boundary,variable_name){
   grid.arrange(
     ggplot() +
       geom_sf(data = net_one, aes(fill = count), color = NA) +
-      scale_fill_viridis() +
+      scale_fill_viridis_c(option = "mako") +
       labs(title = paste(variable_name,"Count for the Fishnet")) +
       mapTheme(),
     ggplot() + 
@@ -266,11 +266,11 @@ lc_mr_visual <- function(mr_dataset,final,legends){
       ggplot() +
       geom_sf(data = filter(temp, Variable == i), 
               aes(fill = Value), colour=NA) +
-      scale_fill_viridis(name="") +
+      scale_fill_viridis(name="", option = "mako") +
       labs(title=i) +
       mapTheme(title_size = 14) + theme(legend.position="bottom")}
   
-  do.call(grid.arrange,c(varList, ncol = 4, top = paste(legends,", Local Morans I statistics")))
+  do.call(grid.arrange,c(varList, ncol = 4, top = paste(legends,", Local Moran's I statistics")))
 }
 
 # risk_visualize: visualize the risk prediction place of the model result
@@ -502,38 +502,3 @@ raster_process <- function(img,boundary){
   df_points <- st_centroid(temp_sf)
   return(df_points)
 }
-
-plotTheme <- theme(
-  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
-  plot.subtitle = element_text(size=8, family = "Open Sans"),
-  plot.caption = element_text(size = 6, family = "Open Sans"),
-  axis.text.x = element_text(size = 10, angle = 45, hjust = 1, family = "Open Sans"),
-  axis.text.y = element_text(size = 10, family = "Open Sans"),
-  axis.title.y = element_text(size = 10, family = "Open Sans"),
-  axis.title.x = element_text(size = 10, family = "Open Sans"),
-  plot.background = element_blank(),
-  panel.grid.major = element_line(colour = "#489cf4", size = .2),
-  axis.ticks = element_blank()
-)
-
-mapTheme <- theme(
-  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
-  plot.subtitle = element_text(size=7 , family = "Open Sans"),
-  plot.caption = element_text(size = 5 , family = "Open Sans"),
-  axis.line = element_blank(),
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks = element_blank(),
-  axis.title.x = element_blank(),
-  axis.title.y = element_blank(),
-  panel.border = element_blank(),
-  panel.grid.major = element_line(colour = 'transparent'),
-  panel.grid.minor = element_blank(),
-  legend.direction = "vertical", 
-  legend.position = "right",
-  legend.text = element_text(size = 8, family = "Open Sans"), 
-  legend.title = element_text(size = 9, family = "Open Sans", face = "bold"),
-  # plot.margin = margin(1, 1, 1, 1, 'cm'),
-  legend.key.height = unit(1, "cm"), 
-  legend.key.width = unit(0.3, "cm")
-)

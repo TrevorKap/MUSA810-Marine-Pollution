@@ -12,12 +12,12 @@ output:
     theme: flatly
     highlight: tango
     number_sections: yes
-mainfont: DejaVu Sans
+mainfont: Open Sans
 editor_options: 
   markdown: 
     wrap: 72
 ---
-
+<link href="https://fonts.googleapis.com/css2?family=OpenSans&display=swap" rel="stylesheet">.
 # Introduction
 
 Pollution is a global problem that takes many forms contaminating every aspect of the environment. Some of this pollution, specifically plastic-waste, ends up in our oceans, harming marine life, contaminating drinking water, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
@@ -27,7 +27,6 @@ Our objective is to develop a site assessment model that identifies effective ze
 
 ```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
 knitr::opts_chunk$set(echo = TRUE)
-
 library(tidyverse)
 library(sf)
 library(RSocrata)
@@ -60,7 +59,8 @@ library(FactoMineR)
 library(factoextra)
 library(extrafont)
 library(grid)
-loadfonts()
+library(RColorBrewer)
+
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
@@ -93,41 +93,47 @@ stor_df <- add_row('landuse',list('industrial'), 'industrial')
 stor_df <- add_row('landuse',list('residential'), 'residential')
 stor_df <- add_row('landuse',list('retail'), 'retail')
 
+plotTheme <- function(base_size = 12, title_size = 16) {
+  theme(
+    text = element_text(family = "Open Sans", color = "black"),
+    plot.title = element_text(size = title_size, family = "Open Sans", colour = "black"), 
+    plot.subtitle = element_text(face = "italic", family = "Open Sans"),
+    plot.caption = element_text(hjust = 0, family = "Open Sans"),
+    axis.ticks = element_blank(),
+    panel.background = element_blank(),
+    panel.grid.major = element_line("grey80", size = 0.1),
+    panel.grid.minor = element_blank(),
+    #panel.border = element_rect(colour = "black", fill = NA, size = 2),
+    strip.background = element_rect(fill = "grey80", color = "white"),
+    strip.text = element_text(size = 12, family = "Open Sans"),
+    axis.title = element_text(size = 12, family = "Open Sans"),
+    axis.text = element_text(size = 10, family = "Open Sans"),
+    plot.background = element_blank(),
+    legend.background = element_blank(),
+    legend.title = element_text(colour = "black", face = "italic", family = "Open Sans"),
+    legend.text = element_text(colour = "black", face = "italic", family = "Open Sans"),
+    strip.text.x = element_text(size = 14, family = "Open Sans")
+  )
+}
 
-plotTheme <- theme(
-  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
-  plot.subtitle = element_text(size=8, family = "Open Sans"),
-  plot.caption = element_text(size = 6, family = "Open Sans"),
-  axis.text.x = element_text(size = 10, angle = 45, hjust = 1, family = "Open Sans"),
-  axis.text.y = element_text(size = 10, family = "Open Sans"),
-  axis.title.y = element_text(size = 10, family = "Open Sans"),
-  axis.title.x = element_text(size = 10, family = "Open Sans"),
-  plot.background = element_blank(),
-  panel.grid.major = element_line(colour = "#489cf4", size = .2),
-  axis.ticks = element_blank()
-)
+mapTheme <- function(base_size = 12, title_size = 16) {
+  theme(
+    text = element_text(family = "Open Sans", color = "black"),
+    plot.title = element_text(size = title_size, colour = "black", family = "Open Sans"),
+    plot.subtitle = element_text(face = "italic", family = "Open Sans"),
+    plot.caption = element_text(hjust = 0, family = "Open Sans"),
+    axis.ticks = element_blank(),
+    panel.background = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    #panel.border = element_rect(colour = "black", fill = NA, size = 2),
+    strip.text.x = element_text(size = 14, family = "Open Sans")
+  )
+}
 
-mapTheme <- theme(
-  plot.title = element_text(size=12, family = "Open Sans", face = "bold"),
-  plot.subtitle = element_text(size=7 , family = "Open Sans"),
-  plot.caption = element_text(size = 5 , family = "Open Sans"),
-  axis.line = element_blank(),
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks = element_blank(),
-  axis.title.x = element_blank(),
-  axis.title.y = element_blank(),
-  panel.border = element_blank(),
-  panel.grid.major = element_line(colour = 'transparent'),
-  panel.grid.minor = element_blank(),
-  legend.direction = "vertical", 
-  legend.position = "right",
-  legend.text = element_text(size = 8, family = "Open Sans"), 
-  legend.title = element_text(size = 9, family = "Open Sans", face = "bold"),
-   # plot.margin = margin(1, 1, 1, 1, 'cm'),
-  legend.key.height = unit(1, "cm"), 
-  legend.key.width = unit(0.3, "cm")
-)
 ```
 
 # Initial Analysis and Preperation
@@ -189,7 +195,7 @@ for (i in seq_along(bd_data_meter_list)) {assign(bdM[i], bd_data_meter_list[[i]]
 ```{r loading other nets, warning = FALSE, message = FALSE, cache = TRUE }
 
 base_path <- "https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/stored_city/"
-city_names <- c("santa_fe", "semarang", "panama", "can_tho", "malaka", 
+city_names <- c("santa_fe", "semarang", "panama", "can_tho", "melaka", "salvador",
                 "surat", "santiago", "bangkok", "chennai", "mumbai", "pune")
 city_data <- list()
 
@@ -222,7 +228,7 @@ net_mumbai <- cnt_wt(Mumbai,net_mumbai)
 net_chennai <- cnt_wt(Chennai,net_chennai)
 net_bangkok <- cnt_wt(Bangkok,net_bangkok)
 net_can_tho <- cnt_wt(Can_Tho,net_can_tho)
-net_melaka <- cnt_wt(Melaka,net_malaka)
+net_melaka <- cnt_wt(Melaka,net_melaka)
 net_panama <- cnt_wt(Panama_City,net_panama)
 net_pune <- cnt_wt(Pune,net_pune)
 net_salvador <- cnt_wt(Salvador,net_salvador)
@@ -238,25 +244,25 @@ z_score_normalize <- function(x) {
   (x - mean(x)) / sd(x)
 }
 
-normarl_city <- function(data){
+normal_city <- function(data){
   data <- data%>% 
     mutate(across(where(is.numeric) & -'count', z_score_normalize),
            across(where(is.numeric), ~replace(., is.nan(.), 0)))
   return(data)
 }
 
-net_salvador <- normarl_city(net_salvador)
-net_santa_fe <- normarl_city(net_santa_fe)
-net_santiago <- normarl_city(net_santiago)
-net_semarang <- normarl_city(net_semarang)
-net_surat <- normarl_city(net_surat)
-net_bangkok <- normarl_city(net_bangkok)
-net_can_tho <- normarl_city(net_can_tho)
-net_chennai <- normarl_city(net_chennai)
-net_melaka <- normarl_city(net_melaka)
-net_mumbai <- normarl_city(net_mumbai)
-net_panama <- normarl_city(net_panama)
-net_pune <- normarl_city(net_pune)
+net_salvador <- normal_city(net_salvador)
+net_santa_fe <- normal_city(net_santa_fe)
+net_santiago <- normal_city(net_santiago)
+net_semarang <- normal_city(net_semarang)
+net_surat <- normal_city(net_surat)
+net_bangkok <- normal_city(net_bangkok)
+net_can_tho <- normal_city(net_can_tho)
+net_chennai <- normal_city(net_chennai)
+net_melaka <- normal_city(net_melaka)
+net_mumbai <- normal_city(net_mumbai)
+net_panama <- normal_city(net_panama)
+net_pune <- normal_city(net_pune)
 ```
 
 ```{r aggregate data, warning = FALSE, message = FALSE, cache = TRUE }
@@ -297,72 +303,81 @@ The third map shows the 'nearest neighbor' distance of retail in Santiago, Chile
 
 Lastly, a significance analysis was conducted on the presence of restaurants in Bangkok, Thailand. The same variables (land-use, water, etc) used for their nearest neighbor factor was also used in their significance aspect. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
 
-```{r visualize count & continuous, warning = FALSE, message = FALSE, cache = TRUE }
-#visual_count(chen_net,'waste')
-#visual_count(chen_net,'water')
-visual_count(net_chennai,"restaurant")
-visual_count(chen_net,'road')
-#visual_count(bok_net,'industrial')
-#visual_count(chen_net,"residential")
-#visual_count(chen_net,'retail')
+```{r waste visualization grid, warning = FALSE, message = FALSE, cache = TRUE }
+map_waste <- visual_count(net_chennai, "waste")
+map_waste_nn <- visual_cotinuous(net_chennai,'waste_nn')
 
-#visual_cotinuous(chen_net,'waste_nn')
-#visual_cotinuous(san_net,'water_nn')
-#visual_cotinuous(san_net,"restaurant_nn")
-#visual_cotinuous(san_net,'road_nn')
-#visual_cotinuous(san_net,'industrial_nn')
-#visual_cotinuous(san_net,"residential_nn")
-visual_cotinuous(san_net,'retail_nn')
-
-#visual_count(bok_net,'waste_sig')
-#visual_count(bok_net,'water_sig')
-visual_count(bok_net,"restaurant_sig")
-#visual_count(bok_net,'road_sig')
-#visual_count(bok_net,'industrial_sig')
-#visual_count(bok_net,"residential_sig")
-#visual_count(bok_net,'retail_sig')
-
-#visual_cotinuous(bok_net,'waste_sig_dis')
-#visual_cotinuous(bok_net,'water_sig_dis')
-#visual_cotinuous(bok_net,"restaurant_sig_dis")
-#visual_cotinuous(bok_net,'road_sig_dis')
-#visual_cotinuous(bok_net,'industrial_sig_dis')
-#visual_cotinuous(bok_net,"residential_sig_dis")
-#visual_cotinuous(bok_net,'retail_sig_dis')
+grid.arrange(map_waste, map_waste_nn, ncol = 2)
 
 ```
 
 
 
-## Principal Component Analysis (idk this part)
+```{r visualize count, warning = FALSE, message = FALSE, cache = TRUE }
+
+map_restaurant <- visual_count(net_chennai,"restaurant")
+map_road <- visual_count(net_chennai,'road')
+map_industrial <- visual_count(net_chennai,'industrial')
+map_residential <- visual_count(net_chennai,"residential")
+map_retail <- visual_count(net_chennai,'retail')
+
+grid.arrange(map_restaurant, map_road, map_industrial,
+             map_residential, map_retail,
+             ncol = 2)
+
+
+```
+
+```{r visualize nearest neighbour, warning = FALSE, message = FALSE, cache = TRUE }
+
+map_water_nn <- visual_count(net_chennai,'water_nn')
+map_restaurant_nn <- visual_count(net_chennai,"restaurant_nn")
+map_road_nn <- visual_count(net_chennai,'road_nn')
+map_industrial_nn <- visual_count(net_chennai,'industrial_nn')
+map_residential_nn <- visual_count(net_chennai,"residential_nn")
+map_retail_nn <- visual_count(net_chennai,'retail_nn')
+
+grid.arrange(map_water_nn, map_restaurant_nn, map_road_nn,
+             map_industrial_nn, map_residential_nn, map_retail_nn,
+             ncol = 2)
+```
+
+
+## Principal Component Analysis
 
 The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. The reason why we perform PCA is to decrease the dimension of variable. The following result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
 
 ```{r PCA analysis, warning = FALSE, message = FALSE, cache = TRUE }
+corr <- st_drop_geometry(net_total) %>% dplyr::select(!c(uniqueID,cvID,city,country))
+corr_nor<- scale(corr)
+corr_matrix <- cor(corr_nor)
+#ggcorrplot(corr_matrix)
+
 data.pca <- princomp(corr_matrix)
 summary(data.pca)
 data.pca$loadings[, 1:2]
-
-fviz_eig(data.pca, addlabels = TRUE)
-
-fviz_pca_var(data.pca, col.var = "black")
-
-fviz_cos2(data.pca, choice = "var", axes = 1:2)
-
+fviz_eig(data.pca, addlabels = TRUE) + ggtitle("Eigenvalues from Principal Component Analysis") + plotTheme()
+fviz_pca_var(data.pca, col.var = "black")+ plotTheme()
+fviz_cos2(data.pca, choice = "var", axes = 1:2)+ plotTheme()
+n_colors <- 100 
+mako_gradient <- viridis(n_colors, option = "mako")
 fviz_pca_var(data.pca, col.var = "cos2",
-            gradient.cols = c("black", "orange", "green"),
-            repel = TRUE)
+             gradient.cols = mako_gradient,
+             repel = TRUE) + plotTheme()
+
+
+
 ```
 
-# 3. Model Building
+# Model Building
 
-## 3.1 Reduced Bias Model
+## Reduced Bias Model
 
 In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators.
 
 ```{r model build, warning = FALSE, message = FALSE, cache = TRUE }
 # prepare for model data
-df_model <- st_drop_geometry(tt_net)%>%dplyr::select(!cvID)
+df_model <- st_drop_geometry(net_)%>%dplyr::select(!cvID)
 df_model <- dummy_cols(df_model, select_columns = "city")
 df_model <- dummy_cols(df_model, select_columns = "country")
 df_model <- df_model %>% dplyr::select(!c(city,country)) %>% mutate(uniqueID = 1:n())
@@ -490,22 +505,6 @@ grid.arrange(
 )
 ```
 
-Below shows the various models for Bangkok and their predictions of litter risk across 5 categories of intensity.
-
-```{r bangkok risk_normal, warning = FALSE, message = FALSE, cache = TRUE }
-df_rf_b <- df_rf_rst %>% filter(city == 'Bangkok')
-df_lr_b <- df_lr_rst %>% filter(city == 'Bangkok')
-df_lrqs_b <- df_lrqs_rst %>% filter(city == 'Bangkok')
-df_lrqp_b <- df_lrqp_rst %>% filter(city == 'Bangkok')
-df_brm_b <- df_brm_rst %>% filter(city == 'Bangkok')
-grid.arrange(
-  risk_v(df_rf_b,litter_b,"kmeans",'random forest'),
-  risk_v(df_lr_b,litter_b,"kmeans",'linear regression'),
-  risk_v(df_lrqs_b,litter_b,"kmeans",'Lr-quasi'),
-  risk_v(df_lrqp_b,litter_b,"kmeans",'Lr-quasipossion'),
-  risk_v(df_brm_b,litter_b,"kmeans",'HrB regression'),nrow = 2
-)
-```
 
 The following comparative model visaulizes the strength of the model as it is used acrossed cities.
 
@@ -537,55 +536,12 @@ df_lr_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst, by="uniq
 df_lrqs_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst, by="uniqueID")
 df_lrqp_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst, by="uniqueID")
 df_brm_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst, by="uniqueID")
-
 ```
 
-## 3.3 Model Testing Across Different Cities
+# Model Building
 
-For our various models, we have tested them on Bangkok as well. The results are displayed below. Each model has a different level of sensitivity.
-
-Below shows the various models for Chennai and their predictions of litter risk across 5 categories of intensity.
-
-
-```{r model test, warning = FALSE, message = FALSE, cache = TRUE }
-
-
-df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
-df_lr_c <- df_lr_rst %>% filter(city == 'Chennai')
-df_lrqs_c <- df_lrqs_rst %>% filter(city == 'Chennai')
-df_lrqp_c <- df_lrqp_rst %>% filter(city == 'Chennai')
-df_brm_c <- df_brm_rst %>% filter(city == 'Chennai')
-
-grid.arrange(
-  risk_v(df_rf_c,litter_p,"kmeans",'random forest'),
-  risk_v(df_lr_c,litter_p,"kmeans",'linear regression'),
-  risk_v(df_lrqs_c,litter_p,"kmeans",'Lr-quasi'),
-  risk_v(df_lrqp_c,litter_p,"kmeans",'Lr-quasipossion'), 
-  risk_v(df_brm_c,litter_p,"kmeans",'HrB regression'),nrow = 2
-)
-```
-
-Below shows the various models for Bangkok and their predictions of litter risk across 5 categories of intensity.
-
-```{r bangkok risk_normal, warning = FALSE, message = FALSE, cache = TRUE }
-df_rf_b <- df_rf_rst %>% filter(city == 'Bangkok')
-df_lr_b <- df_lr_rst %>% filter(city == 'Bangkok')
-df_lrqs_b <- df_lrqs_rst %>% filter(city == 'Bangkok')
-df_lrqp_b <- df_lrqp_rst %>% filter(city == 'Bangkok')
-df_brm_b <- df_brm_rst %>% filter(city == 'Bangkok')
-grid.arrange(
-  risk_v(df_rf_b,litter_b,"kmeans",'random forest'),
-  risk_v(df_lr_b,litter_b,"kmeans",'linear regression'),
-  risk_v(df_lrqs_b,litter_b,"kmeans",'Lr-quasi'),
-  risk_v(df_lrqp_b,litter_b,"kmeans",'Lr-quasipossion'),
-  risk_v(df_brm_b,litter_b,"kmeans",'HrB regression'),nrow = 2
-)
-```
-
-
-
-## Random Forest Model -- based on tidymodels
-```{r}
+## Random Forest Model (TidyModels)
+```{r rf tidymodels, warning = FALSE, message = FALSE, cache = TRUE }
 set.seed(123)
 net_tt_nor <- st_drop_geometry(net_total_li) %>%
   dplyr::select(-c(uniqueID,cvID,city,country))
@@ -628,7 +584,7 @@ rf_results <- tune_grid(
 show_best(rf_results, metric = "rmse")
 ```
 
-```{r}
+```{r final_rf, warning = FALSE, message = FALSE, cache = TRUE }
 final_rf <- finalize_workflow(
   rf_workflow,
   select_best(rf_results, "rmse")
@@ -650,7 +606,7 @@ df_rf_rst <- cbind(net_total,temp_cat)
 ```
 
 ## Linear Model
-```{r}
+```{r linear model, warning = FALSE, message = FALSE, cache = TRUE }
 set.seed(223)
 train_control <- trainControl(method = "cv", number = 60)
 
@@ -667,8 +623,8 @@ test_cbind <- cbind(test_cbind,temp_risk_cat)
 city_viz('Chennai',test_cbind,'rf_model')
 ```
 
-## multi-vision model evaluation
-```{r}
+## Multi-Vision Model Evaluation
+```{r multi-vision model eval, warning = FALSE, message = FALSE, cache = TRUE }
 # rf model result -- ts_bind
 
 rf_test <- ts_bind %>% dplyr::select(count,Prediction)
@@ -702,7 +658,7 @@ ggplot(rf_test, aes(x = Residuals)) +
   geom_histogram(bins = 30, fill = "grey")
 ```
 
-```{r}
+```{r mixed rst, warning = FALSE, message = FALSE, cache = TRUE }
 mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
   rename(lr_pred = Prediction,
          rf_pred = 'rf_test$Prediction') %>%
@@ -741,8 +697,8 @@ ggplot(mixed_rst, aes(sample = Residuals)) +
   theme_minimal()
 ```
 
-## multi-vision model build 
-```{r}
+## Multi-Vision Model Build
+```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
   dplyr::select(Prediction,Risk_Category)%>%
   rename(Pre_lr = Prediction,
@@ -752,7 +708,7 @@ rst_total <- cbind(df_rf_rst,test_cb_rst)%>%
          Risk_rf = Risk_Category)
 ```
 
-```{r}
+```{r, warning = FALSE, message = FALSE, cache = TRUE }
 city_viz_new <- function(cities,data,model){
   temp <- data %>% filter(city == cities)
   risk_v_new(temp,get(cities),model,cities)
@@ -769,7 +725,7 @@ city_viz('Chennai',rst_total,'mixed_model'),nrow = 1)
 
 ```
 
-```{r}
+```{r, warning = FALSE, message = FALSE, cache = TRUE }
 city_viz('Chennai',df_rf_rst,'rf_model')
 city_viz('Bangkok',df_rf_rst,'rf_model')
 city_viz('Can_Tho',df_rf_rst,'rf_model')
@@ -784,9 +740,9 @@ city_viz('Semarang',df_rf_rst,'rf_model')
 city_viz('Surat',df_rf_rst,'rf_model')
 ```
 
-## Random Forest Model -- based on caret one
+## Random Forest Model (Caret)
 ### 3 variables trees
-```{r}
+```{r 3 variable trees, warning = FALSE, message = FALSE, cache = TRUE }
 
 sample <- sample.split(net_tt_nor$city, SplitRatio = 0.8)
 train  <- subset(net_tt_nor, sample == TRUE) 
@@ -804,7 +760,7 @@ grid <- expand.grid(mtry = c(10,12,14,16))
 rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
 
 predictions <- predict(rf_model, test)
-actual <- test$count  # Assuming 'y' is the target variable in your test data
+actual <- test$count
 
 rmse_value <- rmse(actual, predictions)
 r_squared <- cor(actual, predictions)^2
@@ -812,9 +768,7 @@ r_squared <- cor(actual, predictions)^2
 df_rf_rst <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
 df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst,'kmeans')) %>%dplyr::select(Risk_Category)
 df_rf_rst <- cbind(df_rf_rst,df_rf_rst_temp)
-```
 
-```{r 3-variable rf}
 risk_v <-function(model_data,litter_data,model,city){
   model_data$Risk_Category <- as.factor(model_data$Risk_Category)
 >>>>>>> Stashed changes
@@ -828,7 +782,7 @@ risk_v <-function(model_data,litter_data,model,city){
 }
 ```
 
-```{r}
+```{r rst total, warning = FALSE, message = FALSE, cache = TRUE }
 rst_total <- rst_total %>%
   mutate(Prediction = 0.4*Pre_rf + 0.6*Pre_lr)
 rst_total <- risk_level(rst_total,'kmeans')
@@ -840,7 +794,7 @@ city_viz_new('Chennai',rst_total,'mixed_model')
 ```
 
 
-```{r}
+```{r rst total 4, warning = FALSE, message = FALSE, cache = TRUE }
 rst_total4 <- rst_total %>%
   st_transform(4326)
 
@@ -858,3 +812,8 @@ city_viz_new('Semarang',rst_total4,'mixed_model')
 city_viz_new('Surat',rst_total4,'mixed_model')
 ```
 
+# Model Results
+
+# Model Analysis
+
+# Conclusion
