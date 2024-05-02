@@ -24,6 +24,27 @@ editor_options:
 
 ## Background
 
+Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilizes cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
+
+With these efforts, each campaign requires an evaluation of local context and detailed understanding of the city's systems and dynamic. This aspect of the process requires long-term planning and methodical decision-making to understand the pre-existing conditions in place. Hence, our model aims to streamline the process of understanding the general structure of each city-context and provide a comprehensive solution on where efforts and resources should be allocated to. Ultimately saving time on where to implement their waste-reduction strategies. 
+
+We based our focus on various cities from the Resilient Cities Network and Urban Ocean program. The Resilient Cities Network is a coalition of cities around the world that assist one another in building safer, more sustainable, and equitable futures for their populations. Each of which shares their knowledge, experiences, and policy practices to empower one another. A subsection of the Resilient Cities Network is the Urban Ocean program, a partnership with Ocean Conservancy tackling the ocean plastic problem. The city displayed as the example for our model is Chennai, India. The city is apart of the Urban Oceans 12 city network with the goal of proactively enhancing their sanitation infrastructure to combat plastic pollution in their region.
+
+The 12 participating cities apart of the Urban Ocean program as of May 2024 are:
+
+1. Can Tho, Vietnam
+2. Chennai, India
+3. Melaka, Malaysia
+4. Mumbai, India
+5. Panama City, Panama
+6. Pune, India
+7. Santiago, Chile
+8. Semarang, Indonesia
+9. Surat, India
+10. Bangkok, Thailand
+11. Santa Fe, Argentina
+12. Salvador, Brazil
+
 ## Motivation and Use Case
 
 Pollution is a global problem that takes many forms contaminating every aspect of the environment. Some of this pollution, specifically plastic-waste, ends up in our oceans, harming marine life, contaminating drinking water, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
@@ -153,10 +174,10 @@ mapTheme <- function(base_size = 10, title_size = 14) {
 
 # Exploratory Data Analysis
 
-## Understanding the Data
+## Data Sources
+### Marine Debris Tracker 
 
-### Marine Debris Tracker
-
+In terms of our data & variables, our primary environmental health indicator, marine debris/litter, was acquired via manual download from Marine Debris Tracker (<https://www.debristracker.org/data/>). The Marine Debris Tracker is a web-application & public-use database that tracks all recorded global litter disposal efforts from participating organizations. The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over the several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Some cities included as few as ~500 data points. Despite the repeated process of the model itself, results and accuracy laid contingent on data quantity and external factors available to each region. 
 
 ### OpenStreetMap Data
 
@@ -169,6 +190,11 @@ For our model, we directed our focus on data modeling from the Urban Ocean citie
 In terms of our data & variables, acquiring litter data, our primary environmental health indicator, was acquired via manual download data from Marine Debris Tracker (<https://www.debristracker.org/data/>). The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors available to each region. 
 
 After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
+
+
+### Understanding the Data
+
+Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
 ## Feature Engineering
 ```{r chennai data, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
