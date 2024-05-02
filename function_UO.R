@@ -199,7 +199,7 @@ nn_visual <- function(nn_data,titles){
   ggplot() +
     geom_sf(data = temp, aes(fill=value), colour=NA) +
     scale_fill_viridis(name="NN Distance", option = "mako") +
-    labs(title= paste(titles,"knn distance"))+
+    labs(title= paste(str_to_title(titles),"knn distance"))+
     mapTheme()+
     theme(plot.title = element_text(size = 10, hjust = 0))
 }
@@ -207,16 +207,16 @@ nn_visual <- function(nn_data,titles){
 visual_count <- function(net_one,variable){
   ggplot() +
     geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
-    scale_fill_viridis_c(option = "mako") +
-    labs(title = paste(variable,"Count for the Fishnet")) +
+    scale_fill_viridis_c(option = "mako", name = str_to_title(variable)) +
+    labs(title = paste(str_to_title(variable),"Count for the Fishnet")) +
     mapTheme()
 }
 
 visual_cotinuous <- function(net_one,variable){
   ggplot() +
     geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
-    scale_fill_continuous() +
-    labs(title = paste(variable,"Count for the Fishnet")) +
+    scale_fill_continuous(name = str_to_title(variable)) +
+    labs(title = paste(str_to_title(variable),"Count for the Fishnet")) +
     mapTheme()
 }
 
@@ -232,12 +232,12 @@ visual_count_net <- function(net_one,point_one,boundary,variable_name){
     ggplot() +
       geom_sf(data = net_one, aes(fill = count), color = NA) +
       scale_fill_viridis_c(option = "mako") +
-      labs(title = paste(variable_name,"Count for the Fishnet")) +
+      labs(title = paste(str_to_title(variable_name),"Count for the Fishnet")) +
       mapTheme(),
     ggplot() + 
       geom_sf(data = boundary) +
       geom_sf(data = point_one, colour="red", size=0.2, show.legend = "point") +
-      labs(title= paste(variable_name,", Chennai")) +
+      labs(title= paste(str_to_title(variable_name),", Chennai")) +
       mapTheme(title_size = 14),
     nrow = 1
   )
