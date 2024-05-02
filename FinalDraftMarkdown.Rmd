@@ -193,20 +193,21 @@ OpenStreetMap (OSM) data was used to provide additional context to the litter da
 ### Other Data
 
 For our model, we directed our focus on data modeling from the Urban Ocean cities. To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using Google My Maps (<https://www.google.com/mymaps>) or sourced online. Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard. 
- 
-
-In terms of our data & variables, acquiring litter data, our primary environmental health indicator, was acquired via manual download data from Marine Debris Tracker (<https://www.debristracker.org/data/>). The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors available to each region. 
 
 After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
 
 
 ### Understanding the Data
 
-Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
+Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Overall the goal of the data gathering and variables chosen provide a model an understanding the city itself, and in turn understand the systems in place and the environment assessment needed. 
 
-## Feature Engineering
+## Extract, Transform, Loading (ETL) Process
 
-Each aspect of the data gathering, through manual download, creation, or API, can now be coalesced into one cohesive concept. 
+Each aspect of the data gathering, through manual download, creation, or API, can now be coalesced into one cohesive visual. As mentioned with the 500x500 meter grid, all variables including litter as measuring based on an attribute regarding the cells. This grid is structure by the boundary box created from Google My Maps. This boundary file projects the city and defines its boundary on where the model is evaluating. Boundary files for our data are knowingly compatible with KML or GEOJSON files, or other file types that can be converted to raster layers. 
+
+For example, our litter data is not counted as individual data points for model development, but rather a sum of points within each cell. This allows for a better indication of frequency and density of litter in each area. The same method is applied to our dependent variables as well for uniformed formatted and consistency in structure. Below code & figure 3 demonstrate the example process of importing the litter CSV, boundary KML, and the creation of the overlay used for data exploration and analysis. 
+
+### Figure 3
 
 ```{r fishnetimage}
 knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/pictures/FishnetProcessSlide.png")
@@ -353,19 +354,28 @@ net_total_li <- net_total_li %>%
 ```
 
 
-## Mapping
+## Feature Engineering
 
-The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate based on the data available. 
+The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate within the city based on the data available. 
 
-Each chart below visualizes a dependent variable reformatted for repeatable use in context that relates to its association with litter accumulation. The examples are, restaurants, roads, retail proximity, and 'significant presence' of restaurants. These are simply the visualized examples and our variables broadly include land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. Our variable selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter. 
+Figure 2 shown below depicts the dependent variables used for model development. Each serve their own purpose in characterizing the city that is evaluated. Social & economic activities are depicted using restaurants and population density. Restaurants are an indication of commercial corridors and general 'downtown' aesthetic that attracts large populations, typically located in central hubs of urban activity. Their presence, especially when in clusters, can indicate a higher likelihood of commercial hubs and in turn program the model to classify these areas as major activity. Another metric for characterizing a city landscape is population density. Regardless of population itself, density is a key factor in determining where people are located in relation to the rest of the city. This metric supports our geospatial assessment in determining relative risk of litter accumulation, rather than independent probability. 
 
-The first map shows the count of restaurants in Chennai, India, similar to the litter data collected, there are few restaurants in any single area, but have tens of each counted throughout that provide insight of the general density/areas of high-activity. 
+Geomorphology describes the city's physical geography for the model. 
 
-The second map shows the roads in Chennai, India. Roads indicate urban development and density. All forms of data, whether points, lines, or polygons, are represented onto the fishnet grid to allow for comprehensive data in a uniformed format that allows for ease of comparison and analysis.
+### Figure 2
 
-The third map shows the 'nearest neighbor' distance of retail in Santiago, Chile. The nearest neighbor analysis is used to find the closest points of the same type. This allows us to find the proximity of another variant to determine commercial/high activity spots in the area. The nearest neighbor factor was repeated for restaurants, land-use, and water. 
+```{r Variables, warning = FALSE, message = FALSE, cache = TRUE }
+knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/pictures/Variables.png")
 
-Lastly, a significance analysis was conducted on the presence of restaurants in Bangkok, Thailand. The same variables (land-use, water, etc) used for their nearest neighbor factor was also used in their significance aspect. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
+```
+
+In addition to the dependent variables in their counted presence, we implemented a K-Nearest Neighbor analysis (also displayed) to determine the proximity of each data point to one another and incorporate that as an additional variable to our model. K-Nearest Neighbor (KNN) allows us to find the proximity of another variant to determine commercial/high activity spots in the area. The nearest neighbor factor was repeated for land-use, roads, restaurants, water, and waste facilities. We added KNN as a factor to place emphasis on density and location-based processing. This addition acts as a fail-safe for our model's cell calculation given that examining count alone does not incorporate the real-world application of proximity. 
+
+Local Moran's I 
+
+
+These visualized examples display what the model is interpreting when making its calculations in relation to litter accumulation risk. The examples are, waste management facilities (waste), water (streams, ponds, canals, etc), restaurants, and zoning (industrial, residential, retail). The overall  selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing an indication on where litter most likely accumulated or ends up. Each variable is then placed on a combined fishnet grid with the litter data, and evaluated for association between the variables and litter. 
+
 
 ```{r waste map, warning = FALSE, message = FALSE, cache = TRUE}
 map_waste <- visual_count(net_chennai, "waste")
