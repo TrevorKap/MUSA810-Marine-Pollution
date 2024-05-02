@@ -11,15 +11,12 @@ output:
     code_folding: "hide"
     theme: flatly
     highlight: tango
-    number_sections: yes
+    number_sections: no
 mainfont: Avenir
 editor_options: 
   markdown: 
     wrap: 72
 ---
-
-  prettydoc::html_pretty:
-    theme: leonids
 
 # Introduction
 
@@ -78,7 +75,7 @@ library(xgboost)
 library(Metrics)
 library(caret)
 
-source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
+#source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
 st_c    <- st_coordinates
 st_coid <- st_centroid
@@ -117,14 +114,14 @@ plotTheme <- function(base_size = 10, title_size = 14) {
     plot.subtitle = element_text(face = "italic", family = "Avenir"),
     plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
-    panel.background = element_blank(),
-    panel.grid.major = element_line("grey80", size = 0.1),
+    #panel.grid.major = element_line("grey80", size = 0.1),
     panel.grid.minor = element_blank(),
     #panel.border = element_rect(colour = "black", fill = NA, size = 2),
-    strip.background = element_rect(fill = "grey80", color = "white"),
+    #strip.background = element_rect(fill = "grey80", color = "white"),
     strip.text = element_text(size = 10, family = "Avenir"),
     axis.title = element_text(size = 10, family = "Avenir"),
     axis.text = element_text(size = 8, family = "Avenir"),
+    panel.background = element_rect(fill = "#ecf6ff"),
     plot.background = element_blank(),
     legend.background = element_blank(),
     legend.title = element_text(colour = "black", face = "italic", family = "Avenir"),
@@ -140,7 +137,8 @@ mapTheme <- function(base_size = 10, title_size = 14) {
     plot.subtitle = element_text(face = "italic", family = "Avenir"),
     plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
-    panel.background = element_blank(),
+    panel.background = element_rect(fill = "#ecf6ff"),
+    plot.background = element_blank(),
     axis.title = element_blank(),
     axis.text = element_blank(),
     axis.title.x = element_blank(),
@@ -173,7 +171,7 @@ In terms of our data & variables, acquiring litter data, our primary environment
 After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
 
 ## Feature Engineering
-```{r chennai data, warning = FALSE, message = FALSE, results ='hide', cache = TRUE}
+```{r chennai data, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 
@@ -199,7 +197,7 @@ final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into 
 chen_net <- final_net
 ```
 
-```{r data loading, warning = FALSE, message = FALSE, cache = TRUE, hide = TRUE}
+```{r data loading, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 city_data_list <- lapply(cities, load_city_data)
 names(city_data_list) <- cities
 
@@ -216,7 +214,7 @@ for (i in seq_along(bd_data_list)) {assign(bd[i], bd_data_list[[i]])}
 for (i in seq_along(bd_data_meter_list)) {assign(bdM[i], bd_data_meter_list[[i]])}
 ```
 
-```{r loading other nets, warning = FALSE, message = FALSE, cache = TRUE, hide = TRUE}
+```{r loading other nets, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 
 base_path <- "https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/stored_city/"
 city_names <- c("santa_fe", "semarang", "panama", "can_tho", "melaka", "salvador",
@@ -233,7 +231,7 @@ list2env(setNames(city_data, paste0("net_", city_names)), envir = .GlobalEnv)
 
 ```
 
-```{r, warning = FALSE, message = FALSE, cache = TRUE }
+```{r, warning = FALSE, message = FALSE, cache = TRUE}
 cnt_wt <- function(litter,net){
   temp <- st_join(litter,net,join = st_within)
   temp <- temp %>% filter(!is.na(uniqueID))
@@ -312,8 +310,7 @@ net_total_li <- net_total_li %>%
 ```
 
 
-
-## 
+## Mapping
 
 The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate based on the data available. 
 
@@ -327,12 +324,10 @@ The third map shows the 'nearest neighbor' distance of retail in Santiago, Chile
 
 Lastly, a significance analysis was conducted on the presence of restaurants in Bangkok, Thailand. The same variables (land-use, water, etc) used for their nearest neighbor factor was also used in their significance aspect. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
 
-```{r waste visualization grid, warning = FALSE, message = FALSE, cache = TRUE}
+```{r waste map, warning = FALSE, message = FALSE, cache = TRUE}
 map_waste <- visual_count(net_chennai, "waste")
 map_waste_nn <- visual_count(net_chennai,'waste_nn')
-
 grid.arrange(map_waste, map_waste_nn, ncol = 2)
-
 ```
 
 
@@ -345,27 +340,24 @@ map_road <- visual_count(net_chennai,'road')
 map_industrial <- visual_count(net_chennai,'industrial')
 map_residential <- visual_count(net_chennai,"residential")
 map_retail <- visual_count(net_chennai,'retail')
-
 grid.arrange(map_water, map_restaurant, ncol = 2)
 grid.arrange(map_road, map_industrial, ncol = 2)
 grid.arrange(map_residential, map_retail,
              ncol = 2)
 
-
 ```
 
 ```{r visualize nearest neighbour, warning = FALSE, message = FALSE, cache = TRUE }
-
 map_water_nn <- visual_count(net_chennai,'water_nn')
 map_restaurant_nn <- visual_count(net_chennai,"restaurant_nn")
 map_road_nn <- visual_count(net_chennai,'road_nn')
 map_industrial_nn <- visual_count(net_chennai,'industrial_nn')
 map_residential_nn <- visual_count(net_chennai,"residential_nn")
 map_retail_nn <- visual_count(net_chennai,'retail_nn')
-
 grid.arrange(map_water_nn, map_restaurant_nn, ncol = 2)
 grid.arrange(map_road_nn, map_industrial_nn, ncol = 2)
 grid.arrange(map_residential_nn, map_retail_nn, ncol = 2)
+
 ```
 
 
@@ -378,7 +370,6 @@ corr <- st_drop_geometry(net_total) %>% dplyr::select(!c(uniqueID,cvID,city,coun
 corr_nor<- scale(corr)
 corr_matrix <- cor(corr_nor)
 #ggcorrplot(corr_matrix)
-
 data.pca <- princomp(corr_matrix)
 summary(data.pca)
 data.pca$loadings[, 1:2]
@@ -571,10 +562,12 @@ rst_total <- risk_level(rst_total,'kmeans')
 
 grid.arrange(
 city_viz('Chennai',test_cbind,'Linear Regression Model'),
-city_viz('Chennai',df_rf_rst,'Random Forest Model'),
-city_viz('Chennai',rst_total,'Mixed Model'),nrow = 1)
+city_viz('Chennai',df_rf_rst,'Random Forest Model'), nrow = 1)
+
+city_viz('Chennai',rst_total,'Mixed Model')
 
 ```
+
 # Model Results
 
 ```{r all risk maps mixed model, warning = FALSE, message = FALSE, cache = TRUE }
@@ -606,11 +599,9 @@ risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang')
 risk_Surat <- city_viz_new('Surat', rst_total, 'Surat')
 
       
-# Grid arrange the plots
+
 grid.arrange(risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka, risk_Mumbai,
              risk_Panama_City, nrow = 2)
-
-# Second grid.arrange with 6 plots in the second row
 grid.arrange(risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
              nrow = 2)
 ```
@@ -630,4 +621,5 @@ Data Sources
 Image Sources
 * 
 
-
+prettydoc::html_pretty:
+    theme: leonids

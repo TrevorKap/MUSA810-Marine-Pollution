@@ -2,8 +2,8 @@
  /*------------- Whole Document---------------- */
 
 body, html {
-  font-family: "Avenir";
-  font-size: 14px;
+  background-color: #ecf6ff;
+  font-size: 36px;
   margin: 0;
   padding: 0;
   height: 100%;
@@ -25,21 +25,24 @@ body, html {
 /*---------points and headers----------*/
 
 p{
-  font-size: 12px;
-  margin-left: 5px;
-  margin-right: 5px;
+  font-family: "Avenir";
+  font-size: 16px;
+  margin-left: 0px;
+  margin-right: 0px;
   color: #696969;
 
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Avenir', sans-serif;
+    color: #1c3aa9;
 }
 
 /*------------Table of Contents (TOC)----------- */
 
 
 .tocify {
+  background-color: #ecf6ff;
   border: none;   /*Removes border */
   border-radius: 0px; /* Gets rid of rounded corners on TOC */
   font-size: 16px;
