@@ -18,6 +18,9 @@ editor_options:
     wrap: 72
 ---
 
+  prettydoc::html_pretty:
+    theme: leonids
+
 # Introduction
 
 ## Abstract
@@ -33,6 +36,8 @@ Our objective is to develop a site assessment model that identifies effective ze
 
 ```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
 knitr::opts_chunk$set(echo = TRUE)
+
+library(stringr)
 library(tidyverse)
 library(sf)
 library(RSocrata)
@@ -194,7 +199,7 @@ final_net <- moran_gen(final_net,stor_df) # calculate the moran's I result into 
 chen_net <- final_net
 ```
 
-```{r data loading, warning = FALSE, message = FALSE, cache = TRUE }
+```{r data loading, warning = FALSE, message = FALSE, cache = TRUE, hide = TRUE}
 city_data_list <- lapply(cities, load_city_data)
 names(city_data_list) <- cities
 
@@ -211,7 +216,7 @@ for (i in seq_along(bd_data_list)) {assign(bd[i], bd_data_list[[i]])}
 for (i in seq_along(bd_data_meter_list)) {assign(bdM[i], bd_data_meter_list[[i]])}
 ```
 
-```{r loading other nets, warning = FALSE, message = FALSE, cache = TRUE }
+```{r loading other nets, warning = FALSE, message = FALSE, cache = TRUE, hide = TRUE}
 
 base_path <- "https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/stored_city/"
 city_names <- c("santa_fe", "semarang", "panama", "can_tho", "melaka", "salvador",
@@ -341,8 +346,9 @@ map_industrial <- visual_count(net_chennai,'industrial')
 map_residential <- visual_count(net_chennai,"residential")
 map_retail <- visual_count(net_chennai,'retail')
 
-grid.arrange(map_water, map_restaurant, map_road, map_industrial,
-             map_residential, map_retail,
+grid.arrange(map_water, map_restaurant, ncol = 2)
+grid.arrange(map_road, map_industrial, ncol = 2)
+grid.arrange(map_residential, map_retail,
              ncol = 2)
 
 
@@ -357,9 +363,9 @@ map_industrial_nn <- visual_count(net_chennai,'industrial_nn')
 map_residential_nn <- visual_count(net_chennai,"residential_nn")
 map_retail_nn <- visual_count(net_chennai,'retail_nn')
 
-grid.arrange(map_water_nn, map_restaurant_nn, map_road_nn,
-             map_industrial_nn, map_residential_nn, map_retail_nn,
-             ncol = 2)
+grid.arrange(map_water_nn, map_restaurant_nn, ncol = 2)
+grid.arrange(map_road_nn, map_industrial_nn, ncol = 2)
+grid.arrange(map_residential_nn, map_retail_nn, ncol = 2)
 ```
 
 
@@ -602,8 +608,11 @@ risk_Surat <- city_viz_new('Surat', rst_total, 'Surat')
       
 # Grid arrange the plots
 grid.arrange(risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka, risk_Mumbai,
-             risk_Panama_City, risk_Pune, risk_Salvador, risk_Santa_Fe,
-             risk_Santiago, risk_Semarang, risk_Surat, nrow = 4)
+             risk_Panama_City, nrow = 2)
+
+# Second grid.arrange with 6 plots in the second row
+grid.arrange(risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
+             nrow = 2)
 ```
 
 

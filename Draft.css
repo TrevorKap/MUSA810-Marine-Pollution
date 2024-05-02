@@ -1,9 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
  /*------------- Whole Document---------------- */
 
 body, html {
-  font-family: "Lexend";
+  font-family: "Avenir";
   font-size: 14px;
   margin: 0;
   padding: 0;
@@ -23,7 +22,7 @@ body, html {
   background-repeat: no-repeat;
 }
 
-/*-------------------*/
+/*---------points and headers----------*/
 
 p{
   font-size: 12px;
@@ -33,36 +32,8 @@ p{
 
 }
 
-#map {
-  width: 100%;
-  top: 0;
-  left: 0;
-  background-color: rgb(237, 237, 237);
-  border-radius: 5px;
-}
-
-.header-sidebar{
-  padding-top: 10px ;
-  font-size: 12px;
-  font-weight: bolder;
-}
-
-
-/*Side float-y*/
-.dropdown-container {
-  height:100px;
-  background-color: rgb(255, 255, 255);
-  position: relative; /* Ensure absolute positioning works */
-    top: 20px; /* Adjust top position as needed */
-    right: 20px;
-}
-
-.dropdown {
-  position: absolute;
-  right: 0;
-  background-color: rgb(221, 219, 218);
-  width: 150px;
-
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Avenir', sans-serif;
 }
 
 /*------------Table of Contents (TOC)----------- */
