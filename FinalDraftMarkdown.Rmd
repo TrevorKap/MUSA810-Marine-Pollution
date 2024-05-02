@@ -17,7 +17,6 @@ editor_options:
   markdown: 
     wrap: 72
 ---
-<link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">.
 
 # Introduction
 
