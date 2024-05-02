@@ -236,7 +236,7 @@ visual_count_net <- function(net_one,point_one,boundary,variable_name){
       mapTheme(),
     ggplot() + 
       geom_sf(data = boundary) +
-      geom_sf(data = point_one, colour="red", size=0.2, show.legend = "point") +
+      geom_sf(data = point_one, colour="#1c3aa9", size=0.2, show.legend = "point") +
       labs(title= paste(str_to_title(variable_name),", Chennai")) +
       mapTheme(title_size = 14),
     nrow = 1
@@ -299,7 +299,7 @@ risk_visualize <- function(model_data,litter_data){
   
   ggplot() +
     geom_sf(data = litter_risk_sf, aes(fill = Risk_Category), colour = NA) +
-    geom_sf(data = litter_data, size = .3, colour = "red") +
+    geom_sf(data = litter_data, size = .3, colour = "#1c3aa9") +
     scale_fill_manual(values = risk_palette) +
     labs(title="Litter Risk Predictions",
          subtitle="") +
@@ -440,7 +440,7 @@ risk_v <-function(model_data,litter_data,model,city){
   model_data$Risk_Category <- as.factor(model_data$Risk_Category)
   ggplot() +
     geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
-    geom_sf(data = litter_data, size = .3, colour = "red") +
+    geom_sf(data = litter_data, size = .3, colour = "#1c3aa9") +
     scale_fill_manual(values = risk_palette) +
     labs(title=paste("Litter Risk Predictions",city,sep = '--'),
          subtitle= model) +

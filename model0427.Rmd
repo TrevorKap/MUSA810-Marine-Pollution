@@ -641,5 +641,4 @@ grid.arrange(city_viz('Chennai',df_xg_rst_3,'xgb_model-50'),
              city_viz('Chennai',df_xg_rst,'xgb_model-100'),
              city_viz('Chennai',df_xg_rst_2,'xgb_model-150'),
              city_viz('Chennai',df_xg_rst_4,'xgb_model-200'),
-             nrow = 2)
-```
+             nrow

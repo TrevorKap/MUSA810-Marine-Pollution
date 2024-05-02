@@ -26,14 +26,31 @@ editor_options:
 
 ## Motivation and Use Case
 
-Pollution is a global problem that takes many forms contaminating every aspect of the environment. Some of this pollution, specifically plastic-waste, ends up in our oceans, harming marine life, contaminating drinking water, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
+Pollution is a global problem that takes many forms contaminating every
+aspect of the environment. Some of this pollution, specifically
+plastic-waste, ends up in our oceans, harming marine life, contaminating
+drinking water, and hurting local economies. In response, Ocean
+Conservancy's Urban Ocean program has been developing projects that
+mitigate marine pollution, assess waste management, and enable cities to
+address ocean plastics and resilience. These projects intend to deploy
+"zero-waste" pilot strategies in cities around the world. With this
+wide-spanning outreach and diversity in partnerships, an assessment on
+site selection and resource allocation becomes a repeated step in the
+process that hinders efficiency each waste-reduction campaign.
 
-Our objective is to develop a site assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+Our objective is to develop a site assessment model that identifies
+effective zero-waste site locations for national and multinational use.
+This geospatial risk assessment model serves the purpose of predicting
+litter accumulation based on globally sourced data with a repeatable
+framework on an international scale. The results of the model aim to
+evaluate which sections of a given area have the highest likelihood to
+produce and contain litter relative to its surroundings. For our case,
+the Urban Ocean program intends to dedicate "zero-waste" solutions in
+these areas for the most effective impact for each deployment.
 
-
-```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
+```{r setup, include=FALSE, warning = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-
+library(ggthemes)
 library(stringr)
 library(tidyverse)
 library(sf)
@@ -45,6 +62,7 @@ library(spdep)
 library(FNN)
 library(grid)
 library(gridExtra)
+library(ggplot2)
 library(knitr)
 library(kableExtra)
 library(tidycensus)
@@ -110,20 +128,22 @@ stor_df <- add_row('landuse',list('retail'), 'retail')
 plotTheme <- function(base_size = 10, title_size = 14) {
   theme(
     text = element_text(family = "Avenir", color = "black"),
+    panel.background = element_rect(fill = "#ecf6ff"),
+    plot.background = element_rect(fill = "#ecf6ff"),
+    plot.border = element_rect(colour = "#ecf6ff", fill = NA, size = 2),
+    legend.background = element_rect(fill = "#ecf6ff"),
+    panel.border = element_rect(colour = "#ecf6ff", fill = NA, size = 2),
+    legend.border = element_rect(colour = "#ecf6ff", fill = NA, size = 2),
     plot.title = element_text(size = title_size, family = "Avenir", colour = "black"), 
     plot.subtitle = element_text(face = "italic", family = "Avenir"),
     plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
-    #panel.grid.major = element_line("grey80", size = 0.1),
+    panel.grid.major = element_line("grey80", size = 0.1),
     panel.grid.minor = element_blank(),
-    #panel.border = element_rect(colour = "black", fill = NA, size = 2),
-    #strip.background = element_rect(fill = "grey80", color = "white"),
+    strip.background = element_rect(fill = "grey80", color = "white"),
     strip.text = element_text(size = 10, family = "Avenir"),
     axis.title = element_text(size = 10, family = "Avenir"),
     axis.text = element_text(size = 8, family = "Avenir"),
-    panel.background = element_rect(fill = "#ecf6ff"),
-    plot.background = element_blank(),
-    legend.background = element_blank(),
     legend.title = element_text(colour = "black", face = "italic", family = "Avenir"),
     legend.text = element_text(colour = "black", face = "italic", family = "Avenir"),
     strip.text.x = element_text(size = 12, family = "Avenir")
@@ -133,18 +153,22 @@ plotTheme <- function(base_size = 10, title_size = 14) {
 mapTheme <- function(base_size = 10, title_size = 14) {
   theme(
     text = element_text(family = "Avenir", color = "black"),
+    panel.background = element_rect(fill = "#ecf6ff"),
+    plot.background = element_rect(fill = "#ecf6ff"),
+    legend.background = element_rect(fill = "#ecf6ff"),
+    panel.border = element_rect(colour = "#ecf6ff", fill = NA, size = 2),
+    plot.border = element_rect(colour = "#ecf6ff", fill = NA, size = 2),
+    legend.border = element_rect(colour = "#ecf6ff", fill = NA, size = 2),
     plot.title = element_text(size = title_size, colour = "black", family = "Avenir"),
     plot.subtitle = element_text(face = "italic", family = "Avenir"),
     plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
-    panel.background = element_rect(fill = "#ecf6ff"),
-    plot.background = element_blank(),
     axis.title = element_blank(),
     axis.text = element_blank(),
     axis.title.x = element_blank(),
     axis.title.y = element_blank(),
     panel.grid.minor = element_blank(),
-    #panel.border = element_rect(colour = "black", fill = NA, size = 2),
+    panel.grid.major = element_blank(),
     strip.text.x = element_text(size = 12, family = "Avenir")
   )
 }
@@ -157,20 +181,39 @@ mapTheme <- function(base_size = 10, title_size = 14) {
 
 ### Marine Debris Tracker
 
-
 ### OpenStreetMap Data
-
 
 ### Other Data
 
-For our model, we directed our focus on data modeling from the Urban Ocean cities. To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using Google My Maps (<https://www.google.com/mymaps>) or sourced online. Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard. 
- 
+For our model, we directed our focus on data modeling from the Urban
+Ocean cities. To develop our model for each respective city (or future
+use), each area was determined by a 'boundary box' that was created by a
+custom KML file using Google My Maps (<https://www.google.com/mymaps>)
+or sourced online. Each boundary's drawing was dictated by political
+boundaries and practical scope of where data was recorded within the
+city, further methodology of each individual city is detailed on the
+interactive dashboard.
 
-In terms of our data & variables, acquiring litter data, our primary environmental health indicator, was acquired via manual download data from Marine Debris Tracker (<https://www.debristracker.org/data/>). The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors available to each region. 
+In terms of our data & variables, acquiring litter data, our primary
+environmental health indicator, was acquired via manual download data
+from Marine Debris Tracker (<https://www.debristracker.org/data/>). The
+data for each city was carved out by a boundary box determined by
+initial-research political boundaries. From there, all debris recorded
+between January 2021 - February 2024 was compiled to a CSV and used as
+our primary independent variable. Each selected city required its own
+evaluation in terms of usable debris data over a several year time span.
+Ideal locations featured several thousand data points across 2-3 years
+for early & late stage model development. Despite the scalability of the
+model itself, results and accuracy lay contingent on data quantity and
+external factors available to each region.
 
-After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
+After the boundary box was created, the data was then projected to a
+fishnet grid. The fishnet grid was used to count the number of litter
+points in each cell in a format that can be compared to by each grid
+cell in the city.
 
 ## Feature Engineering
+
 ```{r chennai data, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
@@ -260,7 +303,6 @@ net_semarang <- cnt_wt(Semarang,net_semarang)
 net_surat <- cnt_wt(Surat,net_surat)
 ```
 
-
 ```{r z-score, warning = FALSE, message = FALSE, cache = TRUE }
 z_score_normalize <- function(x) {
   (x - mean(x)) / sd(x)
@@ -309,61 +351,143 @@ net_total_li <- net_total_li %>%
 
 ```
 
-
 ## Mapping
 
-The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate based on the data available. 
+The litter data features a wide variety of item categories and general
+information about each piece. Despite the quality of detail for each
+recorded sample, this only accounts for litter that has been identified,
+recorded, and disposed of. This data does not account for litter that
+was identified but never disposed of, accounted for, or assumed.
+Regardless, areas where litter was not recorded in a general surrounding
+could not confidently be assumed to be present or not present. Hence,
+the purpose of the model is to predict where litter is most likely to
+accumulate based on the data available.
 
-Each chart below visualizes a dependent variable reformatted for repeatable use in context that relates to its association with litter accumulation. The examples are, restaurants, roads, retail proximity, and 'significant presence' of restaurants. These are simply the visualized examples and our variables broadly include land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. Our variable selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable is then placed on a combined fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter. 
+Each chart below visualizes a dependent variable reformatted for
+repeatable use in context that relates to its association with litter
+accumulation. The examples are, restaurants, roads, retail proximity,
+and 'significant presence' of restaurants. These are simply the
+visualized examples and our variables broadly include land-use,
+proximity to water, waste site facilities, roads, and other indicators
+of commercial activity. Our variable selection was based on our
+hypothesis of areas of human activity leading to higher litter risk. The
+aim of these variables is to act as proxies for litter cases, providing
+insight on where litter most likely accumulated or ends up. Each
+variable is then placed on a combined fishnet grid with the litter data,
+computed using a Chi-Squared test, and evaluated for association between
+the variables and litter.
 
-The first map shows the count of restaurants in Chennai, India, similar to the litter data collected, there are few restaurants in any single area, but have tens of each counted throughout that provide insight of the general density/areas of high-activity. 
+The first map shows the count of restaurants in Chennai, India, similar
+to the litter data collected, there are few restaurants in any single
+area, but have tens of each counted throughout that provide insight of
+the general density/areas of high-activity.
 
-The second map shows the roads in Chennai, India. Roads indicate urban development and density. All forms of data, whether points, lines, or polygons, are represented onto the fishnet grid to allow for comprehensive data in a uniformed format that allows for ease of comparison and analysis.
+The second map shows the roads in Chennai, India. Roads indicate urban
+development and density. All forms of data, whether points, lines, or
+polygons, are represented onto the fishnet grid to allow for
+comprehensive data in a uniformed format that allows for ease of
+comparison and analysis.
 
-The third map shows the 'nearest neighbor' distance of retail in Santiago, Chile. The nearest neighbor analysis is used to find the closest points of the same type. This allows us to find the proximity of another variant to determine commercial/high activity spots in the area. The nearest neighbor factor was repeated for restaurants, land-use, and water. 
+The third map shows the 'nearest neighbor' distance of retail in
+Santiago, Chile. The nearest neighbor analysis is used to find the
+closest points of the same type. This allows us to find the proximity of
+another variant to determine commercial/high activity spots in the area.
+The nearest neighbor factor was repeated for restaurants, land-use, and
+water.
 
-Lastly, a significance analysis was conducted on the presence of restaurants in Bangkok, Thailand. The same variables (land-use, water, etc) used for their nearest neighbor factor was also used in their significance aspect. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
+Lastly, a significance analysis was conducted on the presence of
+restaurants in Bangkok, Thailand. The same variables (land-use, water,
+etc) used for their nearest neighbor factor was also used in their
+significance aspect. We wanted to examine a 'significance' analysis
+because of their direct implication with high human activity, excess
+flow of goods, and interconnection of urban systems. Areas of low
+distances of a "nearest neighbor" imply restaurants are close to one
+another geographically, indicate density in resources, and identify an
+urban core.
 
-```{r waste map, warning = FALSE, message = FALSE, cache = TRUE}
+```{r waste map, warning = FALSE, message = FALSE}
+library(ggplot2)
+library(stringr)
 map_waste <- visual_count(net_chennai, "waste")
 map_waste_nn <- visual_count(net_chennai,'waste_nn')
-grid.arrange(map_waste, map_waste_nn, ncol = 2)
+
+grid.draw(grobTree(rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")), 
+                   grid.arrange(map_waste, map_waste_nn, ncol = 2)))
+
 ```
 
-
-
-```{r visualize count, warning = FALSE, message = FALSE, cache = TRUE }
-
+```{r visualize count, warning = FALSE, message = FALSE}
 map_water <- visual_count(net_chennai,"water")
 map_restaurant <- visual_count(net_chennai,"restaurant")
 map_road <- visual_count(net_chennai,'road')
 map_industrial <- visual_count(net_chennai,'industrial')
 map_residential <- visual_count(net_chennai,"residential")
 map_retail <- visual_count(net_chennai,'retail')
-grid.arrange(map_water, map_restaurant, ncol = 2)
-grid.arrange(map_road, map_industrial, ncol = 2)
-grid.arrange(map_residential, map_retail,
-             ncol = 2)
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(map_water, map_restaurant, ncol = 2)
+  )
+)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(map_road, map_industrial, ncol = 2)
+  )
+)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(map_residential, map_retail, ncol = 2)
+  )
+)
 
 ```
 
-```{r visualize nearest neighbour, warning = FALSE, message = FALSE, cache = TRUE }
+```{r visualize nearest neighbour, warning = FALSE, message = FALSE }
 map_water_nn <- visual_count(net_chennai,'water_nn')
 map_restaurant_nn <- visual_count(net_chennai,"restaurant_nn")
 map_road_nn <- visual_count(net_chennai,'road_nn')
 map_industrial_nn <- visual_count(net_chennai,'industrial_nn')
 map_residential_nn <- visual_count(net_chennai,"residential_nn")
 map_retail_nn <- visual_count(net_chennai,'retail_nn')
-grid.arrange(map_water_nn, map_restaurant_nn, ncol = 2)
-grid.arrange(map_road_nn, map_industrial_nn, ncol = 2)
-grid.arrange(map_residential_nn, map_retail_nn, ncol = 2)
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(map_water_nn, map_restaurant_nn, ncol = 2)
+  )
+)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(map_road_nn, map_industrial_nn, ncol = 2)
+  )
+)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(map_residential_nn, map_retail_nn, ncol = 2)
+  )
+)
 
 ```
 
-
 ## Principal Component Analysis
 
-The PCA analysis below is used to identify the most important variables in the dataset and their correlation with litter. The reason why we perform PCA is to decrease the dimension of variable. The following result can get explained by the color and direction in the last map. and the last PCA map is the basic for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
+The PCA analysis below is used to identify the most important variables
+in the dataset and their correlation with litter. The reason why we
+perform PCA is to decrease the dimension of variable. The following
+result can get explained by the color and direction in the last map. and
+the last PCA map is the basic for choosing the several variables. Based
+on the result, the selected variables included 'waste_sig_dis,
+restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn,
+industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn,
+road_sig_dis, residential_sig, restaurant_sig, restaurant' as the
+'shortened model' independent variables.
 
 ```{r PCA analysis, warning = FALSE, message = FALSE, cache = TRUE }
 corr <- st_drop_geometry(net_total) %>% dplyr::select(!c(uniqueID,cvID,city,country))
@@ -381,16 +505,16 @@ mako_gradient <- viridis(n_colors, option = "mako")
 fviz_pca_var(data.pca, col.var = "cos2",
              gradient.cols = mako_gradient,
              repel = TRUE) + plotTheme()
-
 ```
-
 
 # Model Building
 
 ## Random Forest Model 1
 
 The following random forest model utilizes the TidyModels package.
+
 ```{r rf tidymodels, warning = FALSE, message = FALSE, cache = TRUE }
+
 set.seed(123)
 net_tt_nor <- st_drop_geometry(net_total_li) %>%
   dplyr::select(-c(uniqueID,cvID,city,country))
@@ -456,11 +580,11 @@ df_rf_rst <- cbind(net_total,temp_cat)
 ```
 
 ## Linear Model
+
 ```{r linear model, warning = FALSE, message = FALSE, cache = TRUE }
 set.seed(223)
 train_control <- trainControl(method = "cv", number = 60)
 
-# Train the model
 model <- train(count ~ ., data = train_data, method = "lm",family = "quasi",trControl = train_control)
 
 test_temp <- predict(model,net_total)
@@ -469,13 +593,11 @@ test_cbind <- cbind(net_total,test_temp)%>%
 
 temp_risk_cat <- st_drop_geometry(risk_level(test_cbind,'kmeans')) %>%dplyr::select(Risk_Category)
 test_cbind <- cbind(test_cbind,temp_risk_cat)
-
-city_viz('Chennai',test_cbind,'Random Forest Model')
 ```
 
 ## Multi-Vision Model Evaluation
-```{r multi-vision model eval, warning = FALSE, message = FALSE, cache = TRUE }
-# rf model result -- ts_bind
+
+```{r multi-vision model eval, warning = FALSE, message = FALSE}
 
 rf_test <- ts_bind %>% dplyr::select(count,Prediction)
 
@@ -486,9 +608,9 @@ rf_test$Residuals <- rf_test$count - rf_test$Prediction
 lr_test$Residuals <- lr_test$count - lr_test$Prediction
 
 ggplot(rf_test, aes(x = count, y = Prediction)) +
-  geom_point() +  # Add points
+  geom_point() + 
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
-               linetype = "dotted", color = "red") +  # Residual lines
+               linetype = "dotted", color = "red") +  
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
   labs(x = "Actual Value", y = "Predicted Value", title = "RandomForest Model Residuals") +
   plotTheme()
@@ -503,12 +625,11 @@ ggplot(lr_test, aes(x = count, y = Prediction)) +
 
 ggplot(lr_test, aes(x = Residuals)) + 
   geom_histogram(bins = 30, fill = "grey") + plotTheme()
-
 ggplot(rf_test, aes(x = Residuals)) + 
   geom_histogram(bins = 30, fill = "grey") + plotTheme()
 ```
 
-```{r mixed rst, warning = FALSE, message = FALSE, cache = TRUE }
+```{r mixed rst, warning = FALSE, message = FALSE}
 mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
   rename(lr_pred = Prediction,
          rf_pred = 'rf_test$Prediction') %>%
@@ -517,9 +638,9 @@ mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
 
 ggplot(mixed_rst, aes(x = Residuals)) + 
   geom_histogram(bins = 30, fill = "grey")+ 
-  ggtitle("Histogram of Residuals") +  # Add a title
-  xlab("Values") +  # Label for the x-axis
-  ylab("Frequency") +  # Label for the y-axis
+  ggtitle("Histogram of Residuals") + 
+  xlab("Values") + 
+  ylab("Frequency") + 
   plotTheme()
 
 grid.arrange(
@@ -529,7 +650,6 @@ ggplot(lr_test, aes(x = Residuals)) +
   geom_histogram(bins = 30, fill = "grey") + plotTheme() ,
 ggplot(rf_test, aes(x = Residuals)) + 
   geom_histogram(bins = 30, fill = "grey") + plotTheme() ,nrow = 3)
-
 ggplot(mixed_rst, aes(x = count, y = Prediction)) +
   geom_point() +  # Add points
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
@@ -548,7 +668,8 @@ ggplot(mixed_rst, aes(sample = Residuals)) +
 ```
 
 ## Multi-Vision Model Build
-```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
+
+```{r multi-vision model build, warning = FALSE, message = FALSE}
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
   dplyr::select(Prediction,Risk_Category)%>%
   rename(Pre_lr = Prediction,
@@ -560,17 +681,27 @@ rst_total <- rst_total %>%
   mutate(Prediction = 0.4*Pre_rf + 0.6*Pre_lr)
 rst_total <- risk_level(rst_total,'kmeans')
 
-grid.arrange(
-city_viz('Chennai',test_cbind,'Linear Regression Model'),
-city_viz('Chennai',df_rf_rst,'Random Forest Model'), nrow = 1)
-
-city_viz('Chennai',rst_total,'Mixed Model')
-
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      city_viz('Chennai', test_cbind, 'Linear Regression Model'),
+      city_viz('Chennai', df_rf_rst, 'Random Forest Model'),
+      nrow = 1
+    )
+  )
+)
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(city_viz('Chennai', rst_total, 'Mixed Model'), nrow = 1)
+  )
+)
 ```
 
 # Model Results
 
-```{r all risk maps mixed model, warning = FALSE, message = FALSE, cache = TRUE }
+```{r all risk maps mixed model, warning = FALSE, message = FALSE}
 risk_v_new <-function(model_data,litter_data,model,city){
   model_data$Risk_Category <- as.factor(model_data$Risk_Category)
   ggplot() +
@@ -598,14 +729,27 @@ risk_Santiago <- city_viz_new('Santiago', rst_total, 'Santiago')
 risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang')
 risk_Surat <- city_viz_new('Surat', rst_total, 'Surat')
 
-      
 
-grid.arrange(risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka, risk_Mumbai,
-             risk_Panama_City, nrow = 2)
-grid.arrange(risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
-             nrow = 2)
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka, risk_Mumbai,
+      risk_Panama_City, nrow = 2
+    )
+  )
+)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
+      nrow = 2
+    )
+  )
+)
 ```
-
 
 # Model and Error Analysis
 
@@ -615,11 +759,8 @@ grid.arrange(risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semara
 
 # Sources
 
-Data Sources
-* 
+Data Sources \*
 
-Image Sources
-* 
+Image Sources \*
 
-prettydoc::html_pretty:
-    theme: leonids
+prettydoc::html_pretty: theme: leonids
