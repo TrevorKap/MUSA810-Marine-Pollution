@@ -447,6 +447,7 @@ risk_v <-function(model_data,litter_data,model,city){
     mapTheme(title_size = 8)
 }
 
+
 city_viz <- function(cities,data,model){
   temp <- data %>% filter(city == cities)
   risk_v(temp,get(cities),model,cities)

@@ -12,13 +12,20 @@ output:
     theme: flatly
     highlight: tango
     number_sections: yes
-mainfont: Open Sans
+mainfont: Avenir
 editor_options: 
   markdown: 
     wrap: 72
 ---
-<link href="https://fonts.googleapis.com/css2?family=OpenSans&display=swap" rel="stylesheet">.
+<link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">.
+
 # Introduction
+
+## Abstract
+
+## Background
+
+## Motivation and Use Case
 
 Pollution is a global problem that takes many forms contaminating every aspect of the environment. Some of this pollution, specifically plastic-waste, ends up in our oceans, harming marine life, contaminating drinking water, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
 
@@ -60,14 +67,20 @@ library(factoextra)
 library(extrafont)
 library(grid)
 library(RColorBrewer)
-
+library(caTools)
+library(dials) 
+library(ranger)
+library(xgboost)
+library(Metrics)
+library(caret)
 
 source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
 source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
 st_c    <- st_coordinates
 st_coid <- st_centroid
 
-risk_palette <- c("#BF6F8A", "#DE8595", "#F3C0A6", "#F8D7AD", "#FBEDC6")
+risk_palette <- c("#FBEDC6", "#F8D7AD", "#F3C0A6", "#DE8595", "#BF6F8A")
+
 cities <- c("Bangkok", "Can_Tho", "Chennai", "Melaka", "Mumbai", "Panama_City", 
             "Pune", "Salvador", "Santa_Fe", "Santiago", "Semarang", "Surat")
 
@@ -93,35 +106,35 @@ stor_df <- add_row('landuse',list('industrial'), 'industrial')
 stor_df <- add_row('landuse',list('residential'), 'residential')
 stor_df <- add_row('landuse',list('retail'), 'retail')
 
-plotTheme <- function(base_size = 12, title_size = 16) {
+plotTheme <- function(base_size = 10, title_size = 14) {
   theme(
-    text = element_text(family = "Open Sans", color = "black"),
-    plot.title = element_text(size = title_size, family = "Open Sans", colour = "black"), 
-    plot.subtitle = element_text(face = "italic", family = "Open Sans"),
-    plot.caption = element_text(hjust = 0, family = "Open Sans"),
+    text = element_text(family = "Avenir", color = "black"),
+    plot.title = element_text(size = title_size, family = "Avenir", colour = "black"), 
+    plot.subtitle = element_text(face = "italic", family = "Avenir"),
+    plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
     panel.background = element_blank(),
     panel.grid.major = element_line("grey80", size = 0.1),
     panel.grid.minor = element_blank(),
     #panel.border = element_rect(colour = "black", fill = NA, size = 2),
     strip.background = element_rect(fill = "grey80", color = "white"),
-    strip.text = element_text(size = 12, family = "Open Sans"),
-    axis.title = element_text(size = 12, family = "Open Sans"),
-    axis.text = element_text(size = 10, family = "Open Sans"),
+    strip.text = element_text(size = 10, family = "Avenir"),
+    axis.title = element_text(size = 10, family = "Avenir"),
+    axis.text = element_text(size = 8, family = "Avenir"),
     plot.background = element_blank(),
     legend.background = element_blank(),
-    legend.title = element_text(colour = "black", face = "italic", family = "Open Sans"),
-    legend.text = element_text(colour = "black", face = "italic", family = "Open Sans"),
-    strip.text.x = element_text(size = 14, family = "Open Sans")
+    legend.title = element_text(colour = "black", face = "italic", family = "Avenir"),
+    legend.text = element_text(colour = "black", face = "italic", family = "Avenir"),
+    strip.text.x = element_text(size = 12, family = "Avenir")
   )
 }
 
-mapTheme <- function(base_size = 12, title_size = 16) {
+mapTheme <- function(base_size = 10, title_size = 14) {
   theme(
-    text = element_text(family = "Open Sans", color = "black"),
-    plot.title = element_text(size = title_size, colour = "black", family = "Open Sans"),
-    plot.subtitle = element_text(face = "italic", family = "Open Sans"),
-    plot.caption = element_text(hjust = 0, family = "Open Sans"),
+    text = element_text(family = "Avenir", color = "black"),
+    plot.title = element_text(size = title_size, colour = "black", family = "Avenir"),
+    plot.subtitle = element_text(face = "italic", family = "Avenir"),
+    plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
     panel.background = element_blank(),
     axis.title = element_blank(),
@@ -130,25 +143,32 @@ mapTheme <- function(base_size = 12, title_size = 16) {
     axis.title.y = element_blank(),
     panel.grid.minor = element_blank(),
     #panel.border = element_rect(colour = "black", fill = NA, size = 2),
-    strip.text.x = element_text(size = 14, family = "Open Sans")
+    strip.text.x = element_text(size = 12, family = "Avenir")
   )
 }
 
 ```
 
-# Initial Analysis and Preperation
+# Exploratory Data Analysis
 
-For our model, we directed our focus on various cities based from the Resilient Cities Network. These cities displayed are Chennai India; Bangkok, Thailand; and Santiago, Chile. The three cities mentioned are apart of a 12 city networking with the goal of proactively enhancing their sanitation infrastructure to combat plastic pollution in their region. The data regarding each region and its attributes was sourced from OpenStreetMap (OSM) to ensure a repeatable framework & quality consistency. 
+## Understanding the Data
 
-To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using Google My Maps (<https://www.google.com/mymaps>). Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard. 
+### Marine Debris Tracker
+
+
+### OpenStreetMap Data
+
+
+### Other Data
+
+For our model, we directed our focus on data modeling from the Urban Ocean cities. To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using Google My Maps (<https://www.google.com/mymaps>) or sourced online. Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard. 
  
-## Data Sources and Methodology
 
 In terms of our data & variables, acquiring litter data, our primary environmental health indicator, was acquired via manual download data from Marine Debris Tracker (<https://www.debristracker.org/data/>). The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over a several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Despite the scalability of the model itself, results and accuracy lay contingent on data quantity and external factors available to each region. 
 
 After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
 
-
+## Feature Engineering
 ```{r chennai data, warning = FALSE, message = FALSE, results ='hide', cache = TRUE}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
@@ -289,7 +309,7 @@ net_total_li <- net_total_li %>%
 
 
 
-## Marine Debris Data, in Summary
+## 
 
 The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate based on the data available. 
 
@@ -303,9 +323,9 @@ The third map shows the 'nearest neighbor' distance of retail in Santiago, Chile
 
 Lastly, a significance analysis was conducted on the presence of restaurants in Bangkok, Thailand. The same variables (land-use, water, etc) used for their nearest neighbor factor was also used in their significance aspect. We wanted to examine a 'significance' analysis because of their direct implication with high human activity, excess flow of goods, and interconnection of urban systems. Areas of low distances of a "nearest neighbor" imply restaurants are close to one another geographically, indicate density in resources, and identify an urban core. 
 
-```{r waste visualization grid, warning = FALSE, message = FALSE, cache = TRUE }
+```{r waste visualization grid, warning = FALSE, message = FALSE, cache = TRUE}
 map_waste <- visual_count(net_chennai, "waste")
-map_waste_nn <- visual_cotinuous(net_chennai,'waste_nn')
+map_waste_nn <- visual_count(net_chennai,'waste_nn')
 
 grid.arrange(map_waste, map_waste_nn, ncol = 2)
 
@@ -315,13 +335,14 @@ grid.arrange(map_waste, map_waste_nn, ncol = 2)
 
 ```{r visualize count, warning = FALSE, message = FALSE, cache = TRUE }
 
+map_water <- visual_count(net_chennai,"water")
 map_restaurant <- visual_count(net_chennai,"restaurant")
 map_road <- visual_count(net_chennai,'road')
 map_industrial <- visual_count(net_chennai,'industrial')
 map_residential <- visual_count(net_chennai,"residential")
 map_retail <- visual_count(net_chennai,'retail')
 
-grid.arrange(map_restaurant, map_road, map_industrial,
+grid.arrange(map_water, map_restaurant, map_road, map_industrial,
              map_residential, map_retail,
              ncol = 2)
 
@@ -365,182 +386,14 @@ fviz_pca_var(data.pca, col.var = "cos2",
              gradient.cols = mako_gradient,
              repel = TRUE) + plotTheme()
 
-
-
 ```
+
 
 # Model Building
 
-## Reduced Bias Model
+## Random Forest Model 1
 
-In light of the inherent bias stemmed from litter data, we also are developing a 'Reduced Bias' Model in attempt to compensate for potential  assumptions made by the model in terms of quantity. We take each indicator and coalesce them into a single variable used for our model to compare litter data to the indicators.
-
-```{r model build, warning = FALSE, message = FALSE, cache = TRUE }
-# prepare for model data
-df_model <- st_drop_geometry(net_)%>%dplyr::select(!cvID)
-df_model <- dummy_cols(df_model, select_columns = "city")
-df_model <- dummy_cols(df_model, select_columns = "country")
-df_model <- df_model %>% dplyr::select(!c(city,country)) %>% mutate(uniqueID = 1:n())
-
-# several model 
-temp.rf <- randomForest(count ~ ., data = df_model%>%dplyr::select(!uniqueID), mtry = 10,ntree=70, 
-                         importance = TRUE, na.action = na.omit) 
-
-temp.lr <- glm(count ~ ., data = df_model%>%dplyr::select(!uniqueID),family = "poisson", na.action = na.omit) 
-
-temp.lr.qs <- glm(count ~ ., data = df_model%>%dplyr::select(!uniqueID),family = "quasi", na.action = na.omit) 
-
-temp.lr.qp <- glm(count ~ ., data = df_model%>%dplyr::select(!uniqueID),family = "quasipoisson", na.action = na.omit) 
-
-nn_model = neuralnet(count ~ .,data=df_model%>%dplyr::select(!uniqueID),hidden=c(5,2),
-linear.output = TRUE
-)
-
-temp.hbr <- fit.1<- brm(count~ ., data=df_model%>%dplyr::select(!uniqueID), family=gaussian(),warmup=500, iter=1000, chains=2,cores=2,seed = 1115)
-```
-
-## 3.2 Model Results
-
-The following model results of each of the models was added to the dataframe. We test a range of statistical models for a comparative analysis, including random forest, linear model, quasi poisson, hierarchical bayes regression. This section also includes a decision tree model. While this model has a strong visualization of the risk area, its accuracy was not strong.
-
-```{r decision tree model, warning = FALSE, message = FALSE, cache = TRUE }
-set.seed(123)
-data_split <- initial_split(df_model, prop = 0.75)
-train_data <- training(data_split)
-test_data <- testing(data_split)
-
-# Create a decision tree model specification
-tree_spec <- decision_tree(mode = "regression", tree_depth = 4,engine = 'rpart') 
-
-# Fit the model to the training data
-tree_fit <- tree_spec %>%
- fit(count ~ ., data = train_data)
-
-predictions <- tree_fit %>%
- predict(test_data) %>%
- pull(.pred)
-
-metrics <- metric_set(rmse, rsq)
-model_performance <- test_data %>%
- mutate(predictions = predictions) %>%
- metrics(truth = count, estimate = predictions)
-
-print(model_performance)
-
-predictions <- tree_fit %>%
- predict(df_model)%>%
- pull(.pred)
-
-df_dt_rst <- df_model%>%
-  mutate(Prediction = predictions)%>%
-  dplyr::select(uniqueID,count,Prediction)
-
-df_dt_rst <- left_join(final_net%>%dplyr::select(uniqueID),df_dt_rst, by="uniqueID")
-
-#risk_v(df_dt_rst,litter_p,"kmeans")
-```
-
-```{r model result, warning = FALSE, message = FALSE, cache = TRUE }
-df_rf_rst <- model_process(df_model,temp.rf)
-df_lr_rst <- model_process(df_model,temp.lr)
-df_lrqs_rst <- model_process(df_model,temp.lr.qs)
-df_lrqp_rst <- model_process(df_model,temp.lr.qp)
-df_nn_rst <- model_process(df_model,nn_model)
-
-df_brm_rst <- model_process(df_model,temp.hbr)
-estimates_list <- list()
-# Iterate over each row by index
-for(i in 1:nrow(df_brm_rst)) {
-  # Extract the 'Prediction' for the current row
-  current_prediction <- df_brm_rst$Prediction[[i]][1]
-  estimates_list[[i]] <- current_prediction
-}
-
-df_brm_rst$Estimate <- estimates_list
-df_brm_rst <- df_brm_rst %>%
-  dplyr::select(uniqueID,count,Estimate)%>%
-  rename(Prediction = Estimate)
-
-df_brm_rst$Prediction <- as.numeric(unlist(df_brm_rst$Prediction))
-#df_brm_r <- model_result(df_model,fit.1) %>%mutate(model = 'BRM')
-
-
-#df_rf_r <- model_result(df_model,temp.rf) %>%mutate(model = 'RF')
-#df_lr_r <- model_result(df_model,temp.lr) %>%mutate(model = 'LR')
-#df_lrqs_r <- model_result(df_model,temp.lr.qs)%>%mutate(model = 'LR_quasi')
-#df_lrqp_r <- model_result(df_model,temp.lr.qp)%>%mutate(model = 'LR_quasipoisson')
-#df_nn_r <- model_result(df_model,nn_model)%>%mutate(model = 'Neural Net')
-#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
-
-df_rf_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst, by="uniqueID")
-df_lr_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst, by="uniqueID")
-df_lrqs_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst, by="uniqueID")
-df_lrqp_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst, by="uniqueID")
-df_brm_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst, by="uniqueID")
-
-```
-
-## 3.3 Model Testing Across Different Cities
-
-For our various models, we have tested them on Bangkok as well. The results are displayed below. Each model has a different level of sensitivity.
-
-Below shows the various models for Chennai and their predictions of litter risk across 5 categories of intensity.
-
-
-```{r model test, warning = FALSE, message = FALSE, cache = TRUE }
-
-
-df_rf_c <- df_rf_rst %>% filter(city == 'Chennai')
-df_lr_c <- df_lr_rst %>% filter(city == 'Chennai')
-df_lrqs_c <- df_lrqs_rst %>% filter(city == 'Chennai')
-df_lrqp_c <- df_lrqp_rst %>% filter(city == 'Chennai')
-df_brm_c <- df_brm_rst %>% filter(city == 'Chennai')
-
-grid.arrange(
-  risk_v(df_rf_c,litter_p,"kmeans",'random forest'),
-  risk_v(df_lr_c,litter_p,"kmeans",'linear regression'),
-  risk_v(df_lrqs_c,litter_p,"kmeans",'Lr-quasi'),
-  risk_v(df_lrqp_c,litter_p,"kmeans",'Lr-quasipossion'), 
-  risk_v(df_brm_c,litter_p,"kmeans",'HrB regression'),nrow = 2
-)
-```
-
-
-The following comparative model visaulizes the strength of the model as it is used acrossed cities.
-
-```{r normal_compare, warning = FALSE, message = FALSE, cache = TRUE }
-grid.arrange(
-#risk_v(df_rf_s,litter_s,'kmeans'),
-risk_v(df_rf_c,litter_p,'kmeans','random forest'),
-risk_v(df_rf_b,litter_b,'kmeans','random forest'),nrow = 1)
-
-grid.arrange(
-#risk_v(df_lr_s,litter_s,'kmeans'),
-risk_v(df_lr_c,litter_p,'kmeans','linear regression'),
-risk_v(df_lr_b,litter_b,'kmeans','linear regression'),nrow = 1)
-
-grid.arrange(
-#risk_v(df_lrqs_s,litter_s,'kmeans'),
-risk_v(df_lrqs_c,litter_p,'kmeans','Lr-quasi'),
-risk_v(df_lrqs_b,litter_b,'kmeans','Lr-quasi'),nrow = 1)
-
-grid.arrange(
-#risk_v(df_lrqp_s,litter_s,'kmeans'),
-risk_v(df_lrqp_c,litter_p,'kmeans','Lr-quasipossion'),
-risk_v(df_lrqp_b,litter_b,'kmeans','Lr-quasipossion'),nrow = 1)
-Neural Net')
-#df_r_tt <- do.call("rbind", list(df_rf_r, df_lr_r, df_lrqs_r,df_lrqp_r,df_nn_r))
-
-df_rf_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_rf_rst, by="uniqueID")
-df_lr_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lr_rst, by="uniqueID")
-df_lrqs_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqs_rst, by="uniqueID")
-df_lrqp_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_lrqp_rst, by="uniqueID")
-df_brm_rst <- left_join(tt_net%>%dplyr::select(uniqueID,city),df_brm_rst, by="uniqueID")
-```
-
-# Model Building
-
-## Random Forest Model (TidyModels)
+The following random forest model utilizes the TidyModels package.
 ```{r rf tidymodels, warning = FALSE, message = FALSE, cache = TRUE }
 set.seed(123)
 net_tt_nor <- st_drop_geometry(net_total_li) %>%
@@ -587,8 +440,9 @@ show_best(rf_results, metric = "rmse")
 ```{r final_rf, warning = FALSE, message = FALSE, cache = TRUE }
 final_rf <- finalize_workflow(
   rf_workflow,
-  select_best(rf_results, "rmse")
+  select_best(rf_results, metric = "rmse")
 )
+
 final_rf <- last_fit(final_rf, split = net_tt_split )
 
 #results <- collect_metrics(final_rf)
@@ -620,7 +474,7 @@ test_cbind <- cbind(net_total,test_temp)%>%
 temp_risk_cat <- st_drop_geometry(risk_level(test_cbind,'kmeans')) %>%dplyr::select(Risk_Category)
 test_cbind <- cbind(test_cbind,temp_risk_cat)
 
-city_viz('Chennai',test_cbind,'rf_model')
+city_viz('Chennai',test_cbind,'Random Forest Model')
 ```
 
 ## Multi-Vision Model Evaluation
@@ -641,7 +495,7 @@ ggplot(rf_test, aes(x = count, y = Prediction)) +
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
   labs(x = "Actual Value", y = "Predicted Value", title = "RandomForest Model Residuals") +
-  theme_minimal()
+  plotTheme()
 
 ggplot(lr_test, aes(x = count, y = Prediction)) +
   geom_point() +  # Add points
@@ -649,13 +503,13 @@ ggplot(lr_test, aes(x = count, y = Prediction)) +
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
   labs(x = "Actual Value", y = "Predicted Value", title = "Linear Regression Model Residuals") +
-  theme_minimal()
+  plotTheme()
 
 ggplot(lr_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey")
+  geom_histogram(bins = 30, fill = "grey") + plotTheme()
 
 ggplot(rf_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey")
+  geom_histogram(bins = 30, fill = "grey") + plotTheme()
 ```
 
 ```{r mixed rst, warning = FALSE, message = FALSE, cache = TRUE }
@@ -670,15 +524,15 @@ ggplot(mixed_rst, aes(x = Residuals)) +
   ggtitle("Histogram of Residuals") +  # Add a title
   xlab("Values") +  # Label for the x-axis
   ylab("Frequency") +  # Label for the y-axis
-  theme_minimal() 
+  plotTheme()
 
 grid.arrange(
 ggplot(mixed_rst, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey"),
+  geom_histogram(bins = 30, fill = "grey") + plotTheme() ,
 ggplot(lr_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey"),
+  geom_histogram(bins = 30, fill = "grey") + plotTheme() ,
 ggplot(rf_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey"),nrow = 3)
+  geom_histogram(bins = 30, fill = "grey") + plotTheme() ,nrow = 3)
 
 ggplot(mixed_rst, aes(x = count, y = Prediction)) +
   geom_point() +  # Add points
@@ -686,7 +540,7 @@ ggplot(mixed_rst, aes(x = count, y = Prediction)) +
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
   labs(x = "Actual Value", y = "Predicted Value", title = 'Mixed Model Residuals') +
-  theme_minimal()
+  plotTheme()
 
 ggplot(mixed_rst, aes(sample = Residuals)) +
   stat_qq() +
@@ -694,7 +548,7 @@ ggplot(mixed_rst, aes(sample = Residuals)) +
   ggtitle("Normal Q-Q Plot") +
   xlab("Theoretical Quantiles") +
   ylab("Sample Quantiles") +
-  theme_minimal()
+  plotTheme()
 ```
 
 ## Multi-Vision Model Build
@@ -706,114 +560,66 @@ test_cb_rst <- st_drop_geometry(test_cbind) %>%
 rst_total <- cbind(df_rf_rst,test_cb_rst)%>%
   rename(Pre_rf = Prediction,
          Risk_rf = Risk_Category)
-```
+rst_total <- rst_total %>%
+  mutate(Prediction = 0.4*Pre_rf + 0.6*Pre_lr)
+rst_total <- risk_level(rst_total,'kmeans')
 
-```{r, warning = FALSE, message = FALSE, cache = TRUE }
+grid.arrange(
+city_viz('Chennai',test_cbind,'Linear Regression Model'),
+city_viz('Chennai',df_rf_rst,'Random Forest Model'),
+city_viz('Chennai',rst_total,'Mixed Model'),nrow = 1)
+
+```
+# Model Results
+
+```{r all risk maps mixed model, warning = FALSE, message = FALSE, cache = TRUE }
+risk_v_new <-function(model_data,litter_data,model,city){
+  model_data$Risk_Category <- as.factor(model_data$Risk_Category)
+  ggplot() +
+    geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
+    geom_sf(data = litter_data, size = .3, colour = "red") +
+    scale_fill_manual(values = risk_palette, guide = "none") +
+    labs(title=model) +
+    mapTheme(title_size = 8)
+}
 city_viz_new <- function(cities,data,model){
   temp <- data %>% filter(city == cities)
   risk_v_new(temp,get(cities),model,cities)
 }
 
-<<<<<<< Updated upstream
-risk_v_new <- function(model_data,litter_data,model,city){
-  model_data$Risk_Category <- factor(model_data$Risk_Category,levels = c(5,4,3,2,1))
-=======
-grid.arrange(
-city_viz('Chennai',test_cbind,'lr_model'),
-city_viz('Chennai',df_rf_rst,'rf_model'),
-city_viz('Chennai',rst_total,'mixed_model'),nrow = 1)
+risk_Chennai <- city_viz_new('Chennai', rst_total, 'Chennai')
+risk_Bangkok <- city_viz_new('Bangkok', rst_total, 'Bangkok')
+risk_Can_Tho <- city_viz_new('Can_Tho', rst_total, 'Can Tho')
+risk_Melaka <- city_viz_new('Melaka', rst_total, 'Melaka')
+risk_Mumbai <- city_viz_new('Mumbai', rst_total, 'Mumbai')
+risk_Panama_City <- city_viz_new('Panama_City', rst_total, 'Panama City')
+risk_Pune <- city_viz_new('Pune', rst_total, 'Pune')
+risk_Salvador <- city_viz_new('Salvador', rst_total, 'Salvador')
+risk_Santa_Fe <- city_viz_new('Santa_Fe', rst_total, 'Santa Fe')
+risk_Santiago <- city_viz_new('Santiago', rst_total, 'Santiago')
+risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang')
+risk_Surat <- city_viz_new('Surat', rst_total, 'Surat')
 
-```
-
-```{r, warning = FALSE, message = FALSE, cache = TRUE }
-city_viz('Chennai',df_rf_rst,'rf_model')
-city_viz('Bangkok',df_rf_rst,'rf_model')
-city_viz('Can_Tho',df_rf_rst,'rf_model')
-city_viz('Melaka',df_rf_rst,'rf_model')
-city_viz('Mumbai',df_rf_rst,'rf_model')
-city_viz('Panama_City',df_rf_rst,'rf_model')
-city_viz('Pune',df_rf_rst,'rf_model')
-city_viz('Salvador',df_rf_rst,'rf_model')
-city_viz('Santa_Fe',df_rf_rst,'rf_model')
-city_viz('Santiago',df_rf_rst,'rf_model')
-city_viz('Semarang',df_rf_rst,'rf_model')
-city_viz('Surat',df_rf_rst,'rf_model')
-```
-
-## Random Forest Model (Caret)
-### 3 variables trees
-```{r 3 variable trees, warning = FALSE, message = FALSE, cache = TRUE }
-
-sample <- sample.split(net_tt_nor$city, SplitRatio = 0.8)
-train  <- subset(net_tt_nor, sample == TRUE) 
-test   <- subset(net_tt_nor, sample == FALSE)
-
-df_model_tr <- train%>%dplyr::select(!c(uniqueID,city))
-
-train_control <- trainControl(
-  method = "cv",        # Cross-validation
-  number = 10,          # Number of folds in the cross-validation
-  verboseIter = TRUE    # Print training log
-)
-set.seed(4326)
-grid <- expand.grid(mtry = c(10,12,14,16))
-rf_model <- train(count ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = grid)
-
-predictions <- predict(rf_model, test)
-actual <- test$count
-
-rmse_value <- rmse(actual, predictions)
-r_squared <- cor(actual, predictions)^2
-
-df_rf_rst <- net_total%>%mutate(Prediction = predict(rf_model,net_total))
-df_rf_rst_temp <- st_drop_geometry(risk_level(df_rf_rst,'kmeans')) %>%dplyr::select(Risk_Category)
-df_rf_rst <- cbind(df_rf_rst,df_rf_rst_temp)
-
-risk_v <-function(model_data,litter_data,model,city){
-  model_data$Risk_Category <- as.factor(model_data$Risk_Category)
->>>>>>> Stashed changes
-  ggplot() +
-    geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
-    geom_sf(data = litter_data, size = .3, colour = "red") +
-    scale_fill_viridis(discrete = TRUE) +
-    labs(title=paste("Litter Risk Predictions",city,sep = '--'),
-         subtitle= model) +
-    mapTheme(title_size = 8)
-}
-```
-
-```{r rst total, warning = FALSE, message = FALSE, cache = TRUE }
-rst_total <- rst_total %>%
-  mutate(Prediction = 0.4*Pre_rf + 0.6*Pre_lr)
-rst_total <- risk_level(rst_total,'kmeans')
-
-
-city_viz_new('Chennai',test_cbind,'lr_model')
-city_viz_new('Chennai',df_rf_rst,'rf_model')
-city_viz_new('Chennai',rst_total,'mixed_model')
+      
+# Grid arrange the plots
+grid.arrange(risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka, risk_Mumbai,
+             risk_Panama_City, risk_Pune, risk_Salvador, risk_Santa_Fe,
+             risk_Santiago, risk_Semarang, risk_Surat, nrow = 4)
 ```
 
 
-```{r rst total 4, warning = FALSE, message = FALSE, cache = TRUE }
-rst_total4 <- rst_total %>%
-  st_transform(4326)
+# Model and Error Analysis
 
-city_viz_new('Chennai',rst_total4,'mixed_model')
-city_viz_new('Bangkok',rst_total4,'mixed_model')
-city_viz_new('Can_Tho',rst_total4,'mixed_model')
-city_viz_new('Melaka',rst_total4,'mixed_model')
-city_viz_new('Mumbai',rst_total4,'mixed_model')
-city_viz_new('Panama_City',rst_total4,'mixed_model')
-city_viz_new('Pune',rst_total4,'mixed_model')
-city_viz_new('Salvador',rst_total4,'mixed_model')
-city_viz_new('Santa_Fe',rst_total4,'mixed_model')
-city_viz_new('Santiago',rst_total4,'mixed_model')
-city_viz_new('Semarang',rst_total4,'mixed_model')
-city_viz_new('Surat',rst_total4,'mixed_model')
-```
-
-# Model Results
-
-# Model Analysis
+# Web-Based Dashboard
 
 # Conclusion
+
+# Sources
+
+Data Sources
+* 
+
+Image Sources
+* 
+
+

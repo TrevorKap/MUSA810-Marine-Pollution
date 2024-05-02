@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
 
  /*------------- Whole Document---------------- */
 
 body, html {
-  font-family: "Open Sans";
+  font-family: "Lexend";
   font-size: 14px;
   margin: 0;
   padding: 0;

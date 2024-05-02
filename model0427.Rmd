@@ -278,7 +278,7 @@ show_best(rf_results, metric = "rmse")
 ```{r}
 final_rf <- finalize_workflow(
   rf_workflow,
-  select_best(rf_results, "rmse")
+  select_best(rf_results, metric = "rmse")
 )
 final_rf <- last_fit(final_rf, split = net_tt_split )
 
