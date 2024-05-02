@@ -557,11 +557,13 @@ test_cbind <- cbind(test_cbind,temp_risk_cat)
 city_viz('Chennai',test_cbind,'Linear Regression Model')
 ```
 
-## Multi-Vision Model Evaluation
+## Multi-Vision Model Evaluation & Comparison
 
-Both Random Forest regressions and Linear Regressions have their benefits and drawbacks. The Random Forest model is known for its ability to handle large datasets and high dimensionality, but can be prone to overfitting and cannot handle 'data noise' as well as a Linear model. Random Forest models also tend to outperform linear regression in prediction accuracy when there are non-linear relationships between dependent and independent variables. We did not assume a linear or non-linear relationship between litter and the independent variables which also emphasizes the multi-modal approach. The Linear Regression model is known for its simplicity, but can be prone to underfitting and may not perform well if there is non-linear relationships among the variables. To evaluate the performance of both models, we compare the residuals of the both models by plotting them on a histogram to visualize the distribution and a scatter plot to for the relationship. 
+Both Random Forest regressions and Linear Regressions have their benefits and drawbacks. The Random Forest model is known for its ability to handle large datasets and high dimensionality, but can be prone to overfitting and cannot handle 'data noise' as well as a Linear model. Random Forest models also tend to outperform linear regression in prediction accuracy when there are non-linear relationships between dependent and independent variables. We did not assume a linear or non-linear relationship between litter and the independent variables which also emphasizes the multi-modal approach. The Linear Regression model is known for its simplicity, but can be prone to underfitting and may not perform well if there is non-linear relationships among the variables. To evaluate the performance of both models, we compare the residuals by plotting them on a histogram to visualize the distribution and a scatter plot for the relationship. 
 
-The RandomForest scatterplot shows a weak relationship between the actual and predicted values, with an underestimation of actual values that when the value exceed 2. These results tell us the model can indicate lower-risk areas better than higher-risk areas. Meanwhile the Linear Regression residuals have a similar result but has slightly more curvature which indicates greater performance when predicting places with higher actual values. 
+The RandomForest scatterplot shows a weak relationship between the actual and predicted values, with an underestimation of the actual when the value exceed 2. These results tell us the model can indicate lower-risk areas better than higher-risk areas but have yet to identify a correlation between the independent and dependent variables. Meanwhile the Linear Regression residuals have a similar result but has slightly more curvature in the line of best fit (shown in green) which indicates mildly better performance when predicting places with higher actual values. 
+
+The histograms explain the same story differently. The Linear Model has residuals that over and underpredict the actual values, while the Random Forest consistently underpredicts the actual values. Now these results are where the mixed-model approach is incorporated. We must note that the data itself is already bias and skewed because of the inherent nature of litter, and the true verification of the model's integrity is the real-world comparison to where it predicts. 
 
 ```{r multi-vision model eval, warning = FALSE, message = FALSE, cache = TRUE}
 # rf model result -- ts_bind
@@ -593,14 +595,22 @@ ggplot(lr_test, aes(x = count, y = Prediction)) +
   plotTheme()
 
 ggplot(lr_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") + plotTheme()
+  geom_histogram(bins = 30, fill = "grey") + 
+  geom_vline(xintercept = 0, linetype="dashed", 
+                color = "black") +
+  labs(title = "Linear Model Residuals")+
+  plotTheme()
 
 ggplot(rf_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") + plotTheme()
+  geom_histogram(bins = 30, fill = "grey") +
+   geom_vline(xintercept = 0, linetype="dashed", 
+                color = "black") +
+  labs(title = "Random Forest Model Residuals")+
+  plotTheme()
 ```
 
-Mixed MOdel
-The QQ plot to visualize the normality of the residuals.
+The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest.
+
 
 
 ```{r mixed rst, warning = FALSE, message = FALSE, cache = TRUE }
@@ -612,7 +622,9 @@ mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
 
 ggplot(mixed_rst, aes(x = Residuals)) + 
   geom_histogram(bins = 30, fill = "grey")+ 
-  ggtitle("Histogram of Residuals") +  # Add a title
+  geom_vline(xintercept = 0, linetype="dashed", 
+                color = "black") +
+  ggtitle("Histogram of Mixed-Model Residuals") +  # Add a title
   xlab("Values") +  # Label for the x-axis
   ylab("Frequency") +  # Label for the y-axis
   plotTheme()
