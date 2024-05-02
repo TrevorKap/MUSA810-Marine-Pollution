@@ -175,12 +175,20 @@ mapTheme <- function(base_size = 10, title_size = 14) {
 # Exploratory Data Analysis
 
 ## Data Sources
+
+Data Sources: *
+
+Image Sources *
+
+prettydoc::html_pretty: theme: leonids
+
 ### Marine Debris Tracker 
 
 In terms of our data & variables, our primary environmental health indicator, marine debris/litter, was acquired via manual download from Marine Debris Tracker (<https://www.debristracker.org/data/>). The Marine Debris Tracker is a web-application & public-use database that tracks all recorded global litter disposal efforts from participating organizations. The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over the several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Some cities included as few as ~500 data points. Despite the repeated process of the model itself, results and accuracy laid contingent on data quantity and external factors available to each region. 
 
 ### OpenStreetMap Data
 
+OpenStreetMap (OSM) data was used to provide additional context to the litter data. OSM featured land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
 ### Other Data
 
@@ -197,6 +205,15 @@ After the boundary box was created, the data was then projected to a fishnet gri
 Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
 ## Feature Engineering
+
+Each aspect of the data gathering, through manual download, creation, or API, can now be coalesced into one cohesive concept. 
+
+```{r fishnetimage}
+knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/pictures/FishnetProcessSlide.png")
+
+```
+
+
 ```{r chennai data, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 #step to load city's data
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
@@ -639,13 +656,4 @@ grid.arrange(risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semara
 
 # Conclusion
 
-# Sources
 
-Data Sources
-* 
-
-Image Sources
-* 
-
-prettydoc::html_pretty:
-    theme: leonids
