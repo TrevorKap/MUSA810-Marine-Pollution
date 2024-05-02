@@ -178,11 +178,9 @@ mapTheme <- function(base_size = 10, title_size = 14) {
 
 ## Data Sources
 
-Data Sources: *
+Data Sources: [Marine Debris Tracker](https://www.debristracker.org/data/), [OpenStreetMap](https://www.openstreetmap.org/), [Google My Maps](https://www.google.com/mymaps)
 
-Image Sources *
-
-prettydoc::html_pretty: theme: leonids
+Research & Partnership:[Ocean Conservancy/Urban Ocean](https://www.oceanconservancy.org/urban-ocean/), [Resilient Cities Network](https://resilientcitiesnetwork.org/), 
 
 ### Marine Debris Tracker 
 
@@ -609,8 +607,11 @@ ggplot(rf_test, aes(x = Residuals)) +
   plotTheme()
 ```
 
-The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest.
+The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk. 
 
+The next visual features all three models compared. Here we see the Multi-Vision (bottom) having the best bell-curve representation. The Linear Model (middle) has a less consistent, duel distribution and is not as ideal as the Multi-Vision. The Random Forest (top) has a more consistent distribution but is not as accurate as the Multi-Vision because of the greater skew. The Multi-Vision model is the best performer.
+
+Now we examine the scatterplot of multi-vision residuals. It still shows an identical relationship as the previous two, which may not be as desired, but also does not tell the full story. The model is not perfect, but it is the best performer in the context of the data and the model's purpose. The meaning of the model is better explained by the Q-Q plot. The Q-Q plot shows the residuals of the model in comparison to a normal distribution of the actual dataset. The closer the points are to the 45-degree line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are not perfectly aligned but are very close for the most part, creating a mild curvature in the middle, indicating skewness in the data. However, the tail-end of the points of higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles. Overall, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
 
 ```{r mixed rst, warning = FALSE, message = FALSE, cache = TRUE }
@@ -624,7 +625,7 @@ ggplot(mixed_rst, aes(x = Residuals)) +
   geom_histogram(bins = 30, fill = "grey")+ 
   geom_vline(xintercept = 0, linetype="dashed", 
                 color = "black") +
-  ggtitle("Histogram of Mixed-Model Residuals") +  # Add a title
+  ggtitle("Histogram of Multi-Vision Residuals") +  # Add a title
   xlab("Values") +  # Label for the x-axis
   ylab("Frequency") +  # Label for the y-axis
   plotTheme()
@@ -642,7 +643,8 @@ ggplot(mixed_rst, aes(x = count, y = Prediction)) +
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  labs(x = "Actual Value", y = "Predicted Value", title = 'Mixed Model Residuals') +
+  geom_smooth(color= "darkgreen")+
+  labs(x = "Actual Value", y = "Predicted Value", title = 'Multi-Vision Residuals') +
   plotTheme()
 
 ggplot(mixed_rst, aes(sample = Residuals)) +
@@ -655,6 +657,9 @@ ggplot(mixed_rst, aes(sample = Residuals)) +
 ```
 
 ## Multi-Vision Model Build
+
+The Random Forrest and Linear models are depicted side-by-side. When creating our final results, as mentioned, both are given equal weight input. We are looking for where the two models coincide and contrast in their predictions for litter assessment. These two results then provide an area where to dedicate zero-waste site resources. The final map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generality develops a definitive solution and action plan for Urban Ocean. 
+
 ```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
   dplyr::select(Prediction,Risk_Category)%>%
@@ -677,6 +682,8 @@ city_viz('Chennai',rst_total,'Mixed Model')
 
 # Model Results
 
+As Chennai, India being our example city for our model, the purpose of the demonstration is to also prove replicability among other cities. As a result, we have applied the model to 11 other cities around the world. The results are shown below. Each city has its own unique characteristics and features that are evaluated with the same variables. The results are shown in the 5-category risk levels and are consistent with the Chennai example. Each city has its own special results that cater to the local context. This newly found insight shall narrow the area of focus for Urban Ocean's zero-waste sites, empower the local community, and provide a more sustainable future. 
+
 ```{r all risk maps mixed model, warning = FALSE, message = FALSE, cache = TRUE }
 risk_v_new <-function(model_data,litter_data,model,city){
   model_data$Risk_Category <- as.factor(model_data$Risk_Category)
@@ -692,18 +699,18 @@ city_viz_new <- function(cities,data,model){
   risk_v_new(temp,get(cities),model,cities)
 }
 
-risk_Chennai <- city_viz_new('Chennai', rst_total, 'Chennai')
-risk_Bangkok <- city_viz_new('Bangkok', rst_total, 'Bangkok')
-risk_Can_Tho <- city_viz_new('Can_Tho', rst_total, 'Can Tho')
-risk_Melaka <- city_viz_new('Melaka', rst_total, 'Melaka')
-risk_Mumbai <- city_viz_new('Mumbai', rst_total, 'Mumbai')
-risk_Panama_City <- city_viz_new('Panama_City', rst_total, 'Panama City')
+risk_Chennai <- city_viz_new('Chennai', rst_total, 'Chennai, India')
+risk_Bangkok <- city_viz_new('Bangkok', rst_total, 'Bangkok, Thailand')
+risk_Can_Tho <- city_viz_new('Can_Tho', rst_total, 'Can Tho, Vietnam')
+risk_Melaka <- city_viz_new('Melaka', rst_total, 'Melaka, Malaysia')
+risk_Mumbai <- city_viz_new('Mumbai', rst_total, 'Mumbai, India')
+risk_Panama_City <- city_viz_new('Panama_City', rst_total, 'Panama City, Panama')
 risk_Pune <- city_viz_new('Pune', rst_total, 'Pune')
-risk_Salvador <- city_viz_new('Salvador', rst_total, 'Salvador')
-risk_Santa_Fe <- city_viz_new('Santa_Fe', rst_total, 'Santa Fe')
-risk_Santiago <- city_viz_new('Santiago', rst_total, 'Santiago')
-risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang')
-risk_Surat <- city_viz_new('Surat', rst_total, 'Surat')
+risk_Salvador <- city_viz_new('Salvador', rst_total, 'Salvador, Brazil')
+risk_Santa_Fe <- city_viz_new('Santa_Fe', rst_total, 'Santa Fe, Argentina')
+risk_Santiago <- city_viz_new('Santiago', rst_total, 'Santiago, Chile')
+risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang, Indonesia')
+risk_Surat <- city_viz_new('Surat', rst_total, 'Surat, India')
 
       
 
@@ -713,8 +720,6 @@ grid.arrange(risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semara
              nrow = 2)
 ```
 
-
-# Model and Error Analysis
 
 # Web-Based Dashboard
 
