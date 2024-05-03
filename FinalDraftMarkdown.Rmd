@@ -758,7 +758,6 @@ ggplot(rf_test, aes(x = count, y = Prediction)) +
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
                linetype = "dotted", color = "red") +  
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  geom_smooth(color= "darkgreen")+
   labs(x = "Actual Value", y = "Predicted Value", title = "RandomForest Model Residuals") +
   plotTheme()
 
@@ -767,7 +766,6 @@ ggplot(lr_test, aes(x = count, y = Prediction)) +
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  geom_smooth(color= "darkgreen")+
   labs(x = "Actual Value", y = "Predicted Value", title = "Linear Regression Model Residuals") +
   plotTheme()
 
@@ -835,7 +833,6 @@ ggplot(mixed_rst, aes(x = count, y = Prediction)) +
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  geom_smooth(color= "darkgreen")+
   labs(x = "Actual Value", y = "Predicted Value", title = 'Multi-Vision Residuals') +
   plotTheme()
 
