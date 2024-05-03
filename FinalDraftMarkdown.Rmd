@@ -24,6 +24,29 @@ editor_options:
 
 ## Background
 
+Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilizes cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
+
+With these efforts, each campaign requires an evaluation of local context and detailed understanding of the city's systems and dynamic. This aspect of the process requires long-term planning and methodical decision-making to understand the pre-existing conditions in place. Hence, our model aims to streamline the process of understanding the general structure of each city-context and provide a comprehensive solution on where efforts and resources should be allocated to. Ultimately saving time on where to implement their waste-reduction strategies. 
+
+We based our focus on various cities from the Resilient Cities Network and Urban Ocean program. The Resilient Cities Network is a coalition of cities around the world that assist one another in building safer, more sustainable, and equitable futures for their populations. Each of which shares their knowledge, experiences, and policy practices to empower one another. A subsection of the Resilient Cities Network is the Urban Ocean program, a partnership with Ocean Conservancy tackling the ocean plastic problem. The city displayed as the example for our model is Chennai, India. The city is apart of the Urban Oceans 12 city network with the goal of proactively enhancing their sanitation infrastructure to combat plastic pollution in their region.
+
+The 12 participating cities apart of the Urban Ocean program as of May 2024 are: <font size="4"> 
+
+  1. Can Tho, Vietnam
+  2. Chennai, India
+  3. Melaka, Malaysia
+  4. Mumbai, India
+  5. Panama City, Panama
+  6. Pune, India
+  7. Santiago, Chile
+  8. Semarang, Indonesia
+  9. Surat, India
+  10. Bangkok, Thailand
+  11. Santa Fe, Argentina
+  12. Salvador, Brazil
+
+</font> 
+
 ## Motivation and Use Case
 
 Pollution is a global problem that takes many forms contaminating every
@@ -177,10 +200,11 @@ mapTheme <- function(base_size = 10, title_size = 14) {
 
 # Exploratory Data Analysis
 
-## Understanding the Data
+## Data Sources
 
-### Marine Debris Tracker
+Data Sources: [Marine Debris Tracker](https://www.debristracker.org/data/), [OpenStreetMap](https://www.openstreetmap.org/), [Google My Maps](https://www.google.com/mymaps)
 
+<<<<<<< HEAD
 ### OpenStreetMap Data
 
 ### Other Data
@@ -206,13 +230,49 @@ Ideal locations featured several thousand data points across 2-3 years
 for early & late stage model development. Despite the scalability of the
 model itself, results and accuracy lay contingent on data quantity and
 external factors available to each region.
+=======
+Research & Partnership:[Ocean Conservancy/Urban Ocean](https://www.oceanconservancy.org/urban-ocean/), [Resilient Cities Network](https://resilientcitiesnetwork.org/), 
+
+### Marine Debris Tracker 
+
+In terms of our data & variables, our primary environmental health indicator, marine debris/litter, was acquired via manual download from Marine Debris Tracker (<https://www.debristracker.org/data/>). The Marine Debris Tracker is a web-application & public-use database that tracks all recorded global litter disposal efforts from participating organizations. The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over the several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Some cities included as few as ~500 data points. Despite the repeated process of the model itself, results and accuracy laid contingent on data quantity and external factors available to each region. 
+
+### OpenStreetMap Data
+
+OpenStreetMap (OSM) data was used to provide additional context to the litter data. OSM featured land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
+
+### Other Data
+
+For our model, we directed our focus on data modeling from the Urban Ocean cities. To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using Google My Maps (<https://www.google.com/mymaps>) or sourced online. Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard. 
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 
 After the boundary box was created, the data was then projected to a
 fishnet grid. The fishnet grid was used to count the number of litter
 points in each cell in a format that can be compared to by each grid
 cell in the city.
 
+<<<<<<< HEAD
 ## Feature Engineering
+=======
+
+### Understanding the Data
+
+Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Overall the goal of the data gathering and variables chosen provide a model an understanding the city itself, and in turn understand the systems in place and the environment assessment needed. 
+
+## Extract, Transform, Loading (ETL) Process
+
+Each aspect of the data gathering, through manual download, creation, or API, can now be coalesced into one cohesive visual. As mentioned with the 500x500 meter grid, all variables including litter as measuring based on an attribute regarding the cells. This grid is structure by the boundary box created from Google My Maps. This boundary file projects the city and defines its boundary on where the model is evaluating. Boundary files for our data are knowingly compatible with KML or GEOJSON files, or other file types that can be converted to raster layers. 
+
+For example, our litter data is not counted as individual data points for model development, but rather a sum of points within each cell. This allows for a better indication of frequency and density of litter in each area. The same method is applied to our dependent variables as well for uniformed formatted and consistency in structure. Below code & figure 3 demonstrate the example process of importing the litter CSV, boundary KML, and the creation of the overlay used for data exploration and analysis. 
+
+### Figure 3
+
+```{r fishnetimage}
+knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/pictures/FishnetProcessSlide.png")
+
+```
+
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 
 ```{r chennai data, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 #step to load city's data
@@ -351,6 +411,7 @@ net_total_li <- net_total_li %>%
 
 ```
 
+<<<<<<< HEAD
 ## Mapping
 
 The litter data features a wide variety of item categories and general
@@ -404,6 +465,39 @@ flow of goods, and interconnection of urban systems. Areas of low
 distances of a "nearest neighbor" imply restaurants are close to one
 another geographically, indicate density in resources, and identify an
 urban core.
+=======
+
+## Feature Engineering I
+
+The litter data features a wide variety of item categories and general information about each piece. Despite the quality of detail for each recorded sample, this only accounts for litter that has been identified, recorded, and disposed of. This data does not account for litter that was identified but never disposed of, accounted for, or assumed. Regardless, areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Hence, the purpose of the model is to predict where litter is most likely to accumulate within the city based on the data available. 
+
+Figure 2 shown below depicts the dependent variables used for model development. Each serve their own purpose in characterizing the city that is evaluated. Social & economic activities are depicted using restaurants and population density. Restaurants are an indication of commercial corridors and general 'downtown' aesthetic that attracts large populations, typically located in central hubs of urban activity. Their presence, especially when in clusters, can indicate a higher likelihood of commercial hubs and in turn program the model to classify these areas as major activity. Another metric for characterizing a city landscape is population density. Regardless of population itself, density is a key factor in determining where people are located in relation to the rest of the city. This metric supports our geospatial assessment in determining relative risk of litter accumulation, rather than independent probability. 
+
+Geomorphology describes the city's physical geography for the model. Trash, when moved around by nature, weather, human activity, can a higher probability of moving towards lower elevations and bodies of water. Using water distribution as a factor accomplishes two pieces of information in one variable. Naturally, water distribution displays where water is located. When trash makes contact with a body of water, it rarely exists, requiring cleanup intervention to remove it, acting as an indication of higher risk. Secondly, it acts as a general but not definite idea of terrain. Proximity to water does not fully account or indicate for elevation, but it does provide a general idea of a path of travel for loose trash naturally moving. 
+
+Waste management or waste facilities serve the purpose off collecting, storing, transporting, recycling, and disposing of waste in an area to prevent or minimize adverse effects on the environment and public health of an area. These facilities act as a factor of litter risk because of their location in relation to the city center, where litter has been located, and their capabilities to cover their assign jurisdiction. Their critical role in the sanitation infrastructure and system in a city is a key factor in understanding any operation weaknesses. 
+
+Landuse is a general indicator of the city's zoning and urban planning. Industrial zones, for example, are likely to have litter accumulation due to the nature of the activities. Residential zones, on the other hand, are less likely to have litter accumulation due to the opposite nature. The model uses landuse to potentially discover patterns in the city that may not necessarily be identified by intuition alone, but is still important is creating the picture of how an area is structured. With this generalization in mind, zoning alone is not enough for describing landuse. Roads also are a vaiable incorporated into the model to frame the network of the city, also acting as a proxy to density. Grid streets or segments closer together often represent denser, potentially taller buildings that represent activity, as well as vise-versa. Hence, each variable is a general feature known to be present in every city and allows for replicated use to any place in the world. 
+
+### Figure 2
+
+```{r Variables, warning = FALSE, message = FALSE, cache = TRUE }
+knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/pictures/Variables.png")
+
+```
+
+## Feature Engineering II
+
+In addition to the dependent variables in their counted presence, we implemented a K-Nearest Neighbor analysis (also displayed) to determine the proximity of each data point to one another and incorporate that as an additional variable to our model. K-Nearest Neighbor (KNN) allows us to find the proximity of another variant to determine commercial/high activity spots in the area. The nearest neighbor factor was repeated for land-use, roads, restaurants, water, and waste facilities. We added KNN as a factor to place emphasis on density and location-based processing. This addition acts as a fail-safe for our model's cell calculation given that examining count alone does not incorporate the real-world application of proximity. 
+
+Local Moran's I measures spatial autocorrelation which measures the degree of spatial relationship between observations, measuring how closer values are clustered in a space. We measure these among the dependent and independent variables to factor in any spatial lags identified within the region. Similar to KNN in terms of purpose, this factor allows the model to understand the relationship between the dependent and independent variables and apply that relationship in its calculations for each cell.
+
+The visualized examples (Figure 3) display what the model is interpreting when making interpreting the independent variables. The examples are, waste management facilities (waste), water (streams, ponds, canals, etc), restaurants, and zoning (industrial, residential, retail). The overall  selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing an indication on where litter most likely accumulated or ends up. Each variable is then placed on a combined fishnet grid with the litter data, and evaluated for association between the variables and litter. 
+
+### Figure 3
+
+The visuals showing 'count' measure the number of parcels with the zone or number of buildings within the cells and does not account for density. The nearest neighbor maps ('Variable'_nn) measured their proximity on a gradient scale, with the darker colors indicating closer proximity.
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 
 ```{r waste map, warning = FALSE, message = FALSE}
 library(ggplot2)
@@ -446,7 +540,14 @@ grid.draw(
 
 ```
 
+<<<<<<< HEAD
 ```{r visualize nearest neighbour, warning = FALSE, message = FALSE }
+=======
+
+
+
+```{r visualize nearest neighbour, warning = FALSE, message = FALSE, cache = TRUE }
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 map_water_nn <- visual_count(net_chennai,'water_nn')
 map_restaurant_nn <- visual_count(net_chennai,"restaurant_nn")
 map_road_nn <- visual_count(net_chennai,'road_nn')
@@ -478,6 +579,7 @@ grid.draw(
 
 ## Principal Component Analysis
 
+<<<<<<< HEAD
 The PCA analysis below is used to identify the most important variables
 in the dataset and their correlation with litter. The reason why we
 perform PCA is to decrease the dimension of variable. The following
@@ -488,6 +590,20 @@ restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn,
 industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn,
 road_sig_dis, residential_sig, restaurant_sig, restaurant' as the
 'shortened model' independent variables.
+=======
+The Principal Component Analysis (PCA) is a dimensional reduction technique used to transform high-dimensional data into a lower-dimensional space while preserving as much variance as possible. The PCA below is used to identify the most important variables in the dataset and their correlation with litter, ultimately creating synthetic variables that can augment the data input for the model. 
+
+The first output depicts the general metrics found in the independent variables, such as standard deviation, variance, and the proportion of variance explained by each component. 
+
+The Eigenvalues from the PCA are shown in the second graph. The Eigenvalues are the amount of variance explained by each component, quantifying the importance of each component in the dataset. The first dimension explains the vast majority of the variance, with a sharp decrease thereafter. This means that we only need 1 dimension of overlap when evaluating our model and additional dimensions of evaluation will not be useful thereafter. 
+
+The PCA Variables graph shows the correlation of each variable in comparison to the first two dimensions. The arrows that represent each variable have varying directions and lengths, indicating mostly little correlation between the first dimension and second dimension. But the few variables that have relatively longer lengths have stronger relationships between both dimensions and can be used for the model. To better understand their importance we evaluate their Squared Cosine. 
+
+The squared cosine value (Cos2) in the third graph shows the quality of the representation of the variables on the factor map. The closer the value is to 1, the better the representation of the variable. What we notice particularly about these variables with the largest quality of representation is that they are statistical factor rather than a numeric value. Almost each independent variable with a ~0.75 value is either a KNN or significance value. The only exception being sum_pop (population density) and avg_pop (average population). 
+
+Similar to the second graph, highest correlation among the dependent and independent variables can be explained by the color and direction in the last graph. The last PCA graph is the basis for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables. Each variable with a '_sig' suffix indicates where the presence of the variable, considering KNN and Moran's I, have significant impact on where the dependent variable, litter, is located. 
+
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 
 ```{r PCA analysis, warning = FALSE, message = FALSE, cache = TRUE }
 corr <- st_drop_geometry(net_total) %>% dplyr::select(!c(uniqueID,cvID,city,country))
@@ -509,10 +625,18 @@ fviz_pca_var(data.pca, col.var = "cos2",
 
 # Model Building
 
-## Random Forest Model 1
+Our model goal is to predict the relative likelihood of litter accumulation in a given area based on the independent variables. The model will be built using the Random Forest and Linear Regression algorithms. The Random Forest model is a machine learning algorithm that uses an ensemble of decision trees to predict the likelihood of an event occurring, the event being the presence of trash. The Linear Regression model is a statistical model that uses a linear relationship between the dependent and independent variables to predict the continuous value of litter being present. We take both of these models/results and compare them to determine a mixed-use approach that factors both results with equal weight. 
 
+## Random Forest Model 
+
+The following random forest model utilizes the 'TidyModels' package. The data is then split to a 75-25 train-test set. We specify the randomforest to function as a 'regression' to specify the type of output to be evaluated, that being the 'count' of litter in each cell. The data is then divided into 10 folds for cross-validation to measure accuracy among each iteration. The model is then tuned using a grid search to find the optimal hyperparameters at each level of different tree (decision) size, ranging between 500 - 2000 decisions. The best-performing model iteration is selected based on the Root-mean-square deviation metric, measuring the accuracy of the forecasted results of each decision. The mean error depicted in the table by each forest (iteration) lies around 0.844 - 0.847. The first result, Preprocessor1_Model10, has the best result with the lowest RMSE of 0.844. This model will be used for our final mixed-used approach.
+
+
+<<<<<<< HEAD
 The following random forest model utilizes the TidyModels package.
 
+=======
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 ```{r rf tidymodels, warning = FALSE, message = FALSE, cache = TRUE }
 
 set.seed(123)
@@ -581,6 +705,11 @@ df_rf_rst <- cbind(net_total,temp_cat)
 
 ## Linear Model
 
+<<<<<<< HEAD
+=======
+The linear regression model, also built from 'TidyModels', takes a similar approach to predicting the count of litter in each cell. The model is trained using the same train-test split as the Random Forest using the 'lm' method, known as a linear method. Next, it is trained using the 'quasi' family to account for the overdispersion of the data. Then cross-validated using 60 folds to measure the accuracy. The results are then shown in the map below in terms of a risk-level category. Level 1 being the lowest, assuming little-no litter risk, and 5 being the highest, our newly 'selected' site areas to direct zero-waste sites on. The map depicting Chennai, India shows a scatter of category-5 assessment areas depicting the far north and south of the city to be the primary areas of focus. These areas are also not where our litter data was recorded which shows the model's ability to predict areas of high risk without prior data, exactly as intended.
+
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 ```{r linear model, warning = FALSE, message = FALSE, cache = TRUE }
 set.seed(223)
 train_control <- trainControl(method = "cv", number = 60)
@@ -593,11 +722,28 @@ test_cbind <- cbind(net_total,test_temp)%>%
 
 temp_risk_cat <- st_drop_geometry(risk_level(test_cbind,'kmeans')) %>%dplyr::select(Risk_Category)
 test_cbind <- cbind(test_cbind,temp_risk_cat)
+<<<<<<< HEAD
 ```
 
 ## Multi-Vision Model Evaluation
 
 ```{r multi-vision model eval, warning = FALSE, message = FALSE}
+=======
+
+city_viz('Chennai',test_cbind,'Linear Regression Model')
+```
+
+## Multi-Vision Model Evaluation & Comparison
+
+Both Random Forest regressions and Linear Regressions have their benefits and drawbacks. The Random Forest model is known for its ability to handle large datasets and high dimensionality, but can be prone to overfitting and cannot handle 'data noise' as well as a Linear model. Random Forest models also tend to outperform linear regression in prediction accuracy when there are non-linear relationships between dependent and independent variables. We did not assume a linear or non-linear relationship between litter and the independent variables which also emphasizes the multi-modal approach. The Linear Regression model is known for its simplicity, but can be prone to underfitting and may not perform well if there is non-linear relationships among the variables. To evaluate the performance of both models, we compare the residuals by plotting them on a histogram to visualize the distribution and a scatter plot for the relationship. 
+
+The RandomForest scatterplot shows a weak relationship between the actual and predicted values, with an underestimation of the actual when the value exceed 2. These results tell us the model can indicate lower-risk areas better than higher-risk areas but have yet to identify a correlation between the independent and dependent variables. Meanwhile the Linear Regression residuals have a similar result but has slightly more curvature in the line of best fit (shown in green) which indicates mildly better performance when predicting places with higher actual values. 
+
+The histograms explain the same story differently. The Linear Model has residuals that over and underpredict the actual values, while the Random Forest consistently underpredicts the actual values. Now these results are where the mixed-model approach is incorporated. We must note that the data itself is already bias and skewed because of the inherent nature of litter, and the true verification of the model's integrity is the real-world comparison to where it predicts. 
+
+```{r multi-vision model eval, warning = FALSE, message = FALSE, cache = TRUE}
+# rf model result -- ts_bind
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 
 rf_test <- ts_bind %>% dplyr::select(count,Prediction)
 
@@ -612,6 +758,7 @@ ggplot(rf_test, aes(x = count, y = Prediction)) +
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
                linetype = "dotted", color = "red") +  
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
+  geom_smooth(color= "darkgreen")+
   labs(x = "Actual Value", y = "Predicted Value", title = "RandomForest Model Residuals") +
   plotTheme()
 
@@ -620,16 +767,41 @@ ggplot(lr_test, aes(x = count, y = Prediction)) +
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
+  geom_smooth(color= "darkgreen")+
   labs(x = "Actual Value", y = "Predicted Value", title = "Linear Regression Model Residuals") +
   plotTheme()
 
 ggplot(lr_test, aes(x = Residuals)) + 
+<<<<<<< HEAD
   geom_histogram(bins = 30, fill = "grey") + plotTheme()
+=======
+  geom_histogram(bins = 30, fill = "grey") + 
+  geom_vline(xintercept = 0, linetype="dashed", 
+                color = "black") +
+  labs(title = "Linear Model Residuals")+
+  plotTheme()
+
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 ggplot(rf_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") + plotTheme()
+  geom_histogram(bins = 30, fill = "grey") +
+   geom_vline(xintercept = 0, linetype="dashed", 
+                color = "black") +
+  labs(title = "Random Forest Model Residuals")+
+  plotTheme()
 ```
 
+<<<<<<< HEAD
 ```{r mixed rst, warning = FALSE, message = FALSE}
+=======
+The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk. 
+
+The next visual features all three models compared. Here we see the Multi-Vision (bottom) having the best bell-curve representation. The Linear Model (middle) has a less consistent, duel distribution and is not as ideal as the Multi-Vision. The Random Forest (top) has a more consistent distribution but is not as accurate as the Multi-Vision because of the greater skew. The Multi-Vision model is the best performer.
+
+Now we examine the scatterplot of multi-vision residuals. It still shows an identical relationship as the previous two, which may not be as desired, but also does not tell the full story. The model is not perfect, but it is the best performer in the context of the data and the model's purpose. The meaning of the model is better explained by the Q-Q plot. The Q-Q plot shows the residuals of the model in comparison to a normal distribution of the actual dataset. The closer the points are to the 45-degree line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are not perfectly aligned but are very close for the most part, creating a mild curvature in the middle, indicating skewness in the data. However, the tail-end of the points of higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles. Overall, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
+
+
+```{r mixed rst, warning = FALSE, message = FALSE, cache = TRUE }
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
   rename(lr_pred = Prediction,
          rf_pred = 'rf_test$Prediction') %>%
@@ -638,9 +810,17 @@ mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
 
 ggplot(mixed_rst, aes(x = Residuals)) + 
   geom_histogram(bins = 30, fill = "grey")+ 
+<<<<<<< HEAD
   ggtitle("Histogram of Residuals") + 
   xlab("Values") + 
   ylab("Frequency") + 
+=======
+  geom_vline(xintercept = 0, linetype="dashed", 
+                color = "black") +
+  ggtitle("Histogram of Multi-Vision Residuals") +  # Add a title
+  xlab("Values") +  # Label for the x-axis
+  ylab("Frequency") +  # Label for the y-axis
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
   plotTheme()
 
 grid.arrange(
@@ -655,7 +835,8 @@ ggplot(mixed_rst, aes(x = count, y = Prediction)) +
   geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
                linetype = "dotted", color = "red") +  # Residual lines
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  labs(x = "Actual Value", y = "Predicted Value", title = 'Mixed Model Residuals') +
+  geom_smooth(color= "darkgreen")+
+  labs(x = "Actual Value", y = "Predicted Value", title = 'Multi-Vision Residuals') +
   plotTheme()
 
 ggplot(mixed_rst, aes(sample = Residuals)) +
@@ -669,7 +850,13 @@ ggplot(mixed_rst, aes(sample = Residuals)) +
 
 ## Multi-Vision Model Build
 
+<<<<<<< HEAD
 ```{r multi-vision model build, warning = FALSE, message = FALSE}
+=======
+The Random Forrest and Linear models are depicted side-by-side. When creating our final results, as mentioned, both are given equal weight input. We are looking for where the two models coincide and contrast in their predictions for litter assessment. These two results then provide an area where to dedicate zero-waste site resources. The final map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generality develops a definitive solution and action plan for Urban Ocean. 
+
+```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
   dplyr::select(Prediction,Risk_Category)%>%
   rename(Pre_lr = Prediction,
@@ -701,7 +888,13 @@ grid.draw(
 
 # Model Results
 
+<<<<<<< HEAD
 ```{r all risk maps mixed model, warning = FALSE, message = FALSE}
+=======
+As Chennai, India being our example city for our model, the purpose of the demonstration is to also prove replicability among other cities. As a result, we have applied the model to 11 other cities around the world. The results are shown below. Each city has its own unique characteristics and features that are evaluated with the same variables. The results are shown in the 5-category risk levels and are consistent with the Chennai example. Each city has its own special results that cater to the local context. This newly found insight shall narrow the area of focus for Urban Ocean's zero-waste sites, empower the local community, and provide a more sustainable future. 
+
+```{r all risk maps mixed model, warning = FALSE, message = FALSE, cache = TRUE }
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 risk_v_new <-function(model_data,litter_data,model,city){
   model_data$Risk_Category <- as.factor(model_data$Risk_Category)
   ggplot() +
@@ -716,18 +909,18 @@ city_viz_new <- function(cities,data,model){
   risk_v_new(temp,get(cities),model,cities)
 }
 
-risk_Chennai <- city_viz_new('Chennai', rst_total, 'Chennai')
-risk_Bangkok <- city_viz_new('Bangkok', rst_total, 'Bangkok')
-risk_Can_Tho <- city_viz_new('Can_Tho', rst_total, 'Can Tho')
-risk_Melaka <- city_viz_new('Melaka', rst_total, 'Melaka')
-risk_Mumbai <- city_viz_new('Mumbai', rst_total, 'Mumbai')
-risk_Panama_City <- city_viz_new('Panama_City', rst_total, 'Panama City')
+risk_Chennai <- city_viz_new('Chennai', rst_total, 'Chennai, India')
+risk_Bangkok <- city_viz_new('Bangkok', rst_total, 'Bangkok, Thailand')
+risk_Can_Tho <- city_viz_new('Can_Tho', rst_total, 'Can Tho, Vietnam')
+risk_Melaka <- city_viz_new('Melaka', rst_total, 'Melaka, Malaysia')
+risk_Mumbai <- city_viz_new('Mumbai', rst_total, 'Mumbai, India')
+risk_Panama_City <- city_viz_new('Panama_City', rst_total, 'Panama City, Panama')
 risk_Pune <- city_viz_new('Pune', rst_total, 'Pune')
-risk_Salvador <- city_viz_new('Salvador', rst_total, 'Salvador')
-risk_Santa_Fe <- city_viz_new('Santa_Fe', rst_total, 'Santa Fe')
-risk_Santiago <- city_viz_new('Santiago', rst_total, 'Santiago')
-risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang')
-risk_Surat <- city_viz_new('Surat', rst_total, 'Surat')
+risk_Salvador <- city_viz_new('Salvador', rst_total, 'Salvador, Brazil')
+risk_Santa_Fe <- city_viz_new('Santa_Fe', rst_total, 'Santa Fe, Argentina')
+risk_Santiago <- city_viz_new('Santiago', rst_total, 'Santiago, Chile')
+risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang, Indonesia')
+risk_Surat <- city_viz_new('Surat', rst_total, 'Surat, India')
 
 
 grid.draw(
@@ -751,16 +944,21 @@ grid.draw(
 )
 ```
 
+<<<<<<< HEAD
 # Model and Error Analysis
+=======
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
 
 # Web-Based Dashboard
 
 # Conclusion
 
-# Sources
 
+<<<<<<< HEAD
 Data Sources \*
 
 Image Sources \*
 
 prettydoc::html_pretty: theme: leonids
+=======
+>>>>>>> 772d48c0fb7ad191788cd9fe8629ef4a4bdbe4cf
