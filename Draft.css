@@ -9,6 +9,14 @@ body, html {
   height: 100%;
 }
 
+img[alt]:after {
+  content: attr(alt); 
+  display: block;
+  font-size: 12px;
+  color: #696969;
+  margin-top: 5px;
+}
+
 /*---------titles----------*/
 
 .title {
@@ -16,25 +24,24 @@ body, html {
   font-weight: bold;
 }
 
-
 .subtitle {
   font-size: 20px;
   font-style: bold;
-  color: #696969; /* Example color */
+  color: #696969; 
 }
 
-/* Style the author */
 .author {
   font-size: 16px;
-  font-weight: italic;
-  color: #696969; /* Example color */
+  font-weight: normal;
+  font-style: italic;
+  color: #696969; 
 }
 
-/* Style the date */
 .date {
   font-size: 16px;
+  font-weight: normal;
   font-style: italic;
-  color: #696969; /* Example color */
+  color: #696969; 
 }
 
 /*----------LOGO above TOC---------*/
@@ -64,18 +71,48 @@ p{
 ul, ol {
   font-family: "Avenir";
   font-size: 14px; 
-  margin-left: 20px; 
+  margin-left: 8px; 
   color: #696969; 
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Avenir', sans-serif;
-    color: #1c3aa9;
-    font-size: 80%;
+h1 {
+  font-family: 'Avenir', sans-serif;
+  font-size: 24px;
+  color: #1c3aa9;
+}
+
+h2 {
+  font-family: 'Avenir', sans-serif;
+  font-size: 18px;
+  color: #1c3aa9;
+}
+
+h3 {
+  font-family: 'Avenir', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #696969; 
+}
+
+h4 {
+  font-family: 'Avenir', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  color: #696969; 
+}
+
+/*------------table----------- */
+
+.table-container {
+  max-width: 800px; /* Adjust the maximum width as needed */
+  margin: 0 auto; /* Center the table horizontally */
+}
+
+.table-container table {
+  width: 100%; /* Make the table fill its container */
 }
 
 /*------------Table of Contents (TOC)----------- */
-
 
 .tocify {
   background-color: #ecf6ff;

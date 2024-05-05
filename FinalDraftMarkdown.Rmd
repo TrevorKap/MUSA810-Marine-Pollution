@@ -2,7 +2,7 @@
 title: "Zero-Waste Pilot Site-Selection in Urban Ocean Program Cities"
 subtitle: "Analyses for the Marine Litter Assessment Dashboard for Urban Ocean"
 author: "Shreya Bansal, Tianxiao Chen, Stephanie Cheng, Trevor Kapuvari, Xiaofan Liu"
-date: "2024-05-10"
+date: "2024-05-07"
 output: 
   html_document:
     css: Draft.css
@@ -18,23 +18,41 @@ editor_options:
     wrap: 72
 ---
 
-This project was completed for the MUSA/Smart Cities Practicum course (MUSA 801) instructed by Michael Fichman and Matthew Harris. We are grateful to our instructors for their continued support and feedback. We are also grateful to our client Daniel Sebastian Padilla Ochoa from Ocean Conservancy for his guidance and support throughout this practicum.
+This project was completed for the MUSA/Smart Cities Practicum course (MUSA 790) instructed by Michael Fichman and Matthew Harris. We are grateful to our instructors for their continued support and feedback. We are also grateful to our client Daniel Sebastian Padilla Ochoa from Ocean Conservancy for his guidance and support throughout this practicum project.
 
 # Introduction
 
 ## Abstract
 
-How best? By leveraging geospatial machine learning, this project seeks to explore how best to navigate zero-waste siting in areas facing bleak marine litter conditions.
+Marine litter  continues to pose as a major threat to people, animals, and the environment. While zero-waste pilot programs like Ocean Conservancy’s Urban Ocean have made strides, there often exists a difficulty in site-selection of pilots due to lacking litter information. This adds unnecessary barriers to the siting of pilot zero-waste pickup programs. By leveraging geospatial machine learning, this project seeks to explore how best to navigate zero-waste siting in areas facing bleak marine litter conditions.
 
 ## Background
 
-![Project Partners. Source: Ocean Conservancy](partners.png)
+As marine litter worsens across the world, litter accumulation poses significant cyclical health, biodiversity, and climate risks. For example, an estimated 11 million metric tons of plastic waste enter the ocean every year, and this number expected to triple by 2040. Particularly in developing countries with lacking waste disposal systems and recycling programs, litter accumulation poses a much steeper issue that is often difficult to solve systemically. This often disproportionately impacts vulnerable coastal dwellers and fisherman who heavily rely on the marine ecosystem. 
 
-Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilizes cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
+Urban Ocean aims to prevent ocean plastic pollution by supporting cities to develop projects that address the interrelated challenges of plastic pollution and infrastructure resilience. This includes reducing the amount of single-use plastic produced, improving waste management systems, promoting circular economy principles, and building awareness.
+
+<div style="display: flex;">
+  <div style="flex: 50%;">
+    <img src="partners.png" alt="Project Partners. Source: Ocean Conservancy" style="width: 100%;">
+  </div>
+  <div style="flex: 50%;">
+    <img src="mumbai.png" alt="Source: The Independent" style="width: 100%;">
+  </div>
+</div>
+
+Urban Ocean is an accelerator project created out of a trilateral initiative/partnership between Circulate Initiative, Resilient Cities Network, and Ocean Conservancy:
+
+- [Resilient Cities Network](resilientcitiesnetwork.org) is a network of cities bringing together global knowledge, practice, partnerships, and funding to empower its members through building equity and resilience. The organization supports on-the-ground projects and solutions to facilitate connections and information-sharing between communities and local leaders.
+- [Ocean Conservancy](www.oceanconservancy.org) is working to protect the ocean from today’s greatest global challenges. Together with our partners, we create science-based solutions for a healthy ocean and the wildlife and communities that depend on it. For more information, visit , or follow us on Facebook, Twitter or Instagram.
+
+- The [Circulate Initiative](www.thecirculateinitiative.org) is a non-profit organization that works to solve the plastic pollution challenge and build circular and equitable economies across emerging markets. It delivers cutting-edge research, builds high-impact programs, and drives collective action with industry stakeholders including businesses, investors, and policymakers. For more information, please visit: .
+
+Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilize cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
 
 With these efforts, each campaign requires an evaluation of local context and detailed understanding of the city's systems and dynamic. This aspect of the process requires long-term planning and methodical decision-making to understand the pre-existing conditions in place. Hence, our model aims to streamline the process of understanding the general structure of each city-context and provide a comprehensive solution on where efforts and resources should be allocated to. Ultimately saving time on where to implement their waste-reduction strategies. 
 
-We based our focus on various cities from the Urban Ocean program. The Resilient Cities Network is a coalition of cities around the world that assist one another in building safer, more sustainable, and equitable futures for their populations. Each of which shares their knowledge, experiences, and policy practices to empower one another. The 12 participating cities a part of the Urban Ocean program as of May 2024 are: <font size="4"> 
+We based our focus and model on the current cities from the Urban Ocean program. The Resilient Cities Network is a coalition of cities around the world that assist one another in building safer, more sustainable, and equitable futures for their populations. Each of which shares their knowledge, experiences, and policy practices to empower one another. The 12 participating cities a part of the Urban Ocean program as of May 2024 are:
 
   1. Can Tho, Vietnam
   2. Chennai, India
@@ -49,13 +67,14 @@ We based our focus on various cities from the Urban Ocean program. The Resilient
   11. Santa Fe, Argentina
   12. Salvador, Brazil
 
-</font> 
 
 ## Motivation and Use Case
 
-Pollution is a global problem that takes many forms contaminating every aspect of the environment. Some of this pollution, specifically plastic-waste, ends up in our oceans, harming marine life, contaminating drinking water, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
+Pollution is a global problem that takes many forms contaminating every aspect of the environment. Much of this pollution, ends up in oceans, harming marine life, contaminating water bodies, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
 
 Our objective is to develop a site assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+
+This dashboard is to support the narrative-building and decision-making of zero-waste pilot siting and attract funding sources for cities. Main funding partners include private corporates, foundations, and federal departments
 
 
 ```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
@@ -188,7 +207,7 @@ plotTheme <- function(base_size = 10, title_size = 14) {
     plot.subtitle = element_text(face = "italic", family = "Avenir"),
     plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
-    panel.grid.major = element_line("white", size = 0.1),
+    panel.grid.major = element_line("white", size = 0.5),
     panel.grid.minor = element_blank(),
     panel.border = element_blank(),
     plot.border = element_blank(),
@@ -232,6 +251,8 @@ mapTheme <- function(base_size = 10, title_size = 14) {
 # Exploratory Data Analysis
 
 ## Data Sources
+
+
 
 ### Marine Debris Tracker 
 
@@ -607,15 +628,9 @@ rf_results <- tune_grid(
   resamples = cv_folds,
   grid = rf_grid
 )
-library(kableExtra)
+
 rf_results_df <- as.data.frame(show_best(rf_results, metric = "rmse"))
-#kbl(rf_results_df) %>%
-#  kable_styling(bootstrap_options = c("striped", "hover"))
 
-
-```
-
-```{r final_rf, warning = FALSE, message = FALSE, cache = TRUE }
 final_rf <- finalize_workflow(
   rf_workflow,
   select_best(rf_results, metric = "rmse")
@@ -857,37 +872,7 @@ risk_Santiago <- city_viz_new('Santiago', rst_total, 'Santiago, Chile')
 risk_Semarang <- city_viz_new('Semarang', rst_total, 'Semarang, Indonesia')
 risk_Surat <- city_viz_new('Surat', rst_total, 'Surat, India')
 
-      
 
-grid.draw(
-  grobTree(
-    rectGrob(gp = gpar(fill = "#ecf6ff", lwd = 0, col = "#ecf6ff")),
-    grid.arrange(
-      risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka,
-      nrow = 1
-    )
-  )
-)
-
-grid.draw(
-  grobTree(
-    rectGrob(gp = gpar(fill = "#ecf6ff", lwd = 0, col = "#ecf6ff")),
-    grid.arrange(
-      risk_Mumbai, risk_Panama_City, risk_Pune, risk_Salvador,
-      nrow = 1
-    )
-  )
-)
-
-grid.draw(
-  grobTree(
-    rectGrob(gp = gpar(fill = "#ecf6ff", lwd = 0, col = "#ecf6ff")),
-    grid.arrange(
-      risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
-      nrow = 1
-    )
-  )
-)
 
 grid.draw(
   grobTree(
@@ -915,6 +900,8 @@ Once we have obtained the prediction results from our machine learning model, we
 
 # Conclusion
 
+Sun Metro Optimizer aims to use our data-driven, politically unbiased, and equity and revenue optimizing model to understand improved bus transit route allocation. With accurate forecasts of ridership trends, Sun Metro transit planners can see areas that may be underserved by transit, and ensure that whilst they reach these regions, they optimize routes for ridership and equity.
+
 # Resources
 
 ## Data
@@ -922,7 +909,8 @@ Once we have obtained the prediction results from our machine learning model, we
  - [OpenStreetMap](https://www.openstreetmap.org/)
  - [Google My Maps](https://www.google.com/mymaps)
 
-
 ## Others
  - [Ocean Conservancy/Urban Ocean](https://www.oceanconservancy.org/urban-ocean/)
  - [Resilient Cities Network](https://resilientcitiesnetwork.org/)
+ - [The Independent](https://www.independent.co.uk/climate-change/news/mumbai-india-plastic-bag-ban-environment-recycling-pollution-a8430641.html)
+ 
