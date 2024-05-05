@@ -18,24 +18,23 @@ editor_options:
     wrap: 72
 ---
 
-This project was completed for the MUSA/Smart Cities Practicum course (MUSA 801) instructed by Michael Fichman and Matthew Harris. We are grateful to our instructors for their continued support and feedback. Additionall from Hampton Roads Planning District Commission, and Dexter Locke from the United States Forest Service for providing data, insight, and support throughout the semester. This project would not have been possible without them.
+This project was completed for the MUSA/Smart Cities Practicum course (MUSA 801) instructed by Michael Fichman and Matthew Harris. We are grateful to our instructors for their continued support and feedback. We are also grateful to our client Daniel Sebastian Padilla Ochoa from Ocean Conservancy for his guidance and support throughout this practicum.
 
 # Introduction
 
 ## Abstract
 
+How best? By leveraging geospatial machine learning, this project seeks to explore how best to navigate zero-waste siting in areas facing bleak marine litter conditions.
 
 ## Background
 
-![](image.jpg)
+![Project Partners. Source: Ocean Conservancy](partners.png)
 
 Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilizes cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
 
 With these efforts, each campaign requires an evaluation of local context and detailed understanding of the city's systems and dynamic. This aspect of the process requires long-term planning and methodical decision-making to understand the pre-existing conditions in place. Hence, our model aims to streamline the process of understanding the general structure of each city-context and provide a comprehensive solution on where efforts and resources should be allocated to. Ultimately saving time on where to implement their waste-reduction strategies. 
 
-We based our focus on various cities from the Resilient Cities Network and Urban Ocean program. The Resilient Cities Network is a coalition of cities around the world that assist one another in building safer, more sustainable, and equitable futures for their populations. Each of which shares their knowledge, experiences, and policy practices to empower one another. A subsection of the Resilient Cities Network is the Urban Ocean program, a partnership with Ocean Conservancy tackling the ocean plastic problem. The city displayed as the example for our model is Chennai, India. The city is apart of the Urban Oceans 12 city network with the goal of proactively enhancing their sanitation infrastructure to combat plastic pollution in their region.
-
-The 12 participating cities apart of the Urban Ocean program as of May 2024 are: <font size="4"> 
+We based our focus on various cities from the Urban Ocean program. The Resilient Cities Network is a coalition of cities around the world that assist one another in building safer, more sustainable, and equitable futures for their populations. Each of which shares their knowledge, experiences, and policy practices to empower one another. The 12 participating cities a part of the Urban Ocean program as of May 2024 are: <font size="4"> 
 
   1. Can Tho, Vietnam
   2. Chennai, India
@@ -80,6 +79,7 @@ library(classInt)
 library(RCurl)
 library(httr)
 library(osmdata)
+library(ggplot2)
 library(randomForest)
 library(XML)
 library(neuralnet)
@@ -181,6 +181,52 @@ mapTheme <- function(base_size = 10, title_size = 14) {
   )
 }
 
+plotTheme <- function(base_size = 10, title_size = 14) {
+  theme(
+    text = element_text(family = "Avenir", color = "black"),
+    plot.title = element_text(size = title_size, family = "Avenir", colour = "black"), 
+    plot.subtitle = element_text(face = "italic", family = "Avenir"),
+    plot.caption = element_text(hjust = 0, family = "Avenir"),
+    axis.ticks = element_blank(),
+    panel.grid.major = element_line("white", size = 0.1),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    plot.border = element_blank(),
+    strip.background = element_rect(fill = "grey80", color = "white"),
+    strip.text = element_text(size = 10, family = "Avenir"),
+    axis.title = element_text(size = 10, family = "Avenir"),
+    axis.text = element_text(size = 8, family = "Avenir"),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    legend.background = element_blank(),
+    legend.title = element_text(colour = "black", face = "italic", family = "Avenir"),
+    legend.text = element_text(colour = "black", face = "italic", family = "Avenir"),
+    strip.text.x = element_text(size = 12, family = "Avenir")
+  )
+}
+
+mapTheme <- function(base_size = 10, title_size = 14) {
+  theme(
+    text = element_text(family = "Avenir", color = "black"),
+    plot.title = element_text(size = title_size, colour = "black", family = "Avenir"),
+    plot.subtitle = element_text(face = "italic", family = "Avenir"),
+    plot.caption = element_text(hjust = 0, family = "Avenir"),
+    panel.background = element_blank(),
+    plot.background = element_blank(),
+    legend.background = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    plot.border = element_blank(),
+    strip.text.x = element_text(size = 12, family = "Avenir")
+  )
+}
+
 ```
 
 # Exploratory Data Analysis
@@ -226,7 +272,7 @@ knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Mar
 
 Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Overall the goal of the data gathering and variables chosen provide a model an understanding the city itself, and in turn understand the systems in place and the environment assessment needed. 
 
-### Data Wranging
+### Data Wrangling
 
 Each aspect of the data gathering, through manual download, creation, or API, can now be coalesced into one cohesive visual. As mentioned with the 500x500 meter grid, all variables including litter as measuring based on an attribute regarding the cells. This grid is structure by the boundary box created from Google My Maps. This boundary file projects the city and defines its boundary on where the model is evaluating. Boundary files for our data are knowingly compatible with KML or GEOJSON files, or other file types that can be converted to raster layers. 
 
@@ -275,7 +321,7 @@ for (i in seq_along(bd_data_list)) {assign(bd[i], bd_data_list[[i]])}
 for (i in seq_along(bd_data_meter_list)) {assign(bdM[i], bd_data_meter_list[[i]])}
 ```
 
-```{r loading other nets, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
+```{r loading stored nets, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 
 base_path <- "https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/stored_city/"
 city_names <- c("santa_fe", "semarang", "panama", "can_tho", "melaka", "salvador",
@@ -292,7 +338,8 @@ list2env(setNames(city_data, paste0("net_", city_names)), envir = .GlobalEnv)
 
 ```
 
-```{r cnt wt z-score, warning = FALSE, message = FALSE, cache = TRUE}
+```{r feature engineering 1, warning = FALSE, message = FALSE, cache = TRUE}
+library(grid)
 cnt_wt <- function(litter,net){
   temp <- st_join(litter,net,join = st_within)
   temp <- temp %>% filter(!is.na(uniqueID))
@@ -319,10 +366,9 @@ net_santa_fe <- cnt_wt(Santa_Fe,net_santa_fe)
 net_santiago <- cnt_wt(Santiago,net_santiago)
 net_semarang <- cnt_wt(Semarang,net_semarang)
 net_surat <- cnt_wt(Surat,net_surat)
-```
 
+#z-score-normalizing 
 
-```{r z-score, warning = FALSE, message = FALSE, cache = TRUE }
 z_score_normalize <- function(x) {
   (x - mean(x)) / sd(x)
 }
@@ -346,9 +392,8 @@ net_melaka <- normal_city(net_melaka)
 net_mumbai <- normal_city(net_mumbai)
 net_panama <- normal_city(net_panama)
 net_pune <- normal_city(net_pune)
-```
 
-```{r aggregate data, warning = FALSE, message = FALSE, cache = TRUE }
+# agg
 net_bangkok <- net_bangkok %>% mutate(city = 'Bangkok',country = 'Thailand')
 net_can_tho <- net_can_tho %>% mutate(city = 'Can_Tho',country = 'Vietnam')
 net_chennai <- net_chennai %>% mutate(city = 'Chennai',country = 'India')
@@ -368,11 +413,31 @@ net_total_li <- net_total %>% dplyr::filter(count != 0)
 net_total_li <- net_total_li %>%
   mutate(count = (count - mean(count)) / sd(count))
 
+total_litter <- do.call(rbind, city_data_list)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      ggplot(total_litter, aes(x = master_material, fill = master_material)) + 
+        geom_bar() +
+        plotTheme() +
+        labs(title = "Count of Main Item Category",
+             x = "Category",
+             y = "Count") +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+        scale_fill_manual(values = c("PLASTIC" = "#1c3aa9", "other" = "grey")) +
+        guides(fill = FALSE),
+      nrow = 1
+    )
+  )
+)
+
 ```
 
 
 
-## Feature Engineering II
+### K-Nearest Neighbor
 
 In addition to the dependent variables in their counted presence, we implemented a K-Nearest Neighbor analysis (also displayed) to determine the proximity of each data point to one another and incorporate that as an additional variable to our model. K-Nearest Neighbor (KNN) allows us to find the proximity of another variant to determine commercial/high activity spots in the area. The nearest neighbor factor was repeated for land-use, roads, restaurants, water, and waste facilities. We added KNN as a factor to place emphasis on density and location-based processing. This addition acts as a fail-safe for our model's cell calculation given that examining count alone does not incorporate the real-world application of proximity. 
 
@@ -384,7 +449,11 @@ The visualized examples (Figure 3) display what the model is interpreting when m
 
 The visuals showing 'count' measure the number of parcels with the zone or number of buildings within the cells and does not account for density. The nearest neighbor maps ('Variable'_nn) measured their proximity on a gradient scale, with the darker colors indicating closer proximity.
 
-```{r waste map, warning = FALSE, message = FALSE, cache = TRUE}
+```{r waste map, warning = FALSE, message = FALSE, cache = FALSE}
+library(ggplot2)
+library(stringr)
+library(grid)
+library(gridExtra)
 map_waste <- visual_count(net_chennai, "waste")
 map_waste_nn <- visual_count(net_chennai,'waste_nn')
 grid.draw(grobTree(rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")), 
@@ -401,6 +470,7 @@ map_road <- visual_count(net_chennai,'road')
 map_industrial <- visual_count(net_chennai,'industrial')
 map_residential <- visual_count(net_chennai,"residential")
 map_retail <- visual_count(net_chennai,'retail')
+
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -426,12 +496,14 @@ grid.draw(
 
 
 ```{r visualize nearest neighbour, warning = FALSE, message = FALSE, cache = TRUE }
+
 map_water_nn <- visual_count(net_chennai,'water_nn')
 map_restaurant_nn <- visual_count(net_chennai,"restaurant_nn")
 map_road_nn <- visual_count(net_chennai,'road_nn')
 map_industrial_nn <- visual_count(net_chennai,'industrial_nn')
 map_residential_nn <- visual_count(net_chennai,"residential_nn")
 map_retail_nn <- visual_count(net_chennai,'retail_nn')
+
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -537,9 +609,9 @@ rf_results <- tune_grid(
 )
 library(kableExtra)
 rf_results_df <- as.data.frame(show_best(rf_results, metric = "rmse"))
-kable(rf_results_df, format = "html") %>%
-  kable_styling(full_width = FALSE)
-rf_results_df
+#kbl(rf_results_df) %>%
+#  kable_styling(bootstrap_options = c("striped", "hover"))
+
 
 ```
 
@@ -583,7 +655,7 @@ temp_risk_cat <- st_drop_geometry(risk_level(test_cbind,'kmeans')) %>%dplyr::sel
 test_cbind <- cbind(test_cbind,temp_risk_cat)
 ```
 
-## Multi-Vision Model Build
+## Multi-Vision Mixed Model Build
 
 The Random Forrest and Linear models are depicted side-by-side. When creating our final results, as mentioned, both are given equal weight input. We are looking for where the two models coincide and contrast in their predictions for litter assessment. These two results then provide an area where to dedicate zero-waste site resources. The final map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generality develops a definitive solution and action plan for Urban Ocean. 
 
@@ -615,10 +687,19 @@ grid.draw(
     )
   )
 )
+
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      city_viz('Chennai', rst_total, 'Mixed Model')
+    )
+  )
+)
 ```
 
 
-# Model and Error Analysis
+# Comparative Model and Error Analysis
 
 Both Random Forest regressions and Linear Regressions have their benefits and drawbacks. The Random Forest model is known for its ability to handle large datasets and high dimensionality, but can be prone to overfitting and cannot handle 'data noise' as well as a Linear model. Random Forest models also tend to outperform linear regression in prediction accuracy when there are non-linear relationships between dependent and independent variables. We did not assume a linear or non-linear relationship between litter and the independent variables which also emphasizes the multi-modal approach. The Linear Regression model is known for its simplicity, but can be prone to underfitting and may not perform well if there is non-linear relationships among the variables. To evaluate the performance of both models, we compare the residuals by plotting them on a histogram to visualize the distribution and a scatter plot for the relationship. 
 
@@ -626,46 +707,60 @@ The RandomForest scatterplot shows a weak relationship between the actual and pr
 
 The histograms explain the same story differently. The Linear Model has residuals that over and underpredict the actual values, while the Random Forest consistently underpredicts the actual values. Now these results are where the mixed-model approach is incorporated. We must note that the data itself is already bias and skewed because of the inherent nature of litter, and the true verification of the model's integrity is the real-world comparison to where it predicts. 
 
-```{r multi-vision model eval, warning = FALSE, message = FALSE, cache = TRUE}
-# rf model result -- ts_bind
+## Predicted vs Observed Residuals
 
+```{r Predicted vs Observed Residuals, warning = FALSE, message = FALSE, cache = TRUE}
+library(grid)
 rf_test <- ts_bind %>% dplyr::select(count,Prediction)
-
 lr_rst <- predict(model,test_data)
 lr_test <- cbind(test_data,lr_rst)%>% rename(Prediction = lr_rst) %>% dplyr::select(count,Prediction)
-
 rf_test$Residuals <- rf_test$count - rf_test$Prediction
 lr_test$Residuals <- lr_test$count - lr_test$Prediction
 
-ggplot(rf_test, aes(x = count, y = Prediction)) +
-  geom_point() +  # Add points
-  geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
-               linetype = "dotted", color = "red") +  # Residual lines
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  labs(x = "Actual Value", y = "Predicted Value", title = "RandomForest Model Residuals") +
-  plotTheme()
+mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction) %>%
+  rename(lr_pred = Prediction,
+         rf_pred = 'rf_test$Prediction') %>%
+  mutate(Prediction = 0.5*rf_pred + 0.5*lr_pred,
+         Residuals = count - Prediction)
 
-ggplot(lr_test, aes(x = count, y = Prediction)) +
-  geom_point() +  # Add points
-  geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
-               linetype = "dotted", color = "red") +  # Residual lines
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  labs(x = "Actual Value", y = "Predicted Value", title = "Linear Regression Model Residuals") +
-  plotTheme()
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      ggplot(lr_test, aes(x = count, y = Prediction)) +
+        geom_point() +  
+        geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
+                     linetype = "dotted", color = "#696969") + 
+        geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "#1c3aa9") +
+        labs(x = "Actual Value", y = "Predicted Value", title = "Linear Regression Model Residuals") +
+        plotTheme(),
+      ggplot(rf_test, aes(x = count, y = Prediction)) +
+        geom_point() + 
+        geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
+                     linetype = "dotted", color = "#696969") + 
+        geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "#1c3aa9") +
+        labs(x = "Actual Value", y = "Predicted Value", title = "Random Forest Model Residuals") +
+        plotTheme(),
+      nrow = 1
+    )
+  )
+)
 
-ggplot(lr_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") + 
-  geom_vline(xintercept = 0, linetype="dashed", 
-                color = "black") +
-  labs(title = "Linear Model Residuals")+
-  plotTheme()
-
-ggplot(rf_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") +
-   geom_vline(xintercept = 0, linetype="dashed", 
-                color = "black") +
-  labs(title = "Random Forest Model Residuals")+
-  plotTheme()
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      ggplot(mixed_rst, aes(x = count, y = Prediction)) +
+        geom_point() + 
+        geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
+                     linetype = "dotted", color = "#696969") + 
+        geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "#1c3aa9") +
+        labs(x = "Actual Value", y = "Predicted Value", title = 'Mixed Model Residuals') +
+        plotTheme(),
+      nrow = 1
+    )
+  )
+)
 ```
 
 The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk. 
@@ -674,46 +769,59 @@ The next visual features all three models compared. Here we see the Multi-Vision
 
 Now we examine the scatterplot of multi-vision residuals. It still shows an identical relationship as the previous two, which may not be as desired, but also does not tell the full story. The model is not perfect, but it is the best performer in the context of the data and the model's purpose. The meaning of the model is better explained by the Q-Q plot. The Q-Q plot shows the residuals of the model in comparison to a normal distribution of the actual dataset. The closer the points are to the 45-degree line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are not perfectly aligned but are very close for the most part, creating a mild curvature in the middle, indicating skewness in the data. However, the tail-end of the points of higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles. Overall, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
+## Histogram of Residuals
 
-```{r mixed rst, warning = FALSE, message = FALSE, cache = TRUE }
-mixed_rst <- cbind(lr_test%>%dplyr::select(-Residuals),rf_test$Prediction)%>%
-  rename(lr_pred = Prediction,
-         rf_pred = 'rf_test$Prediction') %>%
-  mutate(Prediction = 0.5*rf_pred + 0.5*lr_pred,
-         Residuals = count - Prediction)
 
-ggplot(mixed_rst, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey")+ 
-  geom_vline(xintercept = 0, linetype="dashed", 
-                color = "black") +
-  ggtitle("Histogram of Multi-Vision Residuals") +  # Add a title
-  xlab("Values") +  # Label for the x-axis
-  ylab("Frequency") +  # Label for the y-axis
-  plotTheme()
+```{r Histogram of Residuals, warning = FALSE, message = FALSE, cache = TRUE }
 
-grid.arrange(
-ggplot(mixed_rst, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") + plotTheme() ,
-ggplot(lr_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") + plotTheme() ,
-ggplot(rf_test, aes(x = Residuals)) + 
-  geom_histogram(bins = 30, fill = "grey") + plotTheme() ,nrow = 3)
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      ggplot(rf_test, aes(x = Residuals)) + 
+        geom_histogram(bins = 30, fill = "grey") +
+        geom_vline(xintercept = 0, linetype="dashed", color = "black") +
+        labs(title = "Random Forest Model Residuals") + 
+        xlab("Values") + 
+        ylab("Frequency") + 
+        plotTheme(),
+      
+      ggplot(lr_test, aes(x = Residuals)) + 
+        geom_histogram(bins = 30, fill = "grey") +
+        geom_vline(xintercept = 0, linetype="dashed", color = "black") +
+        labs(title = "Linear Regression Model Residuals") + 
+        xlab("Values") + 
+        ylab("Frequency") + 
+        plotTheme(),
+      
+      ggplot(mixed_rst, aes(x = Residuals)) + 
+        geom_histogram(bins = 30, fill = "#1c3aa9") +
+        geom_vline(xintercept = 0, linetype="dashed", color = "black") +
+        labs(title = "Mixed Model Residuals") + 
+        xlab("Values") + 
+        ylab("Frequency") + 
+        plotTheme(), 
+      
+      nrow = 3
+    )
+  )
+)
 
-ggplot(mixed_rst, aes(x = count, y = Prediction)) +
-  geom_point() +  # Add points
-  geom_segment(aes(xend = count, yend = Prediction, x = count, y = count), 
-               linetype = "dotted", color = "red") +  # Residual lines
-  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "blue") +
-  labs(x = "Actual Value", y = "Predicted Value", title = 'Multi-Vision Residuals') +
-  plotTheme()
-
-ggplot(mixed_rst, aes(sample = Residuals)) +
+grid.draw(
+  grobTree(
+    rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
+    grid.arrange(
+      ggplot(mixed_rst, aes(sample = Residuals)) +
   stat_qq() +
-  stat_qq_line(colour = "red") +
+  stat_qq_line(colour = "#1c3aa9") +
   ggtitle("Normal Q-Q Plot") +
   xlab("Theoretical Quantiles") +
   ylab("Sample Quantiles") +
-  plotTheme()
+  plotTheme(),
+  nrow = 1
+    )
+  )
+)
 ```
 
 
@@ -726,7 +834,7 @@ risk_v_new <-function(model_data,litter_data,model,city){
   model_data$Risk_Category <- as.factor(model_data$Risk_Category)
   ggplot() +
     geom_sf(data = model_data, aes(fill = Risk_Category), colour = NA) +
-    geom_sf(data = litter_data, size = .3, colour = "red") +
+    geom_sf(data = litter_data, size = .3, colour = "#1c3aa9") +
     scale_fill_manual(values = risk_palette, guide = "none") +
     labs(title=model) +
     mapTheme(title_size = 8)
@@ -751,12 +859,49 @@ risk_Surat <- city_viz_new('Surat', rst_total, 'Surat, India')
 
       
 
-grid.arrange(risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka, risk_Mumbai,
-             risk_Panama_City, nrow = 2)
-grid.arrange(risk_Pune, risk_Salvador, risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
-             nrow = 2)
-```
+grid.draw(
+  grobTree(
+    rectGrob(gp = gpar(fill = "#ecf6ff", lwd = 0, col = "#ecf6ff")),
+    grid.arrange(
+      risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka,
+      nrow = 1
+    )
+  )
+)
 
+grid.draw(
+  grobTree(
+    rectGrob(gp = gpar(fill = "#ecf6ff", lwd = 0, col = "#ecf6ff")),
+    grid.arrange(
+      risk_Mumbai, risk_Panama_City, risk_Pune, risk_Salvador,
+      nrow = 1
+    )
+  )
+)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp = gpar(fill = "#ecf6ff", lwd = 0, col = "#ecf6ff")),
+    grid.arrange(
+      risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
+      nrow = 1
+    )
+  )
+)
+
+grid.draw(
+  grobTree(
+    rectGrob(gp = gpar(fill = "#ecf6ff", lwd = 0, col = "#ecf6ff")),
+    grid.arrange(
+      risk_Chennai, risk_Bangkok, risk_Can_Tho, risk_Melaka,
+      risk_Mumbai, risk_Panama_City, risk_Pune, risk_Salvador,
+      risk_Santa_Fe, risk_Santiago, risk_Semarang, risk_Surat,
+      ncol = 4
+    )
+  )
+)
+
+```
 
 # Web-Based Dashboard
 
