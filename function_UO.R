@@ -212,6 +212,14 @@ visual_count <- function(net_one,variable){
     mapTheme()
 }
 
+visual_count1 <- function(net_one,variable){
+  ggplot() +
+    geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
+    scale_fill_viridis_c(option = "mako", name = str_to_title(variable)) +
+    #labs(title = paste(str_to_title(variable),"Count for the Fishnet")) +
+    mapTheme()
+}
+
 visual_cotinuous <- function(net_one,variable){
   ggplot() +
     geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
