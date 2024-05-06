@@ -28,19 +28,20 @@ Marine litter  continues to pose as a major threat to people, animals, and the e
 
 ## Client Background
 
-![Project Partners. Source: Ocean Conservancy](partners.png) ![Source: The Independent](mumbai.png)
+<div style="text-align:center;">
+  <img src="partners.png" alt="Image Source: Ocean Conservancy" width="450"/>
+  <img src="mumbai.png" alt="Image Source: The Independent" width="350"/>
+  <br><br>
+  Image Source: Ocean Conservancy, The Independent
+</div>
 
-Urban Ocean aims to prevent ocean plastic pollution by supporting cities to develop projects that address the interrelated challenges of plastic pollution and infrastructure resilience. This includes reducing the amount of single-use plastic produced, improving waste management systems, promoting circular economy principles, and building awareness.
-
-Urban Ocean is an accelerator project created out of a trilateral initiative/partnership between Circulate Initiative, Resilient Cities Network, and Ocean Conservancy:
+Urban Ocean aims to prevent ocean plastic pollution by supporting projects in cities address plastic pollution and infrastructure resilience. This includes reducing the amount of single-use plastic produced, improving waste management systems, promoting circular economy principles, and building awareness. Urban Ocean is an accelerator project created out of a trilateral initiative/partnership between Circulate Initiative, Resilient Cities Network, and Ocean Conservancy:
 
 - [Resilient Cities Network](resilientcitiesnetwork.org) is a network of cities bringing together global knowledge, practice, partnerships, and funding to empower its members through building equity and resilience. The organization supports on-the-ground projects and solutions to facilitate connections and information-sharing between communities and local leaders.
 - [Ocean Conservancy](www.oceanconservancy.org) is a non-profit environmental advocacy group working to advance marine health and protection. Ocean Conservancy focuses on science-based solutions for a healthy ocean and the wildlife and communities that depend on it.
 - [The Circulate Initiative](www.thecirculateinitiative.org) is a non-profit organization that works to solve the plastic pollution challenge and build circular and equitable economies across emerging markets. The organization focuses on research, high-impact programs, and stakeholder collaboration to forward sustainability and equitable growth.
 
-Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilize cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
-
-With these efforts, each campaign requires an evaluation of local context and detailed understanding of the city's systems and dynamic. This aspect of the process requires long-term planning and methodical decision-making to understand the pre-existing conditions in place. Hence, our model aims to streamline the process of understanding the general structure of each city-context and provide a comprehensive solution on where efforts and resources should be allocated to. Ultimately saving time on where to implement their waste-reduction strategies. 
+This program takes multiple approaches to address ocean plastic pollution. First, they mobilize cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans and waterways, sharing findings and recommending action plans to local communities and decision makers and working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. With these efforts, each campaign requires an evaluation of local context and detailed understanding of the city's systems and dynamic. This aspect of the process requires long-term planning and methodical decision-making to understand the pre-existing conditions in place. Hence, our model aims to streamline the process of understanding the general structure of each city-context and provide a comprehensive solution on where efforts and resources should be allocated to.
 
 We based our focus and model on the current cities from the Urban Ocean program. The 12 participating cities a part of the Urban Ocean program as of May 2024 are:
 
@@ -59,11 +60,11 @@ We based our focus and model on the current cities from the Urban Ocean program.
 
 ## Motivation and Use Case
 
-As marine litter worsens across the world, litter accumulation poses significant cyclical health, biodiversity, and climate risks. For example, an estimated 11 million metric tons of plastic waste enter the ocean every year, and this number expected to triple by 2040. Particularly in developing countries with lacking waste disposal systems and recycling programs, litter accumulation poses a much steeper issue that is often difficult to solve systemically. This often disproportionately impacts vulnerable coastal dwellers and fisherman who heavily rely on the marine ecosystem. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
+As marine litter worsens across the world, litter accumulation poses significant cyclical health, biodiversity, and climate risks. For example, an estimated 11 million metric tons of plastic waste enter the ocean every year, and this number expected to triple by 2040. Particularly in developing countries with lacking waste disposal systems and recycling programs, litter accumulation poses a much steeper issue that is often difficult to solve systemically. This often disproportionately impacts vulnerable coastal dwellers and fisherman who heavily rely on the marine ecosystem. Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
 
 Our objective is to develop a site selection and assessment tool that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
 
-Our resulting dashboard is to support the narrative-building and decision-making of zero-waste pilot siting and attract funding sources for cities. Main funding partners include private corporates, foundations, and federal departments
+Our resulting dashboard is to support the narrative-building and decision-making of zero-waste pilots and attract funding sources and other support for these cities.
 
 ```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
 knitr::opts_chunk$set(echo = TRUE)
@@ -244,17 +245,17 @@ Our project involved a range of data sources for model building and finding key 
 
 ### Marine Debris Tracker 
 
-Our primary dataset focused on existing marine debris/litter from the [Marine Debris Tracker](https://www.debristracker.org/data/) powered by Morgan Stanley in collaboration with the National Geographic Society and the University of Georgia. The Marine Debris Tracker is a web-application and public use database that tracks user-recorded global litter pick-up projects and initiatives from participating organizations.
+Our primary dataset was existing marine debris/litter from the [Marine Debris Tracker](https://www.debristracker.org/data/) powered by Morgan Stanley in collaboration with the National Geographic Society and the University of Georgia. The Marine Debris Tracker is a web application and public use database that tracks user-recorded global litter pick-up projects and initiatives from participating organizations.
 
 ### OpenStreetMap Data
 
-OpenStreetMap (OSM) data was used to provide additional context to the litter data. OSM featured land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
+[OpenStreetMap (OSM)](https://www.openstreetmap.org) data was used to provide additional context to the litter data. OSM featured land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
 
 ### Other Data
 
-For our model, we directed our focus on data modeling from the Urban Ocean cities. To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using Google My Maps (<https://www.google.com/mymaps>) or sourced online. Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard. 
+For our model, we directed our focus on data modeling from the Urban Ocean cities. To develop our model for each respective city (or future use), each area was determined by a 'boundary box' that was created by a custom KML file using [Google My Maps](https://www.google.com/mymaps) or sourced online. Each boundary's drawing was dictated by political boundaries and practical scope of where data was recorded within the city, further methodology of each individual city is detailed on the interactive dashboard.
 
-After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.  
+Additionally, we also hypothesized population density as having a major influence on our model. We used [Data for Good at Meta's](https://data.humdata.org/organization/meta?q=population+density&sort=if%28gt%28last_modified%2Creview_date%29%2Clast_modified%2Creview_date) global high resolution population density maps. This global dataset works as a proxy for population density.
 
 ## Variables
 
@@ -268,13 +269,14 @@ Waste management or waste facilities serve the purpose off collecting, storing, 
 
 Landuse is a general indicator of the city's zoning and urban planning. Industrial zones, for example, are likely to have litter accumulation due to the nature of the activities. Residential zones, on the other hand, are less likely to have litter accumulation due to the opposite nature. The model uses landuse to potentially discover patterns in the city that may not necessarily be identified by intuition alone, but is still important is creating the picture of how an area is structured. With this generalization in mind, zoning alone is not enough for describing landuse. Roads also are a vaiable incorporated into the model to frame the network of the city, also acting as a proxy to density. Grid streets or segments closer together often represent denser, potentially taller buildings that represent activity, as well as vise-versa. Hence, each variable is a general feature known to be present in every city and allows for replicated use to any place in the world. 
 
-![WILL REPLACE](variablesdraft.png)
+![](variables)
 
 
 ## Feature Engineering
 
-
 ### Understanding the Data
+
+After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.
 
 Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Overall the goal of the data gathering and variables chosen provide a model an understanding the city itself, and in turn understand the systems in place and the environment assessment needed. 
 
