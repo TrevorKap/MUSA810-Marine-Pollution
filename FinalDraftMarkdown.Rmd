@@ -721,11 +721,11 @@ grid.draw(
 
 Both Random Forest regressions and Linear Regressions have their benefits and drawbacks. The Random Forest model is known for its ability to handle large datasets and high dimensionality, but can be prone to overfitting and cannot handle 'data noise' as well as a Linear model. Random Forest models also tend to outperform linear regression in prediction accuracy when there are non-linear relationships between dependent and independent variables. We did not assume a linear or non-linear relationship between litter and the independent variables which also emphasizes the multi-modal approach. The Linear Regression model is known for its simplicity, but can be prone to underfitting and may not perform well if there is non-linear relationships among the variables. To evaluate the performance of both models, we compare the residuals by plotting them on a histogram to visualize the distribution and a scatter plot for the relationship. 
 
-The RandomForest scatterplot shows a weak relationship between the actual and predicted values, with an underestimation with some notable outliers. These results tell us the model can indicate lower-risk areas better than higher-risk areas, but this result is expected given the minimal amount of data available as input. This bias translates to the plots because we are using clusters of cleanup efforts as our datasets. Meanwhile the Linear Regression residuals have a similar result but has slightly more uniformity in the results, which indicates mildly better performance when predicting places with higher actual values. This improved performance indicates a more-linear relationship between the independent and dependent variables, where the more "city activity" is perceived by the model, the higher the risk. 
-
-The histograms explain the same story differently. The Linear Model has residuals that over and underpredict the actual values, while the Random Forest consistently underpredicts the actual values. Now these results are where the mixed-model approach is incorporated. We must note that the data itself is already bias and skewed because of the inherent nature of litter, and the true verification of the model's integrity is the real-world comparison to where it predicts. 
-
 ## Predicted vs Observed Residuals
+
+The RandomForest scatterplot shows a weak relationship between the actual and predicted values, with an underestimation with some notable outliers. These residuals tell us the model can indicate lower-risk areas better than higher-risk areas, but this result is expected given the minimal amount of data available as input. This bias translates to the plots because we are using clusters of cleanup efforts as our datasets. Meanwhile the Linear Regression residuals have a similar result but has slightly more uniformity in the results, which indicates mildly better performance when predicting places with higher actual values. This improved performance indicates a more-linear relationship between the independent and dependent variables, where the more "city activity" is perceived by the model, the higher the risk. 
+
+Now we examine the scatterplot of multi-vision residuals. It still shows an identical relationship as the previous two, which may not be as desired, but also does not tell the full story. The model is not perfect, but it is the best performer in the context of the data and the model's purpose. The meaning of the model and its residuals is further explained by the Q-Q plot. 
 
 ```{r Predicted vs Observed Residuals, warning = FALSE, message = FALSE, cache = TRUE}
 library(grid)
@@ -781,14 +781,19 @@ grid.draw(
 )
 ```
 
-The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk. 
 
-The next visual features all three models compared. Here we see the Multi-Vision (bottom) having the best bell-curve representation. The Linear Model (middle) has a less consistent, duel distribution and is not as ideal as the Multi-Vision. The Random Forest (top) has a more consistent distribution but is not as accurate as the Multi-Vision because of the greater skew. The Multi-Vision model is the best performer.
 
-Now we examine the scatterplot of multi-vision residuals. It still shows an identical relationship as the previous two, which may not be as desired, but also does not tell the full story. The model is not perfect, but it is the best performer in the context of the data and the model's purpose. The meaning of the model is better explained by the Q-Q plot. The Q-Q plot shows the residuals of the model in comparison to a normal distribution of the actual dataset. The closer the points are to the 45-degree line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are not perfectly aligned but are very close for the most part, creating a mild curvature in the middle, indicating skewness in the data. However, the tail-end of the points of higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles. Overall, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
-## Histogram of Residuals
 
+## Histogram of Residuals & Q-Q Plot
+
+The series features all three models compared. Here we see the Multi-Vision (bottom) having the best bell-curve representation. The Linear Model (middle) has a less consistent, duel distribution and is not as ideal as the Multi-Vision. The Random Forest (top) has a more consistent distribution but is not as accurate as the Multi-Vision because of the greater skew. The Multi-Vision model is the best performer.
+
+The histograms explain the same story differently. The Linear Model has residuals that over and underpredict the actual values, while the Random Forest consistently underpredicts the actual values. Now these results are where the mixed-model approach is incorporated. We must note that the data itself is already bias and skewed because of the inherent nature of litter, and the true verification of the model's integrity is the real-world comparison to where it predicts. 
+
+The Multi-Vision Model Residuals features the most ideal distribution than the previous two with a mild right skew still existing, similarly to the RandomForest. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk.
+
+The Q-Q plot shows the residuals of the model in comparison to a normal distribution of the actual dataset. The closer the points are to the 45-degree line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are not perfectly aligned but are very close for the most part, creating a mild curvature in the middle, indicating skewness in the data. However, the tail-end of the points of higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles. Overall, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
 ```{r Histogram of Residuals, warning = FALSE, message = FALSE, cache = TRUE }
 
@@ -845,7 +850,7 @@ grid.draw(
 
 # Model Results
 
-As Chennai, India being our example city for our model, the purpose of the demonstration is to also prove replicability among other cities. As a result, we have applied the model to 11 other cities around the world. The results are shown below. Each city has its own unique characteristics and features that are evaluated with the same variables. The results are shown in the 5-category risk levels and are consistent with the Chennai example. Each city has its own special results that cater to the local context. This newly found insight shall narrow the area of focus for Urban Ocean's zero-waste sites, empower the local community, and provide a more sustainable future. 
+As Chennai, India being our example city for our model, the purpose of the demonstration is to also prove replicability among other cities. As a result, we have applied the model to 11 other cities around the world. The results are shown below. Each city has its own unique characteristics and features that are evaluated with the same variables. The maps show the 5-category risk levels and are consistent with the Chennai example yet catered to their local context. This newly found insight shall narrow the area of focus for Urban Ocean's zero-waste sites. Ultimately empowering the local community, and providing the opportunity for a more sustainable future. 
 
 ```{r all risk maps mixed model, warning = FALSE, message = FALSE, cache = TRUE }
 risk_v_new <-function(model_data,litter_data,model,city){
@@ -897,7 +902,6 @@ grid.draw(
 
 Our web-based dashboard, entitled Marine Litter Assessment Dashboard, visualizes our model results and other data analysis in an interactive way.
 
-!()
 
 Once we have obtained the prediction results from our machine learning model, we input them into a web application. At the core of this application is an interactive map that allows users to view the probability of each county’s region transitioning from permeable to impermeable in the future by selecting various layers. The probability interval is divided into five equal parts based on its highest value, with the high probability change areas highlighted in red. Users can further click on the “check layer” to view specific information about these high probability conversion areas, including their past land cover types and the specific numerical values of their probability of conversion. The high-risk areas are marked in red, making them easier to locate quickly. Users can also select other relevant information from a dropdown list, such as complete land cover maps from 2014/2018 and census tract data. This information can assist decision-makers in balancing their decisions on whether to protect certain areas.
 
