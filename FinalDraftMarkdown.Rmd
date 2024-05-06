@@ -518,23 +518,40 @@ grid.draw(
 
 The Principal Component Analysis (PCA) is a dimensional reduction technique used to transform high-dimensional data into a lower-dimensional space while preserving as much variance as possible. The PCA below is used to identify the most important variables in the dataset and their correlation with litter, ultimately creating synthetic variables that can augment the data input for the model. The first output is a table that depicts the general metrics found in the independent variables, such as standard deviation, variance, and the proportion of variance explained by each component. 
 
-The Eigenvalues from the PCA are shown in the second graph. The Eigenvalues are the amount of variance explained by each component, quantifying the importance of each component in the dataset. The first dimension explains the vast majority of the variance, with a sharp decrease thereafter. These results mean that we only need 1 dimension of overlap when evaluating our model and additional dimensions of evaluation will not be useful thereafter. A single dimensional view means having all the independent and dependent variables overlaid onto a single space provides the greatest insight, and any variations of such will not be useful. 
-
-The squared cosine value (Cos2) in the second graph shows the quality of the representation of the variables on the factor map. The closer the value is to 1, the better the representation of the variable. What we notice particularly about these variables with the largest quality of representation is that they are statistical factor rather than a numeric value. Almost each independent variable with a ~0.75 value is either a KNN or significance value. The only exception being sum_pop (population density) and avg_pop (average population). 
-
-The PCA Variables graph shows the correlation of each variable in comparison to the first two dimensions. The arrows that represent each variable have varying directions and lengths, indicating mostly little correlation between the first dimension and second dimension. But the few variables that have relatively longer lengths have stronger relationships between both dimensions and can be used for the model. To better understand their importance we evaluate their Squared Cosine. This graph serves as the basis for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables. Each variable with a '_sig' suffix indicates where the presence of the variable, considering KNN and Moran's I, have significant impact on where the dependent variable, litter, is located. 
-
-
-```{r PCA analysis, warning = FALSE, message = FALSE, cache = TRUE }
+```{r PCA analysis1, warning = FALSE, message = FALSE, cache = TRUE }
 corr <- st_drop_geometry(net_total) %>% dplyr::select(!c(uniqueID,cvID,city,country))
 corr_nor<- scale(corr)
 corr_matrix <- cor(corr_nor)
 #ggcorrplot(corr_matrix)
 data.pca <- princomp(corr_matrix)
-summary(data.pca)
+pca_sum <- summary(data.pca)
+
+
+```
+```{r PCA analysis2, warning = FALSE, message = FALSE, cache = TRUE }
+
 data.pca$loadings[, 1:2]
+
+```
+
+
+The Eigenvalues are the amount of variance explained by each component, quantifying the importance of each component in the dataset. The first dimension explains the vast majority of the variance, with a sharp decrease thereafter. These results mean that we only need 1 dimension of overlap when evaluating our model and additional dimensions of evaluation will not be useful thereafter. A single dimensional view means having all the independent and dependent variables overlaid onto a single space provides the greatest insight, and any variations of such will not be useful. 
+
+```{r PCA analysis3, warning = FALSE, message = FALSE, cache = TRUE }
 fviz_eig(data.pca, addlabels = TRUE) + ggtitle("Eigenvalues from Principal Component Analysis") + plotTheme()
+
+```
+
+The squared cosine value (Cos2) shows the quality of the representation of the variables on the factor map. The closer the value is to 1, the better the representation of the variable. What we notice particularly about these variables with the largest quality of representation is that they are statistical factor rather than a numeric value. Almost each independent variable with a ~0.75 value is either a KNN or significance value. The only exception being sum_pop (population density) and avg_pop (average population). 
+
+```{r PCA analysis4, warning = FALSE, message = FALSE, cache = TRUE }
 fviz_cos2(data.pca, choice = "var", axes = 1:2)+ plotTheme()
+
+```
+
+The PCA Variables graph shows the correlation of each variable in comparison to the first two dimensions. The arrows that represent each variable have varying directions and lengths, indicating mostly little correlation between the first dimension and second dimension. But the few variables that have relatively longer lengths have stronger relationships between both dimensions and can be used for the model. To better understand their importance we evaluate their Squared Cosine. This graph serves as the basis for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables. Each variable with a '_sig' suffix indicates where the presence of the variable, considering KNN and Moran's I, have significant impact on where the dependent variable, litter, is located. 
+
+```{r PCA analysis5, warning = FALSE, message = FALSE, cache = TRUE }
 n_colors <- 100 
 mako_gradient <- viridis(n_colors, option = "mako")
 fviz_pca_var(data.pca, col.var = "cos2",
@@ -542,6 +559,7 @@ fviz_pca_var(data.pca, col.var = "cos2",
              repel = TRUE) + plotTheme()
 
 ```
+
 
 
 # Model Building
