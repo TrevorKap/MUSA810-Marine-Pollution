@@ -18,19 +18,19 @@ editor_options:
     wrap: 72
 ---
 
-This project was completed for the MUSA/Smart Cities Practicum course (MUSA 790) instructed by Michael Fichman and Matthew Harris. We are grateful to our instructors for their continued support and feedback. We are also grateful to our client Daniel Sebastian Padilla Ochoa from Ocean Conservancy for his guidance and support throughout this practicum project.
+This project was completed for the Urban Spatial Analytics/Smart Cities Practicum course (MUSA 790), instructed by Michael Fichman and Matthew Harris. We are grateful to our instructors for their continued support and feedback. We are also grateful to our client Daniel Sebastian Padilla Ochoa from Ocean Conservancy for his guidance and support throughout this practicum project. This report serves as a report & tutorial for our findings for a spatial risk assessment. 
 
 # Introduction
 
 ## Abstract
 
-Marine litter  continues to pose as a major threat to people, animals, and the environment. While zero-waste pilot programs like Ocean Conservancy’s Urban Ocean have made strides, there often exists a difficulty in site-selection of pilots due to lacking litter information. This adds unnecessary barriers to the siting of pilot zero-waste pickup programs. By leveraging geospatial machine learning, this project seeks to explore how best to navigate zero-waste siting in areas facing bleak marine litter conditions.
+Marine litter continues to pose as a major threat to people, animals, and the environment. That is why Ocean Conservancy’s Urban Ocean have made strides to address this issue through zero-waste pilot sites. However, there often exists a difficulty in site-selection of pilot programs due to the case-by-case diligence in research required to understand each city's environmental situation. This adds unnecessary barriers to the siting of pilot zero-waste pickup programs. By leveraging geospatial machine learning, this project aims to explore how to navigate zero-waste siting in areas facing bleak marine litter conditions.
 
 ## Background
 
-As marine litter worsens across the world, litter accumulation poses significant cyclical health, biodiversity, and climate risks. For example, an estimated 11 million metric tons of plastic waste enter the ocean every year, and this number expected to triple by 2040. Particularly in developing countries with lacking waste disposal systems and recycling programs, litter accumulation poses a much steeper issue that is often difficult to solve systemically. This often disproportionately impacts vulnerable coastal dwellers and fisherman who heavily rely on the marine ecosystem. 
+As marine litter worsens across the world, litter accumulation poses significant cyclical health, biodiversity, and climate risks. For example, an estimated 11 million metric tons of plastic waste enter the ocean every year, and this number expected to triple by 2040. Particularly, in developing countries with weaknesses in their waste disposal systems and recycling programs, litter accumulation poses a much steeper issue that is poses challenges on the systemic level. This problem disproportionately impacts vulnerable coastal dwellers and communities who heavily rely on the marine ecosystem for economic well being. 
 
-Urban Ocean aims to prevent ocean plastic pollution by supporting cities to develop projects that address the interrelated challenges of plastic pollution and infrastructure resilience. This includes reducing the amount of single-use plastic produced, improving waste management systems, promoting circular economy principles, and building awareness.
+Urban Ocean aims to mitigate and reduce ocean plastic pollution by supporting cities to develop projects that address the interrelated challenges of plastic pollution and infrastructure resilience. These efforts include reducing the amount of single-use plastic produced, improving waste management systems, promoting circular economy principles, and building awareness.
 
 <div style="display: flex;">
   <div style="flex: 50%;">
@@ -44,9 +44,9 @@ Urban Ocean aims to prevent ocean plastic pollution by supporting cities to deve
 Urban Ocean is an accelerator project created out of a trilateral initiative/partnership between Circulate Initiative, Resilient Cities Network, and Ocean Conservancy:
 
 - [Resilient Cities Network](resilientcitiesnetwork.org) is a network of cities bringing together global knowledge, practice, partnerships, and funding to empower its members through building equity and resilience. The organization supports on-the-ground projects and solutions to facilitate connections and information-sharing between communities and local leaders.
-- [Ocean Conservancy](www.oceanconservancy.org) is working to protect the ocean from today’s greatest global challenges. Together with our partners, we create science-based solutions for a healthy ocean and the wildlife and communities that depend on it. For more information, visit , or follow us on Facebook, Twitter or Instagram.
+- [Ocean Conservancy](www.oceanconservancy.org) is working to protect the ocean from today’s greatest global challenges. They create science-based solutions for a healthy ocean, marine wildlife, and communities that depend on it.
 
-- The [Circulate Initiative](www.thecirculateinitiative.org) is a non-profit organization that works to solve the plastic pollution challenge and build circular and equitable economies across emerging markets. It delivers cutting-edge research, builds high-impact programs, and drives collective action with industry stakeholders including businesses, investors, and policymakers. For more information, please visit: .
+- The [Circulate Initiative](www.thecirculateinitiative.org) is a non-profit organization that works to solve the plastic pollution challenge and build circular and equitable economies across emerging markets. It delivers cutting-edge research, builds high-impact programs, and drives collective action with industry stakeholders including businesses, investors, and policymakers. 
 
 Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilize cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
 
@@ -70,11 +70,18 @@ We based our focus and model on the current cities from the Urban Ocean program.
 
 ## Motivation and Use Case
 
-Pollution is a global problem that takes many forms contaminating every aspect of the environment. Much of this pollution, ends up in oceans, harming marine life, contaminating water bodies, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
+Pollution is a global problem that takes many forms, contaminating every aspect of the environment. Much of this pollution ends up in oceans, harming marine life, contaminating water bodies, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency for each waste-reduction campaign. 
 
-Our objective is to develop a site assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+Our objective is to develop a site assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework that can be replicated for any city. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
 
-This dashboard is to support the narrative-building and decision-making of zero-waste pilot siting and attract funding sources for cities. Main funding partners include private corporates, foundations, and federal departments
+Each result for our project is displayed on a web-based dashboard to support the narrative-building and decision-making of zero-waste pilot sites, with the hopes to attract funding sources for these cities. 
+Notable mentions who have contributed to the feasibility of the project are: 
+
+- [National Oceanic and Atmospheric Administration](https://www.noaa.gov) (NOAA) is an American scientific agency within the United States Department of Commerce, they have been known for funding this program alongside the Ocean Conservancy and other partners.
+
+-[Morgan Stanley](https://www.morganstanley.com) is an American multinational investment bank and financial services company who sponsors the [Marine Debris Tracker](https://www.debristracker.org/), one of our essential data sources for tracking litter data across the globe.
+
+-[National Geographic](https://www.nationalgeographic.com) is an American television network that has also a partner of the Marine Debris Tracker. 
 
 
 ```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
