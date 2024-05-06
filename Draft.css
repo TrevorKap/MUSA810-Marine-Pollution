@@ -33,14 +33,12 @@ img[alt]:after {
 .author {
   font-size: 16px;
   font-weight: normal;
-  font-style: italic;
   color: #696969; 
 }
 
 .date {
   font-size: 16px;
   font-weight: normal;
-  font-style: italic;
   color: #696969; 
 }
 
@@ -70,7 +68,7 @@ p{
 
 ul, ol {
   font-family: "Avenir";
-  font-size: 18px; 
+  font-size: 16px; 
   margin-left: 8px; 
   color: #696969; 
 }
@@ -109,7 +107,7 @@ h4 {
 }
 
 .table-container table {
-  width: 100%; /* Make the table fill its container */
+  width: 100%;
 }
 
 /*------------Table of Contents (TOC)----------- */

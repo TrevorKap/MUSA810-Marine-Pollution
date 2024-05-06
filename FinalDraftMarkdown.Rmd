@@ -473,7 +473,13 @@ grid.draw(grobTree(rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
 The examples are, waste management facilities (waste), water (streams, ponds, canals, etc), restaurants, and zoning (industrial, residential, retail). The overall  selection was based on our hypothesis of areas of human activity leading to higher litter risk. The aim of these variables is to act as proxies for litter cases, providing an indication on where litter most likely accumulated or ends up. Each variable is then placed on a combined fishnet grid with the litter data, and evaluated for association between the variables and litter. 
 
 ```{r visualize count, warning = FALSE, message = FALSE, cache = TRUE }
-
+visual_count1 <- function(net_one,variable){
+  ggplot() +
+    geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
+    scale_fill_viridis_c(option = "mako", name = str_to_title(variable)) +
+    #labs(title = paste(str_to_title(variable),"Count for the Fishnet")) +
+    mapTheme()
+}
 map_water <- visual_count1(net_chennai,"water")
 map_restaurant <- visual_count1(net_chennai,"restaurant")
 map_road <- visual_count1(net_chennai,'road')
