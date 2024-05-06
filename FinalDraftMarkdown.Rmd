@@ -26,33 +26,23 @@ This project was completed for the MUSA/Smart Cities Practicum course (MUSA 790)
 
 Marine litter  continues to pose as a major threat to people, animals, and the environment. While zero-waste pilot programs like Ocean Conservancy’s Urban Ocean have made strides, there often exists a difficulty in site-selection of pilots due to lacking litter information. This adds unnecessary barriers to the siting of pilot zero-waste pickup programs. By leveraging geospatial machine learning, this project seeks to explore how best to navigate zero-waste siting in areas facing bleak marine litter conditions.
 
-## Background
+## Client Background
 
-As marine litter worsens across the world, litter accumulation poses significant cyclical health, biodiversity, and climate risks. For example, an estimated 11 million metric tons of plastic waste enter the ocean every year, and this number expected to triple by 2040. Particularly in developing countries with lacking waste disposal systems and recycling programs, litter accumulation poses a much steeper issue that is often difficult to solve systemically. This often disproportionately impacts vulnerable coastal dwellers and fisherman who heavily rely on the marine ecosystem. 
+![Project Partners. Source: Ocean Conservancy](partners.png) ![Source: The Independent](mumbai.png)
 
 Urban Ocean aims to prevent ocean plastic pollution by supporting cities to develop projects that address the interrelated challenges of plastic pollution and infrastructure resilience. This includes reducing the amount of single-use plastic produced, improving waste management systems, promoting circular economy principles, and building awareness.
-
-<div style="display: flex;">
-  <div style="flex: 50%;">
-    <img src="partners.png" alt="Project Partners. Source: Ocean Conservancy" style="width: 100%;">
-  </div>
-  <div style="flex: 50%;">
-    <img src="mumbai.png" alt="Source: The Independent" style="width: 100%;">
-  </div>
-</div>
 
 Urban Ocean is an accelerator project created out of a trilateral initiative/partnership between Circulate Initiative, Resilient Cities Network, and Ocean Conservancy:
 
 - [Resilient Cities Network](resilientcitiesnetwork.org) is a network of cities bringing together global knowledge, practice, partnerships, and funding to empower its members through building equity and resilience. The organization supports on-the-ground projects and solutions to facilitate connections and information-sharing between communities and local leaders.
-- [Ocean Conservancy](www.oceanconservancy.org) is working to protect the ocean from today’s greatest global challenges. Together with our partners, we create science-based solutions for a healthy ocean and the wildlife and communities that depend on it. For more information, visit , or follow us on Facebook, Twitter or Instagram.
-
-- The [Circulate Initiative](www.thecirculateinitiative.org) is a non-profit organization that works to solve the plastic pollution challenge and build circular and equitable economies across emerging markets. It delivers cutting-edge research, builds high-impact programs, and drives collective action with industry stakeholders including businesses, investors, and policymakers. For more information, please visit: .
+- [Ocean Conservancy](www.oceanconservancy.org) is a non-profit environmental advocacy group working to advance marine health and protection. Ocean Conservancy focuses on science-based solutions for a healthy ocean and the wildlife and communities that depend on it.
+- [The Circulate Initiative](www.thecirculateinitiative.org) is a non-profit organization that works to solve the plastic pollution challenge and build circular and equitable economies across emerging markets. The organization focuses on research, high-impact programs, and stakeholder collaboration to forward sustainability and equitable growth.
 
 Ocean Conservancy has taken the initiative to organize a global network of cities to combat marine pollution through the Urban Oceans program. This program takes multiple approaches to address ocean plastic pollution. First, they mobilize cleanup campaigns across each city based on volunteer efforts with international and local support groups, such as the International Coastal Cleanup. Second, they research each city's sanitation and urban systems to identify key details regarding what causes trash to end up in oceans & waterways, sharing findings and recommending action plans to local communities and decision makers. And third, working with stakeholders directly to create changes in products, practices, and behaviors as alternative solutions to their current needs. The program has been successful in engaging local communities, businesses, and governments to take action against marine pollution.
 
 With these efforts, each campaign requires an evaluation of local context and detailed understanding of the city's systems and dynamic. This aspect of the process requires long-term planning and methodical decision-making to understand the pre-existing conditions in place. Hence, our model aims to streamline the process of understanding the general structure of each city-context and provide a comprehensive solution on where efforts and resources should be allocated to. Ultimately saving time on where to implement their waste-reduction strategies. 
 
-We based our focus and model on the current cities from the Urban Ocean program. The Resilient Cities Network is a coalition of cities around the world that assist one another in building safer, more sustainable, and equitable futures for their populations. Each of which shares their knowledge, experiences, and policy practices to empower one another. The 12 participating cities a part of the Urban Ocean program as of May 2024 are:
+We based our focus and model on the current cities from the Urban Ocean program. The 12 participating cities a part of the Urban Ocean program as of May 2024 are:
 
   1. Can Tho, Vietnam
   2. Chennai, India
@@ -67,15 +57,13 @@ We based our focus and model on the current cities from the Urban Ocean program.
   11. Santa Fe, Argentina
   12. Salvador, Brazil
 
-
 ## Motivation and Use Case
 
-Pollution is a global problem that takes many forms contaminating every aspect of the environment. Much of this pollution, ends up in oceans, harming marine life, contaminating water bodies, and hurting local economies. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
+As marine litter worsens across the world, litter accumulation poses significant cyclical health, biodiversity, and climate risks. For example, an estimated 11 million metric tons of plastic waste enter the ocean every year, and this number expected to triple by 2040. Particularly in developing countries with lacking waste disposal systems and recycling programs, litter accumulation poses a much steeper issue that is often difficult to solve systemically. This often disproportionately impacts vulnerable coastal dwellers and fisherman who heavily rely on the marine ecosystem. In response, Ocean Conservancy's Urban Ocean program has been developing projects that mitigate marine pollution, assess waste management, and enable cities to address ocean plastics and resilience. These projects intend to deploy "zero-waste" pilot strategies in cities around the world. With this wide-spanning outreach and diversity in partnerships, an assessment on site selection and resource allocation becomes a repeated step in the process that hinders efficiency each waste-reduction campaign. 
 
-Our objective is to develop a site assessment model that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
+Our objective is to develop a site selection and assessment tool that identifies effective zero-waste site locations for national and multinational use. This geospatial risk assessment model serves the purpose of predicting litter accumulation based on globally sourced data with a repeatable framework on an international scale. The results of the model aim to evaluate which sections of a given area have the highest likelihood to produce and contain litter relative to its surroundings. For our case, the Urban Ocean program intends to dedicate "zero-waste" solutions in these areas for the most effective impact for each deployment.
 
-This dashboard is to support the narrative-building and decision-making of zero-waste pilot siting and attract funding sources for cities. Main funding partners include private corporates, foundations, and federal departments
-
+Our resulting dashboard is to support the narrative-building and decision-making of zero-waste pilot siting and attract funding sources for cities. Main funding partners include private corporates, foundations, and federal departments
 
 ```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
 knitr::opts_chunk$set(echo = TRUE)
@@ -252,11 +240,11 @@ mapTheme <- function(base_size = 10, title_size = 14) {
 
 ## Data Sources
 
-
+Our project involved a range of data sources for model building and finding key insights into the current state of marine litter. The exploratory data analysis primarily focused on extracting information from global sources to ensure scalability of the model scope and application.
 
 ### Marine Debris Tracker 
 
-In terms of our data & variables, our primary environmental health indicator, marine debris/litter, was acquired via manual download from Marine Debris Tracker (<https://www.debristracker.org/data/>). The Marine Debris Tracker is a web-application & public-use database that tracks all recorded global litter disposal efforts from participating organizations. The data for each city was carved out by a boundary box determined by initial-research political boundaries. From there, all debris recorded between January 2021 - February 2024 was compiled to a CSV and used as our primary independent variable. Each selected city required its own evaluation in terms of usable debris data over the several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Some cities included as few as ~500 data points. Despite the repeated process of the model itself, results and accuracy laid contingent on data quantity and external factors available to each region. 
+Our primary dataset focused on existing marine debris/litter from the [Marine Debris Tracker](https://www.debristracker.org/data/) powered by Morgan Stanley in collaboration with the National Geographic Society and the University of Georgia. The Marine Debris Tracker is a web-application and public use database that tracks user-recorded global litter pick-up projects and initiatives from participating organizations.
 
 ### OpenStreetMap Data
 
@@ -280,10 +268,7 @@ Waste management or waste facilities serve the purpose off collecting, storing, 
 
 Landuse is a general indicator of the city's zoning and urban planning. Industrial zones, for example, are likely to have litter accumulation due to the nature of the activities. Residential zones, on the other hand, are less likely to have litter accumulation due to the opposite nature. The model uses landuse to potentially discover patterns in the city that may not necessarily be identified by intuition alone, but is still important is creating the picture of how an area is structured. With this generalization in mind, zoning alone is not enough for describing landuse. Roads also are a vaiable incorporated into the model to frame the network of the city, also acting as a proxy to density. Grid streets or segments closer together often represent denser, potentially taller buildings that represent activity, as well as vise-versa. Hence, each variable is a general feature known to be present in every city and allows for replicated use to any place in the world. 
 
-```{r Variables, warning = FALSE, message = FALSE, cache = TRUE }
-knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/pictures/Variables.png")
-
-```
+![WILL REPLACE](variablesdraft.png)
 
 
 ## Feature Engineering
@@ -294,6 +279,9 @@ knitr::include_graphics("https://raw.githubusercontent.com/TrevorKap/MUSA810-Mar
 Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Overall the goal of the data gathering and variables chosen provide a model an understanding the city itself, and in turn understand the systems in place and the environment assessment needed. 
 
 ### Data Wrangling
+
+The marine litter data scope for this analysis is between January 2021 - February 2024. Each selected city required its own evaluation in terms of usable debris data over the several year time span. Ideal locations featured several thousand data points across 2-3 years for early & late stage model development. Some cities included as few as ~500 data points. Despite the repeated process of the model itself, results and accuracy laid contingent on data quantity and external factors available to each region. 
+
 
 Each aspect of the data gathering, through manual download, creation, or API, can now be coalesced into one cohesive visual. As mentioned with the 500x500 meter grid, all variables including litter as measuring based on an attribute regarding the cells. This grid is structure by the boundary box created from Google My Maps. This boundary file projects the city and defines its boundary on where the model is evaluating. Boundary files for our data are knowingly compatible with KML or GEOJSON files, or other file types that can be converted to raster layers. 
 
@@ -672,7 +660,7 @@ test_cbind <- cbind(test_cbind,temp_risk_cat)
 
 ## Multi-Vision Mixed Model Build
 
-The Random Forrest and Linear models are depicted side-by-side. When creating our final results, as mentioned, both are given equal weight input. We are looking for where the two models coincide and contrast in their predictions for litter assessment. These two results then provide an area where to dedicate zero-waste site resources. The final map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generality develops a definitive solution and action plan for Urban Ocean. 
+The Random Forest and Linear models are depicted side-by-side. When creating our final results, as mentioned, both are given equal weight input. We are looking for where the two models coincide and contrast in their predictions for litter assessment. These two results then provide an area where to dedicate zero-waste site resources. The final map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generality develops a definitive solution and action plan for Urban Ocean. 
 
 ```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
@@ -777,15 +765,13 @@ grid.draw(
   )
 )
 ```
-
-The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk. 
+The Multi-Vision Model features a better distribution than the previous two with a mild right skew still existing, similarly to the RandomForest. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk.
 
 The next visual features all three models compared. Here we see the Multi-Vision (bottom) having the best bell-curve representation. The Linear Model (middle) has a less consistent, duel distribution and is not as ideal as the Multi-Vision. The Random Forest (top) has a more consistent distribution but is not as accurate as the Multi-Vision because of the greater skew. The Multi-Vision model is the best performer.
 
 Now we examine the scatterplot of multi-vision residuals. It still shows an identical relationship as the previous two, which may not be as desired, but also does not tell the full story. The model is not perfect, but it is the best performer in the context of the data and the model's purpose. The meaning of the model is better explained by the Q-Q plot. The Q-Q plot shows the residuals of the model in comparison to a normal distribution of the actual dataset. The closer the points are to the 45-degree line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are not perfectly aligned but are very close for the most part, creating a mild curvature in the middle, indicating skewness in the data. However, the tail-end of the points of higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles. Overall, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
 ## Histogram of Residuals
-
 
 ```{r Histogram of Residuals, warning = FALSE, message = FALSE, cache = TRUE }
 
@@ -894,7 +880,7 @@ grid.draw(
 
 Our web-based dashboard, entitled Marine Litter Assessment Dashboard, visualizes our model results and other data analysis in an interactive way.
 
-!()
+![WILL REPLACE)](REPLACE.jpeg)
 
 Once we have obtained the prediction results from our machine learning model, we input them into a web application. At the core of this application is an interactive map that allows users to view the probability of each county’s region transitioning from permeable to impermeable in the future by selecting various layers. The probability interval is divided into five equal parts based on its highest value, with the high probability change areas highlighted in red. Users can further click on the “check layer” to view specific information about these high probability conversion areas, including their past land cover types and the specific numerical values of their probability of conversion. The high-risk areas are marked in red, making them easier to locate quickly. Users can also select other relevant information from a dropdown list, such as complete land cover maps from 2014/2018 and census tract data. This information can assist decision-makers in balancing their decisions on whether to protect certain areas.
 
