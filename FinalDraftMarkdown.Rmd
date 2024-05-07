@@ -150,7 +150,7 @@ plotTheme <- function(base_size = 10, title_size = 14) {
     plot.subtitle = element_text(face = "italic", family = "Avenir"),
     plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
-    panel.grid.major = element_line("white", size = 0.5),
+    panel.grid.major = element_line("white", size = 0.7),
     panel.grid.minor = element_blank(),
     panel.border = element_blank(),
     plot.border = element_blank(),
@@ -213,7 +213,7 @@ Additionally, we also hypothesized population density as having a major influenc
 
 ## Variables
 
-Given all these data sources, our model utilized a range of variables, depicted below.
+Given all these data sources, our model utilized a range of variables, depicted below. The variables used in the model were selected based on hypothesized impact on litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. We hypothesized these variables being able to provide the best insight on where litter most likely accumulated or ends up.
 
 ![](variables.png)
 
@@ -223,26 +223,17 @@ Geomorphology describes the city's physical geography for the model. Trash, when
 
 Waste management or waste facilities serve the purpose of collecting, storing, transporting, recycling, and disposing of waste. This impact directly minimizes adverse effects on the environment and public health of an area. These facilities act as a factor of litter risk because of their location in relation to the city center, where litter has been located, and their capabilities to cover their assigned jurisdiction. Their critical role in the sanitation infrastructure and system in a city is a key factor in understanding any operation weaknesses. 
 
-Landuse is a general indicator of the city's zoning and urban planning. Industrial zones, for example, are likely to have litter accumulation due to the nature of the activities. Residential zones, on the other hand, are less likely to have litter accumulation due to the opposite implication. The model uses landuse to potentially discover patterns in the city that may not necessarily be identified by intuition alone, but is still important is creating the picture of how an area is structured. With this generalization in mind, zoning alone is not enough for describing landuse. Roads also are a variable incorporated into the model to frame the network of the city, also acting as a proxy to density. Grided streets or segments closer together often represent denser, potentially taller buildings that represent activity, as well as vise-versa. Hence, each variable is a general feature known to be present in every city and allows for replicated use to any place in the world. 
+Land use is a general indicator of the city's zoning and urban planning. Industrial zones, for example, are likely to have litter accumulation due to the nature of the activities. Residential zones, on the other hand, are less likely to have litter accumulation due to the opposite implication. The model uses land use to potentially discover patterns in the city that may not necessarily be identified by intuition alone, but is still important is creating the picture of how an area is structured. With this generalization in mind, zoning alone is not enough for describing landu se. Roads also are a variable incorporated into the model to frame the network of the city, also acting as a proxy to density. Gridded streets or segments closer together often represent denser, potentially taller buildings that represent activity, as well as vise-versa. Hence, each variable is a general feature known to be present in every city and allows for replicated use to any place in the world. 
 
 ## Feature Engineering
 
-### Understanding the Data
+### The Fishnet Grid
 
-After the boundary box was created, the data was then projected to a fishnet grid. The fishnet grid was used to count the number of litter points in each cell in a format that can be compared to by each grid cell in the city.
-
- Each variable was then placed on the fishnet grid with the litter data, computed using a Chi-Squared test, and evaluated for association between the variables and litter.
-
-Following data extrapolation, the litter files were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city. The variables used in the model were selected based on their potential association with litter accumulation. These variables included land-use, proximity to water, waste site facilities, roads, and other indicators of commercial activity. The aim of these variables was to act as proxies for litter cases, providing insight on where litter most likely accumulated or ends up. Overall the goal of the data gathering and variables chosen provide a model an understanding the city itself, and in turn understand the systems in place and the environment assessment needed. 
+A fishnet grid was employed in this analysis to allow for the most effective modeling of risk. Each grid cell has a count of a particular variable. Following data extrapolation from OSM data for, the litter data and other variables were overlaid on a 500x500 meter fishnet grid to create a uniformed data structure for each city. The fishnet grid was created using the 'sf' package and projected to the respective city's UTM projection. The grid was used to aggregate and visualize the litter data and other variables to create a uniformed data structure for each city.
 
 ### Data Preprocessing
 
-
-As mentioned with the 500x500 meter grid, all variables including litter as measuring based on an attribute regarding the cells. This grid is structure by the boundary box created from Google My Maps. This boundary file projects the city and defines its boundary on where the model is evaluating. 
-
-For example, our litter data is not counted as individual data points for model development, but rather a sum of points within each cell. This allows for a better indication of frequency and density of litter in each area. The same method is applied to our dependent variables as well for uniformed formatted and consistency in structure. Below code & figure 3 demonstrate the example process of importing the litter CSV, boundary KML, and the creation of the overlay used for data exploration and analysis. 
-
-Our M. With this in mind,. We then repeated this process for the rest of the Urban Ocean cities. As calling large amount of OSM data is time consuming for each city, each fishnet for each city was saved and reloaded in this process.
+The following section demonstrate the process of importing the litter CSV, boundary KML, and the calling of OSM data and other data onto the grid used for data exploration and analysis. This process was then repeated for the rest of the Urban Ocean cities. As calling large amount of OSM data is time consuming for each city, each fishnet for each city was saved to file and reloaded for the purposes of this report.
 
 ![](grid.png)
 
@@ -279,9 +270,7 @@ for (i in seq_along(city_data_list)) {assign(cities[i], city_data_list[[i]])}
 for (i in seq_along(bd_data_list)) {assign(bd[i], bd_data_list[[i]])}
 
 for (i in seq_along(bd_data_meter_list)) {assign(bdM[i], bd_data_meter_list[[i]])}
-```
 
-```{r loading stored nets, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
 base_path <- "https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/stored_city/"
 city_names <- c("santa_fe", "semarang", "panama", "can_tho", "melaka", "salvador",
                 "surat", "santiago", "bangkok", "chennai", "mumbai", "pune")
@@ -299,7 +288,7 @@ list2env(setNames(city_data, paste0("net_", city_names)), envir = .GlobalEnv)
 
 ### Data Wrangling
 
-As suggested above, MDT data used only accounts for litter that has been recorded by the user of the tracker, suggesting that areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Thus, there was a range of data wrangling techniques employed in this model to reduce bias and noise. For example, rather than predicting for litter count, we only considered fishnet grid cells that had records of litter. This meant that only grid cells with litter at a count greater than 0 were modeled. Furthermore, we decided to opt for a "per user" count, in which the litter per grid sell was measured with regards to the number of pieces reported per user to be able to compare differing amounts of litter per person, given that users would typically record data in areas that were biased to their own living circumstances and conditions. Additionally, we used a function to sample more data from the original litter dataset. Lastly, z-score normalization was applied to help normalize the data from a scale of 0-1 to make the data more interpretable.
+As suggested above, MDT data used only accounts for litter that has been recorded by the user of the tracker, suggesting that areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Thus, there was a range of data wrangling techniques employed in this model to reduce bias and noise. For example, rather than predicting for litter count, we only considered fishnet grid cells that had records of litter. This meant that only grid cells with litter at a count greater than 0 were modeled. Furthermore, we decided to opt for a "per user" count, in which the litter per grid cell was measured with regards to the number of pieces reported per user to be able to compare differing amounts of litter per person, given that users would typically record data in areas that were biased to their own living circumstances and conditions. Additionally, we used a function to sample more data from the original litter dataset. Lastly, z-score normalization was applied to help normalize the data from a scale of 0-1 to make the data more interpretable.
 
 ```{r feature engineering 1, warning = FALSE, message = FALSE, cache = TRUE}
 library(grid)
@@ -527,7 +516,7 @@ grid.draw(
 
 ```
 
-The PCA Variables graph shows the correlation of each variable in comparison to the first two dimensions. The arrows that represent each variable have varying directions and lengths, indicating mostly little correlation between the first dimension and second dimension. But the few variables that have relatively longer lengths have stronger relationships between both dimensions and can be used for the model. To better understand their importance we evaluate their Squared Cosine. This graph serves as the basis for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables. Each variable with a '_sig' suffix indicates where the presence of the variable, considering KNN and Moran's I, have significant impact on where the dependent variable, litter, is located. 
+The PCA Variables graph shows the correlation of each variable in comparison to the first two dimensions. The arrows that represent each variable have varying directions and lengths, indicating mostly little correlation between the first dimension and second dimension. But the few variables that have relatively longer lengths have stronger relationships between both dimensions and can be used for the model. To better understand their importance we evaluate their Squared Cosine. This graph serves as the basis for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
 
 ```{r PCA analysis5, warning = FALSE, message = FALSE, cache = TRUE }
 n_colors <- 100 
@@ -552,7 +541,7 @@ grid.draw(
 
 # Model Building
 
-Our model goal is to predict the relative likelihood of litter accumulation in a given area based on the independent variables. The model will be built using the Random Forest and Linear Regression algorithms. .  We take both of these models/results and compare them to determine a mixed-use approach that factors both results with equal weight. 
+Our model goal is to predict the relative likelihood of litter accumulation in a given area based on the independent variables. We evaluated three models, a random forest model, a linear regression model, and a mixed model.
 
 ## Random Forest Model 
 
@@ -645,11 +634,11 @@ test_cbind <- cbind(test_cbind,temp_risk_cat)
 
 ## Mixed Model Build
 
-Both Random Forest regressions and Linear Regressions have their benefits and drawbacks. The Random Forest model is known for its ability to handle large datasets and high dimensionality, but can be prone to overfitting and cannot handle 'data noise' as well as a Linear model. Random Forest models also tend to outperform linear regression in prediction accuracy when there are non-linear relationships between dependent and independent variables. In contrast, the Linear Regression model is known for its simplicity in modeling lineartiy, but can be prone to underfitting and may not perform well if there is non-linear relationships among the variables. 
+Both Random Forest regressions and Linear Regressions have their benefits and drawbacks. The Random Forest model is known for its ability to handle large datasets and high dimensionality, but can be prone to overfitting and cannot handle 'data noise' as well as a Linear model. Random Forest models also tend to outperform linear regression in prediction accuracy when there are non-linear relationships between dependent and independent variables. In contrast, the Linear Regression model is known for its simplicity in modeling linearity, but can be prone to underfitting and may not perform well if there is non-linear relationships among the variables. 
 
-When creating our final results, as mentioned, both are given equal weight input. We are looking for where the two models coincide and contrast in their predictions for litter assessment. These two results then provide an area where to dedicate zero-waste site resources. 
+From these two models, we decided to create an additional mixed model that utilized a 40-60 split of the prediction values of the random forest and the linear regression model, allowing for a balance between the strengths of both model types.
 
-The Random Forest and Linear models are depicted side-by-side. The final mixed model map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generality develops a definitive solution and action plan for Urban Ocean. 
+The Random Forest and Linear models are depicted side-by-side. The final mixed model map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generalizability supports the risk assessment of the project. 
 
 ```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
@@ -692,7 +681,7 @@ grid.draw(
 
 # Comparative Model and Error Analysis
 
-To evaluate the performance of each of the three, we compared the residuals through a series of visualization.
+To evaluate the performance of each of the three, we compared the residuals through a series of plots.
 
 ## Predicted vs Observed Residuals
 
@@ -752,13 +741,11 @@ grid.draw(
 )
 ```
 
-The Random Forest scatterplot shows a weak relationship between the actual and predicted values, with an underestimation with some notable outliers. These residuals tell us the model can indicate lower-risk areas better than higher-risk areas, but this result is expected given the minimal amount of data available as input. This bias translates to the plots because we are using clusters of cleanup efforts as our datasets. Meanwhile, the Linear Regression residuals have a similar result but has slightly more uniformity in the results, which indicates mildly better performance when predicting places with higher actual values. In the mixed model, the residuals see a more even split
+The Random Forest scatterplot shows a somewhat weak relationship between the actual and predicted values, with an underestimation with some notable outliers. These residuals tell us the model can indicate lower-risk areas better than higher-risk areas, but this result is expected given the minimal amount of data available as input. This bias translates to the plots because we are using clusters of cleanup efforts as our datasets. Meanwhile, the Linear Regression residuals have a similar result but has slightly more uniformity in the results, which indicates mildly better performance when predicting places with higher actual values, though the points are less clustered to the line suggesting greater average error. In the mixed model, the residuals see a pattern resembling a combination of the two. This can be further explored through the following histograms.
 
 ## Histogram of Residuals
 
-The residual spread can be further explored through histograms. The Linear Model has residuals that over and underpredict the actual values, while the Random Forest consistently underpredicts the actual values. Now these results are where the mixed-model approach is incorporated. We must note that the data itself is already bias and skewed because of the inherent nature of litter, and the true verification of the model's integrity is the real-world comparison to where it predicts. 
-
-The Multi-Vision Model Residuals features the most ideal distribution than the previous two by combining. This indicates there is greater consistency in this model and, if tuned for accuracy as well, is our best performer in the environmental assessment of relative litter accumulation risk.
+The residual spread can be further explored through histograms. The Linear Model has more residuals that show over and underprediction of the actual values through the more horizontal spread, while the Random Forest is more likely to underpredict due to the more pointed negative skew. The mixed model on the other hand incorporates the more even spread of the linear regression and the greater accuracy of the random forest model, making it more ideal.
 
 ```{r Histogram of Residuals, warning = FALSE, message = FALSE, cache = TRUE }
 
@@ -789,7 +776,6 @@ grid.draw(
         xlab("Values") + 
         ylab("Frequency") + 
         plotTheme(), 
-      
       nrow = 3
     )
   )
@@ -801,7 +787,7 @@ grid.draw(
 
 The Q-Q (quantile to quantile) plot shows the distributions residuals of the model to a theoretical distribution. The closer the points are to the line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are somewhat aligned with a mild curvature in the middle, indicating skewness in the data. However, the tail end of the points of slightly higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles, and suggests that the tails of the residuals' distribution are heavier (have more extreme values) than would be expected under a normal distribution. Regardless, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
-```{r Q-Q, warning = FALSE, message = FALSE, cache = TRUE }
+```{r Q-Q, warning = FALSE, message = FALSE, cache = FALSE }
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -818,8 +804,6 @@ grid.draw(
   )
 )
 ```
-
-
 
 # Model Results
 
@@ -887,7 +871,7 @@ Our model and web dashboard is the outcome of months of data research, wrangling
  - [Marine Debris Tracker](https://www.debristracker.org/data/)
  - [OpenStreetMap](https://www.openstreetmap.org/)
  - [Google My Maps](https://www.google.com/mymaps)
- - [Data for Good at Meta's](https://data.humdata.org/organization/meta?q=population+density&sort=if%28gt%28last_modified%2Creview_date%29%2Clast_modified%2Creview_date)
+ - [Data for Good at Meta](https://data.humdata.org/organization/meta?q=population+density&sort=if%28gt%28last_modified%2Creview_date%29%2Clast_modified%2Creview_date)
 
 ## Others
  - [Ocean Conservancy/Urban Ocean](https://www.oceanconservancy.org/urban-ocean/)
