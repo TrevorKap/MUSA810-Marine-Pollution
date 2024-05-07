@@ -150,7 +150,7 @@ plotTheme <- function(base_size = 10, title_size = 14) {
     plot.subtitle = element_text(face = "italic", family = "Avenir"),
     plot.caption = element_text(hjust = 0, family = "Avenir"),
     axis.ticks = element_blank(),
-    panel.grid.major = element_line("white", size = 0.7),
+    panel.grid.major = element_line("white", size = 0.5),
     panel.grid.minor = element_blank(),
     panel.border = element_blank(),
     plot.border = element_blank(),
@@ -403,7 +403,7 @@ Following this feature engineering, the different variables were visualized in t
 
 The visuals showing 'count' measure the number of parcels with the zone or number of buildings within the cells and does not account for density. The nearest neighbor maps ('Variable'_nn) measured their proximity.
 
-```{r waste map, warning = FALSE, message = FALSE, cache = FALSE}
+```{r waste map, warning = FALSE, message = FALSE, cache = TRUE}
 library(ggplot2)
 library(stringr)
 library(grid)
@@ -545,7 +545,7 @@ Our model goal is to predict the relative likelihood of litter accumulation in a
 
 ## Random Forest Model 
 
-The Random Forest model is a machine learning algorithm that uses an ensemble of decision trees to predict the likelihood of an event occurring, the event being the presence of trash. The following random forest model utilizes the 'TidyModels' package. The data is then split to a 75-25 train-test set. We specify the randomforest to function as a 'regression' to specify the type of output to be evaluated, that being the 'count' of litter in each cell. The data is then divided into 10 folds for cross-validation to measure accuracy among each iteration. The model is then tuned using a grid search to find the optimal hyperparameters at each level of different tree (decision) size, ranging between 500 - 2000 decisions. The best-performing model iteration is selected based on the Root-mean-square deviation metric, measuring the accuracy of the forecasted results of each decision. The mean error depicted in the table by each forest (iteration) lies around 0.975 - 978 The first result, Preprocessor1_Model09, has the best result with the lowest RMSE (root mean square error) of 0.9752240. This model will be used for our final mixed-used approach.
+The Random Forest model is a machine learning algorithm that uses an ensemble of decision trees to predict the likelihood of an event occurring, the event being the presence of trash. The following random forest model utilizes the 'TidyModels' package. The data is then split to a 75-25 train-test set. We specify the randomforest to function as a 'regression' to specify the type of output to be evaluated, that being the 'count' of litter in each cell. The data is then divided into 10 folds for cross-validation to measure accuracy among each iteration. The model is then tuned using a grid search to find the optimal hyperparameters at each level of different tree (decision) size, ranging between 500 - 2000 decisions. The best-performing model iteration is selected based on the Root-mean-square deviation metric, measuring the accuracy of the forecasted results of each decision. The mean error depicted in the table by each forest (iteration) lies around 0.84 The first result, Preprocessor1_Model10, has the best result with the lowest RMSE (root mean square error) of 0.8442832 This model will be used for our final mixed-used approach.
 
 
 ```{r rf tidymodels, warning = FALSE, message = FALSE, cache = TRUE }
@@ -638,7 +638,7 @@ Both Random Forest regressions and Linear Regressions have their benefits and dr
 
 From these two models, we decided to create an additional mixed model that utilized a 40-60 split of the prediction values of the random forest and the linear regression model, allowing for a balance between the strengths of both model types.
 
-The Random Forest and Linear models are depicted side-by-side. The final mixed model map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. This balance between specificity and generalizability supports the risk assessment of the project. 
+The Random Forest and Linear models are depicted side-by-side. The final mixed model map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. Category 5 is classified as the highest risk area to develop litter. These areas serve as the most likely area to have higher litter concentration In contrast, category 1 shows areas of low-risk and are likely not or less affected by the adverse impacts of litter.
 
 ```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
@@ -787,7 +787,7 @@ grid.draw(
 
 The Q-Q (quantile to quantile) plot shows the distributions residuals of the model to a theoretical distribution. The closer the points are to the line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are somewhat aligned with a mild curvature in the middle, indicating skewness in the data. However, the tail end of the points of slightly higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles, and suggests that the tails of the residuals' distribution are heavier (have more extreme values) than would be expected under a normal distribution. Regardless, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
-```{r Q-Q, warning = FALSE, message = FALSE, cache = FALSE }
+```{r Q-Q, warning = FALSE, message = FALSE, cache = TRUE }
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
