@@ -110,6 +110,11 @@ h4 {
   width: 100%;
 }
 
+table {
+  max-width: 800px;
+  font-family: 'Avenir', sans-serif;
+}
+
 /*------------Table of Contents (TOC)----------- */
 
 .tocify {
