@@ -66,130 +66,7 @@ Our objective is to develop a site selection and assessment tool that identifies
 
 Our resulting dashboard aims to support the narrative-building and decision-making of zero-waste pilots and attract funding sources and other support for these cities.
 
-```{r setup, include=FALSE, warning = FALSE, message = FALSE, cache = TRUE }
-knitr::opts_chunk$set(echo = TRUE)
 
-library(stringr)
-library(tidyverse)
-library(sf)
-library(RSocrata)
-library(viridis)
-library(spatstat)
-library(raster)
-library(spdep)
-library(FNN)
-library(grid)
-library(gridExtra)
-library(knitr)
-library(kableExtra)
-library(tidycensus)
-library(classInt)
-library(RCurl)
-library(httr)
-library(osmdata)
-library(ggplot2)
-library(randomForest)
-library(XML)
-library(neuralnet)
-library(MASS)
-library(tidymodels)
-library(jsonlite)
-library(QuickJSR)
-library(hash)
-library(fastDummies)
-library(corrr)
-library(ggcorrplot)
-library(FactoMineR)
-library(factoextra)
-library(extrafont)
-library(grid)
-library(RColorBrewer)
-library(caTools)
-library(dials) 
-library(ranger)
-library(xgboost)
-library(Metrics)
-library(caret)
-
-source("https://raw.githubusercontent.com/urbanSpatial/Public-Policy-Analytics-Landing/master/functions.r")
-source('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/function_UO.R')
-st_c    <- st_coordinates
-st_coid <- st_centroid
-
-risk_palette <- c("#FBEDC6", "#F8D7AD", "#F3C0A6", "#DE8595", "#BF6F8A")
-
-cities <- c("Bangkok", "Can_Tho", "Chennai", "Melaka", "Mumbai", "Panama_City", 
-            "Pune", "Salvador", "Santa_Fe", "Santiago", "Semarang", "Surat")
-
-bd <- c("Bangkok_bd", "Can_Tho_bd", "Chennai_bd", "Melaka_bd", "Mumbai_bd", "Panama_City_bd", "Pune_bd", "Salvador_bd", "Santa_Fe_bd", "Santiago_bd", "Semarang_bd", "Surat_bd")
-
-bdM <- c("Bangkok_bdM", "Can_Tho_bdM", "Chennai_bdM", "Melaka_bdM", "Mumbai_bdM", "Panama_City_bdM","Pune_bdM", "Salvador_bdM", "Santa_Fe_bdM", "Santiago_bdM", "Semarang_bdM", "Surat_bdM")
-
-
-# pre-store of osm data need to use 
-# a more expandable version of function
-# the actual store order is cate label, small cate
-stor_df <- data.frame(cato = character(), small =list(), label = character(),stringsAsFactors = FALSE)
-add_row <-function(cato,small,label){
-  new_row <- list(cato = cato, small = small, label = label)
-  stor_df <- bind_rows(stor_df, new_row)
-  return(stor_df)
-}
-stor_df <- add_row('water',list(c('canal','drain','ditch')), 'water')
-stor_df <- add_row('amenity',list(c('waste_basket','waste_disposal','waste_transfer_station','recycling')), 'waste')
-stor_df <- add_row('amenity',list(c('restaurant','pub','bar')), 'restaurant')
-stor_df <- add_row('highway',list('residential'), 'road')
-stor_df <- add_row('landuse',list('industrial'), 'industrial')
-stor_df <- add_row('landuse',list('residential'), 'residential')
-stor_df <- add_row('landuse',list('retail'), 'retail')
-
-plotTheme <- function(base_size = 10, title_size = 14) {
-  theme(
-    text = element_text(family = "Avenir", color = "black"),
-    plot.title = element_text(size = title_size, family = "Avenir", colour = "black"), 
-    plot.subtitle = element_text(face = "italic", family = "Avenir"),
-    plot.caption = element_text(hjust = 0, family = "Avenir"),
-    axis.ticks = element_blank(),
-    panel.grid.major = element_line("white", size = 0.5),
-    panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    plot.border = element_blank(),
-    strip.background = element_rect(fill = "grey80", color = "white"),
-    strip.text = element_text(size = 10, family = "Avenir"),
-    axis.title = element_text(size = 10, family = "Avenir"),
-    axis.text = element_text(size = 8, family = "Avenir"),
-    panel.background = element_blank(),
-    plot.background = element_blank(),
-    legend.background = element_blank(),
-    legend.title = element_text(colour = "black", face = "italic", family = "Avenir"),
-    legend.text = element_text(colour = "black", face = "italic", family = "Avenir"),
-    strip.text.x = element_text(size = 12, family = "Avenir")
-  )
-}
-
-mapTheme <- function(base_size = 10, title_size = 14) {
-  theme(
-    text = element_text(family = "Avenir", color = "black"),
-    plot.title = element_text(size = title_size, colour = "black", family = "Avenir"),
-    plot.subtitle = element_text(face = "italic", family = "Avenir"),
-    plot.caption = element_text(hjust = 0, family = "Avenir"),
-    panel.background = element_blank(),
-    plot.background = element_blank(),
-    legend.background = element_blank(),
-    axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    axis.text = element_blank(),
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.border = element_blank(),
-    plot.border = element_blank(),
-    strip.text.x = element_text(size = 12, family = "Avenir")
-  )
-}
-
-```
 
 # Exploratory Data Analysis
 
@@ -238,7 +115,8 @@ The following section demonstrate the process of importing the litter CSV, bound
 ![](grid.png)
 
 
-```{r chennai data, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
+
+```r
 litter <- read.csv('https://raw.githubusercontent.com/TrevorKap/MUSA810-Marine-Pollution/main/Data/mdt-dataChennai.csv')
 litter_p <- litter%>%filter(master_material == 'PLASTIC')%>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326, agr = "constant")%>%st_transform('EPSG:32643')
@@ -255,7 +133,8 @@ final_net <- moran_gen(final_net,stor_df)
 chen_net <- final_net
 ```
 
-```{r data loading, warning = FALSE, message = FALSE, cache = TRUE, results='hide'}
+
+```r
 city_data_list <- lapply(cities, load_city_data)
 names(city_data_list) <- cities
 
@@ -283,14 +162,14 @@ for (city in city_names) {
   city_data[[city]] <- net_sf
 }
 list2env(setNames(city_data, paste0("net_", city_names)), envir = .GlobalEnv)
-
 ```
 
 ### Data Wrangling
 
 As suggested above, MDT data used only accounts for litter that has been recorded by the user of the tracker, suggesting that areas where litter was not recorded in a general surrounding could not confidently be assumed to be present or not present. Thus, there was a range of data wrangling techniques employed in this model to reduce bias and noise. For example, rather than predicting for litter count, we only considered fishnet grid cells that had records of litter. This meant that only grid cells with litter at a count greater than 0 were modeled. Furthermore, we decided to opt for a "per user" count, in which the litter per grid cell was measured with regards to the number of pieces reported per user to be able to compare differing amounts of litter per person, given that users would typically record data in areas that were biased to their own living circumstances and conditions. Additionally, we used a function to sample more data from the original litter dataset. Lastly, z-score normalization was applied to help normalize the data from a scale of 0-1 to make the data more interpretable.
 
-```{r feature engineering 1, warning = FALSE, message = FALSE, cache = TRUE}
+
+```r
 library(grid)
 cnt_wt <- function(litter,net){
   temp <- st_join(litter,net,join = st_within)
@@ -384,8 +263,9 @@ grid.draw(
     )
   )
 )
-
 ```
+
+<img src="FinalDraftMarkdown_files/figure-html/feature engineering 1-1.png" width="672" />
 
 The litter data features a wide variety of item categories and general information about each piece. Through the process of our feature engineering, we were able to identify the major litter risks to the cities. According to the above chart, plastic waste is of greatest concern, both in quantity, and given that they are tied to significant long-term sustainability issues including the lack of recyclability, effects on marine life, and the dependence on single-use plastics.
 
@@ -403,7 +283,8 @@ Following this feature engineering, the different variables were visualized in t
 
 The visuals showing 'count' measure the number of parcels with the zone or number of buildings within the cells and does not account for density. The nearest neighbor maps ('Variable'_nn) measured their proximity.
 
-```{r waste map, warning = FALSE, message = FALSE, cache = TRUE}
+
+```r
 library(ggplot2)
 library(stringr)
 library(grid)
@@ -414,11 +295,14 @@ grid.draw(grobTree(rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
                    grid.arrange(map_waste, map_waste_nn, ncol = 2)))
 ```
 
+<img src="FinalDraftMarkdown_files/figure-html/waste map-1.png" width="672" />
+
 ### OSM Variables
 
 The following sections also map OSM variables, including water, restaurants, roads, land use, and more. The selection was based on our hypothesis of areas of human activity leading to higher litter risk. Each variable is mapped on the fishnet grid for an initial exploratory analysis.
 
-```{r visualize count, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 visual_count1 <- function(net_one,variable){
   ggplot() +
     geom_sf(data = net_one, aes(fill = net_one[[variable]]), color = NA) +
@@ -440,11 +324,12 @@ grid.draw(
                    map_industrial, map_residential, map_retail, nrow = 2)
     )
   )
-
 ```
 
-```{r visualize nearest neighbour, warning = FALSE, message = FALSE, cache = TRUE }
+<img src="FinalDraftMarkdown_files/figure-html/visualize count-1.png" width="672" />
 
+
+```r
 map_water_nn <- visual_count1(net_chennai,'water_nn')
 map_restaurant_nn <- visual_count1(net_chennai,"restaurant_nn")
 map_road_nn <- visual_count1(net_chennai,'road_nn')
@@ -460,34 +345,244 @@ grid.draw(
                    map_industrial_nn, map_residential_nn, map_retail_nn, nrow = 2)
     )
   )
-
 ```
+
+<img src="FinalDraftMarkdown_files/figure-html/visualize nearest neighbour-1.png" width="672" />
 
 
 ## Principal Component Analysis
 
 The Principal Component Analysis (PCA) is a dimensional reduction technique used to transform high-dimensional data into a lower-dimensional space while preserving as much variance as possible. The PCA below is used to identify the most important variables in the dataset and their correlation with litter, ultimately creating synthetic variables that can augment the data input for the model. The first output is a table that depicts the general metrics found in the independent variables, such as standard deviation, variance, and the proportion of variance explained by each component. 
 
-```{r PCA analysis1, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 corr <- st_drop_geometry(net_total) %>% dplyr::select(!c(uniqueID,cvID,city,country))
 corr_nor<- scale(corr)
 corr_matrix <- cor(corr_nor)
 #ggcorrplot(corr_matrix)
 data.pca <- princomp(corr_matrix)
 summary(data.pca)
+```
 
 ```
-```{r PCA analysis2, warning = FALSE, message = FALSE, cache = TRUE }
+## Importance of components:
+##                           Comp.1     Comp.2     Comp.3     Comp.4     Comp.5
+## Standard deviation     1.1544504 0.36523214 0.34046877 0.31029899 0.25846779
+## Proportion of Variance 0.6144093 0.06149576 0.05343942 0.04438824 0.03079783
+## Cumulative Proportion  0.6144093 0.67590503 0.72934445 0.77373269 0.80453052
+##                            Comp.6     Comp.7     Comp.8    Comp.9    Comp.10
+## Standard deviation     0.23518531 0.21725529 0.20707302 0.1916407 0.18403398
+## Proportion of Variance 0.02549926 0.02175945 0.01976761 0.0169310 0.01561361
+## Cumulative Proportion  0.83002978 0.85178923 0.87155684 0.8884878 0.90410144
+##                           Comp.11    Comp.12     Comp.13   Comp.14     Comp.15
+## Standard deviation     0.17324598 0.15353018 0.143181926 0.1332383 0.120928775
+## Proportion of Variance 0.01383673 0.01086663 0.009451127 0.0081840 0.006741655
+## Cumulative Proportion  0.91793817 0.92880480 0.938255928 0.9464399 0.953181583
+##                            Comp.16     Comp.17     Comp.18     Comp.19
+## Standard deviation     0.120295484 0.102914317 0.101110151 0.100044032
+## Proportion of Variance 0.006671229 0.004882686 0.004712992 0.004614127
+## Cumulative Proportion  0.959852812 0.964735498 0.969448490 0.974062617
+##                            Comp.20    Comp.21     Comp.22     Comp.23
+## Standard deviation     0.097015031 0.09618051 0.092972876 0.088041257
+## Proportion of Variance 0.004338956 0.00426463 0.003984921 0.003573384
+## Cumulative Proportion  0.978401573 0.98266620 0.986651124 0.990224508
+##                            Comp.24     Comp.25     Comp.26     Comp.27
+## Standard deviation     0.080715923 0.068107836 0.058459405 0.052915014
+## Proportion of Variance 0.003003486 0.002138461 0.001575491 0.001290818
+## Cumulative Proportion  0.993227994 0.995366455 0.996941947 0.998232765
+##                             Comp.28     Comp.29      Comp.30      Comp.31
+## Standard deviation     0.0409395731 0.035875430 0.0252563016 0.0152463435
+## Proportion of Variance 0.0007726696 0.000593337 0.0002940673 0.0001071615
+## Cumulative Proportion  0.9990054343 0.999598771 0.9998928385 1.0000000000
+##                             Comp.32
+## Standard deviation     2.228071e-09
+## Proportion of Variance 2.288576e-18
+## Cumulative Proportion  1.000000e+00
+```
 
+```r
 table_html <- kbl(data.pca$loadings[, 1:2])
 kbl(data.pca$loadings[, 1:2]) %>%
   kable_styling(bootstrap_options = "striped", font_size = 12, full_width = FALSE, html_font = "Avenir")
 ```
 
+<table class="table table-striped" style="font-size: 12px; font-family: Avenir; width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Comp.1 </th>
+   <th style="text-align:right;"> Comp.2 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> count </td>
+   <td style="text-align:right;"> 0.0391065 </td>
+   <td style="text-align:right;"> 0.0282442 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> water </td>
+   <td style="text-align:right;"> 0.0693956 </td>
+   <td style="text-align:right;"> -0.1633430 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> water_nn </td>
+   <td style="text-align:right;"> -0.2529400 </td>
+   <td style="text-align:right;"> 0.1799049 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> waste </td>
+   <td style="text-align:right;"> 0.0600653 </td>
+   <td style="text-align:right;"> -0.0664571 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> waste_nn </td>
+   <td style="text-align:right;"> -0.2834370 </td>
+   <td style="text-align:right;"> 0.0208787 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> restaurant </td>
+   <td style="text-align:right;"> 0.1223218 </td>
+   <td style="text-align:right;"> -0.0422238 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> restaurant_nn </td>
+   <td style="text-align:right;"> -0.2771403 </td>
+   <td style="text-align:right;"> -0.0894539 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> road </td>
+   <td style="text-align:right;"> 0.1634139 </td>
+   <td style="text-align:right;"> 0.4109086 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> road_nn </td>
+   <td style="text-align:right;"> -0.1375091 </td>
+   <td style="text-align:right;"> -0.3191800 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> industrial </td>
+   <td style="text-align:right;"> 0.0455750 </td>
+   <td style="text-align:right;"> -0.2397279 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> industrial_nn </td>
+   <td style="text-align:right;"> -0.1254326 </td>
+   <td style="text-align:right;"> 0.2251861 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> residential </td>
+   <td style="text-align:right;"> 0.1228023 </td>
+   <td style="text-align:right;"> -0.0306500 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> residential_nn </td>
+   <td style="text-align:right;"> -0.1698571 </td>
+   <td style="text-align:right;"> -0.1098496 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> retail </td>
+   <td style="text-align:right;"> 0.0834391 </td>
+   <td style="text-align:right;"> -0.1030719 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> retail_nn </td>
+   <td style="text-align:right;"> -0.2773497 </td>
+   <td style="text-align:right;"> 0.0287448 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> avg_pop </td>
+   <td style="text-align:right;"> 0.2391612 </td>
+   <td style="text-align:right;"> 0.2413757 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> sum_pop </td>
+   <td style="text-align:right;"> 0.2599853 </td>
+   <td style="text-align:right;"> 0.2968630 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> water_sig </td>
+   <td style="text-align:right;"> 0.0926867 </td>
+   <td style="text-align:right;"> -0.1871962 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> water_sig_dis </td>
+   <td style="text-align:right;"> -0.2652302 </td>
+   <td style="text-align:right;"> 0.1821440 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> waste_sig </td>
+   <td style="text-align:right;"> 0.1003334 </td>
+   <td style="text-align:right;"> -0.1030702 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> waste_sig_dis </td>
+   <td style="text-align:right;"> -0.2567700 </td>
+   <td style="text-align:right;"> 0.0972708 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> restaurant_sig </td>
+   <td style="text-align:right;"> 0.1312017 </td>
+   <td style="text-align:right;"> -0.0589612 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> restaurant_sig_dis </td>
+   <td style="text-align:right;"> -0.2806288 </td>
+   <td style="text-align:right;"> -0.0111852 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> road_sig </td>
+   <td style="text-align:right;"> 0.0539025 </td>
+   <td style="text-align:right;"> 0.2301286 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> road_sig_dis </td>
+   <td style="text-align:right;"> -0.0984326 </td>
+   <td style="text-align:right;"> -0.2721898 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> industrial_sig </td>
+   <td style="text-align:right;"> 0.0558730 </td>
+   <td style="text-align:right;"> -0.2686758 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> industrial_sig_dis </td>
+   <td style="text-align:right;"> -0.1533502 </td>
+   <td style="text-align:right;"> 0.2396142 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> residential_sig </td>
+   <td style="text-align:right;"> 0.1201466 </td>
+   <td style="text-align:right;"> -0.1019100 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> residential_sig_dis </td>
+   <td style="text-align:right;"> -0.2504080 </td>
+   <td style="text-align:right;"> 0.0363113 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> retail_sig </td>
+   <td style="text-align:right;"> 0.1067757 </td>
+   <td style="text-align:right;"> -0.1163043 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> retail_sig_dis </td>
+   <td style="text-align:right;"> -0.2377061 </td>
+   <td style="text-align:right;"> 0.0360326 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> count_un </td>
+   <td style="text-align:right;"> 0.0524686 </td>
+   <td style="text-align:right;"> 0.0262507 </td>
+  </tr>
+</tbody>
+</table>
+
 
 The Eigenvalues are the amount of variance explained by each component, quantifying the importance of each component in the dataset. The first dimension explains the vast majority of the variance, with a sharp decrease thereafter. These results mean that we only need 1 dimension of overlap when evaluating our model and additional dimensions of evaluation will not be useful thereafter. A single dimensional view means having all the independent and dependent variables overlaid onto a single space provides the greatest insight, and any variations of such will not be useful. 
 
-```{r PCA analysis3, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -497,12 +592,14 @@ grid.draw(
     )
   )
 )
-
 ```
+
+<img src="FinalDraftMarkdown_files/figure-html/PCA analysis3-1.png" width="672" />
 
 The squared cosine value (Cos2) shows the quality of the representation of the variables on the factor map. The closer the value is to 1, the better the representation of the variable. What we notice particularly about these variables with the largest quality of representation is that they are statistical factor rather than a numeric value. Almost each independent variable with a ~0.75 value is either a KNN or significance value. The only exception being sum_pop (population density) and avg_pop (average population). 
 
-```{r PCA analysis4, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -512,13 +609,14 @@ grid.draw(
     )
   )
 )
-
-
 ```
+
+<img src="FinalDraftMarkdown_files/figure-html/PCA analysis4-1.png" width="672" />
 
 The PCA Variables graph shows the correlation of each variable in comparison to the first two dimensions. The arrows that represent each variable have varying directions and lengths, indicating mostly little correlation between the first dimension and second dimension. But the few variables that have relatively longer lengths have stronger relationships between both dimensions and can be used for the model. To better understand their importance we evaluate their Squared Cosine. This graph serves as the basis for choosing the several variables. Based on the result, the selected variables included 'waste_sig_dis, restaurant_sig_dis, residential_sig_dis, water_sig_dis, residential_nn, industrial_sig_dis, industrial_sig, restaurant_sig, industrial_nn, road_sig_dis, residential_sig, restaurant_sig, restaurant' as the 'shortened model' independent variables.
 
-```{r PCA analysis5, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 n_colors <- 100 
 mako_gradient <- viridis(n_colors, option = "mako")
 
@@ -533,9 +631,9 @@ grid.draw(
     )
   )
 )
-
-
 ```
+
+<img src="FinalDraftMarkdown_files/figure-html/PCA analysis5-1.png" width="672" />
 
 
 
@@ -548,7 +646,8 @@ Our model goal is to predict the relative likelihood of litter accumulation in a
 The Random Forest model is a machine learning algorithm that uses an ensemble of decision trees to predict the likelihood of an event occurring, the event being the presence of trash. The following random forest model utilizes the 'TidyModels' package. The data is then split to a 75-25 train-test set. We specify the randomforest to function as a 'regression' to specify the type of output to be evaluated, that being the 'count' of litter in each cell. The data is then divided into 10 folds for cross-validation to measure accuracy among each iteration. The model is then tuned using a grid search to find the optimal hyperparameters at each level of different tree (decision) size, ranging between 500 - 2000 decisions. The best-performing model iteration is selected based on the Root-mean-square deviation metric, measuring the accuracy of the forecasted results of each decision. The mean error depicted in the table by each forest (iteration) lies around 0.84 The first result, Preprocessor1_Model10, has the best result with the lowest RMSE (root mean square error) of 0.8442832 This model will be used for our final mixed-used approach.
 
 
-```{r rf tidymodels, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 set.seed(123)
 net_tt_nor <- st_drop_geometry(net_total_li) %>%
   dplyr::select(-c(uniqueID,cvID,city,country))
@@ -614,11 +713,85 @@ kbl(rf_results_df) %>%
   kable_styling(bootstrap_options = "striped", font_size = 12, full_width = FALSE, html_font = "Avenir")
 ```
 
+<table class="table table-striped" style="font-size: 12px; font-family: Avenir; width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:right;"> mtry </th>
+   <th style="text-align:right;"> trees </th>
+   <th style="text-align:right;"> min_n </th>
+   <th style="text-align:left;"> .metric </th>
+   <th style="text-align:left;"> .estimator </th>
+   <th style="text-align:right;"> mean </th>
+   <th style="text-align:right;"> n </th>
+   <th style="text-align:right;"> std_err </th>
+   <th style="text-align:left;"> .config </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 1000 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:left;"> rmse </td>
+   <td style="text-align:left;"> standard </td>
+   <td style="text-align:right;"> 0.8442832 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 0.0861736 </td>
+   <td style="text-align:left;"> Preprocessor1_Model10 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 1500 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:left;"> rmse </td>
+   <td style="text-align:left;"> standard </td>
+   <td style="text-align:right;"> 0.8452027 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 0.0853283 </td>
+   <td style="text-align:left;"> Preprocessor1_Model11 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 500 </td>
+   <td style="text-align:right;"> 12 </td>
+   <td style="text-align:left;"> rmse </td>
+   <td style="text-align:left;"> standard </td>
+   <td style="text-align:right;"> 0.8464892 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 0.0865570 </td>
+   <td style="text-align:left;"> Preprocessor1_Model05 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 1500 </td>
+   <td style="text-align:right;"> 9 </td>
+   <td style="text-align:left;"> rmse </td>
+   <td style="text-align:left;"> standard </td>
+   <td style="text-align:right;"> 0.8468462 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 0.0858254 </td>
+   <td style="text-align:left;"> Preprocessor1_Model03 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:left;"> rmse </td>
+   <td style="text-align:left;"> standard </td>
+   <td style="text-align:right;"> 0.8471370 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 0.0852306 </td>
+   <td style="text-align:left;"> Preprocessor1_Model12 </td>
+  </tr>
+</tbody>
+</table>
+
 ## Linear Model
 
 The linear regression model, also built from 'TidyModels', takes a similar approach to predicting the count of litter in each cell. The Linear Regression model is a statistical model that uses a linear relationship between the dependent and independent variables to predict the continuous value of litter being present. The model is trained using the same train-test split as the Random Forest using the 'lm' method, known as a linear method. Next, it is trained using the 'quasi' family to account for the overdispersion of the data. Then cross-validated using 60 folds to measure the accuracy. 
 
-```{r linear model, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 set.seed(223)
 train_control <- trainControl(method = "cv", number = 60)
 
@@ -640,7 +813,8 @@ From these two models, we decided to create an additional mixed model that utili
 
 The Random Forest and Linear models are depicted side-by-side. The final mixed model map, depicting into the 5 categories, narrows down where to focus resources in both a small enough area to a general scope yet large enough to generalize a search area that does not attempt to depict individual cells. Category 5 is classified as the highest risk area to develop litter. These areas serve as the most likely area to have higher litter concentration In contrast, category 1 shows areas of low-risk and are likely not or less affected by the adverse impacts of litter.
 
-```{r multi-vision model build, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 test_cb_rst <- st_drop_geometry(test_cbind) %>%
   dplyr::select(Prediction,Risk_Category)%>%
   rename(Pre_lr = Prediction,
@@ -668,7 +842,11 @@ grid.draw(
     )
   )
 )
+```
 
+<img src="FinalDraftMarkdown_files/figure-html/multi-vision model build-1.png" width="672" />
+
+```r
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -679,6 +857,8 @@ grid.draw(
 )
 ```
 
+<img src="FinalDraftMarkdown_files/figure-html/multi-vision model build-2.png" width="672" />
+
 # Comparative Model and Error Analysis
 
 To evaluate the performance of each of the three, we compared the residuals through a series of plots.
@@ -687,7 +867,8 @@ To evaluate the performance of each of the three, we compared the residuals thro
 
 We primarily conducted model comparison through our plotting of residuals. The following plots visualize the difference in residuals through the predicted and observed values for each of the three models. 
 
-```{r Predicted vs Observed Residuals, warning = FALSE, message = FALSE, cache = TRUE}
+
+```r
 library(grid)
 rf_test <- ts_bind %>% dplyr::select(count,Prediction)
 lr_rst <- predict(model,test_data)
@@ -723,7 +904,11 @@ grid.draw(
     )
   )
 )
+```
 
+<img src="FinalDraftMarkdown_files/figure-html/Predicted vs Observed Residuals-1.png" width="672" />
+
+```r
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -741,14 +926,16 @@ grid.draw(
 )
 ```
 
+<img src="FinalDraftMarkdown_files/figure-html/Predicted vs Observed Residuals-2.png" width="672" />
+
 The Random Forest scatterplot shows a somewhat weak relationship between the actual and predicted values, with an underestimation with some notable outliers. These residuals tell us the model can indicate lower-risk areas better than higher-risk areas, but this result is expected given the minimal amount of data available as input. This bias translates to the plots because we are using clusters of cleanup efforts as our datasets. Meanwhile, the Linear Regression residuals have a similar result but has slightly more uniformity in the results, which indicates mildly better performance when predicting places with higher actual values, though the points are less clustered to the line suggesting greater average error. In the mixed model, the residuals see a pattern resembling a combination of the two. This can be further explored through the following histograms.
 
 ## Histogram of Residuals
 
 The residual spread can be further explored through histograms. The Linear Model has more residuals that show over and underprediction of the actual values through the more horizontal spread, while the Random Forest is more likely to underpredict due to the more pointed negative skew. The mixed model on the other hand incorporates the more even spread of the linear regression and the greater accuracy of the random forest model, making it more ideal.
 
-```{r Histogram of Residuals, warning = FALSE, message = FALSE, cache = TRUE }
 
+```r
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -780,14 +967,16 @@ grid.draw(
     )
   )
 )
-
 ```
+
+<img src="FinalDraftMarkdown_files/figure-html/Histogram of Residuals-1.png" width="672" />
 
 ## Q-Q Plot
 
 The Q-Q (quantile to quantile) plot shows the distributions residuals of the model to a theoretical distribution. The closer the points are to the line, the more similar the dataset is to the theoretical distribution, indicating greater consistency. The data points are somewhat aligned with a mild curvature in the middle, indicating skewness in the data. However, the tail end of the points of slightly higher theoretical quantities far divert from the line of best fit. These outliers deviate at an exponential rate but only after 1.5 theoretical quantiles, with a more systemic deviation between 1 and 1.5 quantiles, and suggests that the tails of the residuals' distribution are heavier (have more extreme values) than would be expected under a normal distribution. Regardless, the results indicate that, despite the imperfections implied with the bias litter data, the model performs well relative to the circumstances and capabilities. 
 
-```{r Q-Q, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 grid.draw(
   grobTree(
     rectGrob(gp=gpar(fill="#ecf6ff", lwd=0, col = "#ecf6ff")),
@@ -805,11 +994,14 @@ grid.draw(
 )
 ```
 
+<img src="FinalDraftMarkdown_files/figure-html/Q-Q-1.png" width="672" />
+
 # Model Results
 
 Following the mixed model building of the test city Chennai, India, we applied the final mixed model to 11 other cities from the Urban Ocean program. The risk assessment results are shown below. Each city has its own unique characteristics and features that are evaluated with the same variables. The maps show the 5 risk levels, narrowing the area of focus for Urban Ocean's zero-waste sites, providing the opportunity for a more sustainable future. 
 
-```{r all risk maps mixed model, warning = FALSE, message = FALSE, cache = TRUE }
+
+```r
 risk_v_new <-function(model_data,litter_data,model,city){
   model_data$Risk_Category <- as.factor(model_data$Risk_Category)
   ggplot() +
@@ -850,8 +1042,9 @@ grid.draw(
     )
   )
 )
-
 ```
+
+<img src="FinalDraftMarkdown_files/figure-html/all risk maps mixed model-1.png" width="672" />
 
 # Web-Based Dashboard
 
