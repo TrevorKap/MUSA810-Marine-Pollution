@@ -397,6 +397,17 @@ test_cb_rst <- st_drop_geometry(test_cbind) %>%
 rst_total <- cbind(df_rf_rst,test_cb_rst)%>%
   rename(Pre_rf = Prediction,
          Risk_rf = Risk_Category)
+rst_total <- rst_total %>%
+  mutate(Prediction = 0.5*Pre_rf + 0.5*Pre_lr)
+rst_total <- st_drop_geometry(risk_level(rst_total,'kmeans'))%>%
+  dplyr::select(Risk_Category)
+
+net_total_new <- cbind(net_total,rst_total)
+net_total_new <-  net_total_new %>%
+  mutate(Risk_Category = 6 - Risk_Category)%>%
+  st_transform(4326)
+
+st_write(net_total_new, "/Users/mr.smile/Desktop/UPENN/Spring24/CPLN790/output_new.geojson", driver = "GeoJSON")
 ```
 
 ```{r}
